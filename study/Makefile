@@ -8,7 +8,7 @@ CLIENT_OBJS = $(patsubst srcs/%.cpp,objs/%.o,$(CLIENT_SRCS))
 
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -I./include
-RM = rm -f
+RM = rm -rf
 
 all: $(SERVER_NAME) $(CLIENT_NAME)
 
@@ -23,10 +23,10 @@ objs/%.o: srcs/%.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) objs
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(SERVER_NAME) $(CLIENT_NAME)
 
 re: fclean all
 
