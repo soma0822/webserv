@@ -6,7 +6,7 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/02 17:25:17 by soma              #+#    #+#             */
-/*   Updated: 2023/12/02 17:47:45 by soma             ###   ########.fr       */
+/*   Updated: 2023/12/02 18:36:10 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,66 @@ void	send_recv_loop(int soc) {
 			default:
 				// レディ有り
 				// ソケットレディ
-				if (FD_ISSET())
+				if (FD_ISSET(soc, &ready)) {
+					// 受信
+					if ((len = recv(soc, buf, sizeof(buf), 0)) == -1) {
+						// エラー
+						perror("recv");
+						end = 1;
+						break;
+					}
+
+					if (len == 0) {
+						// エンド・オブ・ファイル
+						(void) fprintf(stderr, "recv:EOF\n");
+						end = 1;
+						break;
+					}
+					// 文字列化・表示
+					buf[len] = '\0';
+					(void) fprintf(stderr, "[server]%s\n", buf);
+				}
+				// 標準入力レディ
+				if (FD_ISSET(0, &ready)) {
+					// 標準入力から１行読み込み
+					(void) fgets(buf, sizeof(buf), stdin);
+					if (feof(stdin)) {
+						end = 1;
+						break;
+					}
+					// 送信
+					if ((len = send(soc, buf, strlen(buf), 0)) == -1) {
+						// エラー
+						perror("send");
+						end = 1;
+						break;
+					}
+				}
+				break;
+		}
+		if (end) {
+			break;
 		}
 	}
+}
+
+int main(int argc, char *argv[]) {
+	int soc;
+	
+	// 引数にホスト名とポート番号が指定されているか？
+	if (argc <= 2) {
+		(void) fprintf(stderr, "client server-host port\n");
+		return (EX_USAGE);
+	}
+	
+	// サーバーソケットに接続
+	if ((soc = client_socket(argv[1], argv[2])) == -1) {
+		(void) fprintf(stderr, "client_socket():error\n");
+		return (EXIT_FAILURE);
+	}
+	// 送受信ループ
+	send_recv_loop(soc);
+	// ソケットクローズ
+	(void) close(soc);
+	return (EXIT_SUCCESS);
 }
