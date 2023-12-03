@@ -15,7 +15,7 @@ SIGNALTEST_SRCS = srcs/signaltest.cpp
 SIGNALTEST_OBJS = $(patsubst srcs/%.cpp,objs/%.o,$(SIGNALTEST_SRCS))
 
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -I./include -DUNIT_TEST
+CFLAGS = -Wall -Wextra -Werror -I./include -DUNIT_TEST -DUSE_SIGNAL
 RM = rm -rf
 
 all: $(SERVER_NAME) $(CLIENT_NAME) $(DAEMON_NAME) $(SIGNALTEST_NAME)
