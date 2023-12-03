@@ -6,14 +6,14 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 10:11:08 by soma              #+#    #+#             */
-/*   Updated: 2023/12/02 17:13:18 by soma             ###   ########.fr       */
+/*   Updated: 2023/12/03 15:16:54 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "include.hpp"
 
 // サーバーソケットの準備
-int		server_socket(const char *portnm) {
+int		server_socket_by_hostname(const char *hostnm, const char *portnm) {
 	char	nbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
 	struct	addrinfo hints, *res0;
 	int		soc, opt, errcode;
@@ -23,9 +23,10 @@ int		server_socket(const char *portnm) {
 	(void) memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
+	// ソケットがbind()を利用される予定であることを示す
 	hints.ai_flags = AI_PASSIVE;
 	// アドレス情報の決定
-	if ((errcode = getaddrinfo(NULL, portnm, &hints, &res0) != 0)) {
+	if ((errcode = getaddrinfo(hostnm, portnm, &hints, &res0) != 0)) {
 		(void) fprintf(stderr, "getaddrinfo():%s\n", gai_strerror(errcode));
 		return (-1);
 	}
@@ -37,7 +38,7 @@ int		server_socket(const char *portnm) {
 		freeaddrinfo(res0);
 		return(1);
 	}
-	(void) fprintf(stderr, "port=%s\n", sbuf);
+	(void) fprintf(stderr, "addr=%s\nport=%s\n", nbuf, sbuf);
 	// ソケットの生成
 	if ((soc = socket(res0->ai_family, res0->ai_socktype, res0->ai_protocol)) == 1) {
 		perror("socket");
@@ -128,6 +129,7 @@ void	send_recv_loop(int acc) {
 	
 	for (;;) {
 		// 受信
+		// 多重化するときはpoll()等を使う
 		if ((len = recv(acc, buf, sizeof(buf), 0)) == -1) {
 			// エラー
 			perror("recv");
@@ -160,13 +162,13 @@ int main(int args, char *argv[]) {
 	int soc;
 	
 	// 引数にポート番号が指定されているか？
-	if (args <= 1) {
-		(void) fprintf(stderr, "server port\n");
+	if (args <= 2) {
+		(void) fprintf(stderr, "server address port\n");
 		return (EXIT_FAILURE);
 	}
 	
 	// サーバーソケットの準備
-	if ((soc = server_socket(argv[1])) == -1) {
+	if ((soc = server_socket_by_hostname(argv[1], argv[2])) == -1) {
 		(void) fprintf(stderr, "server_socket(%s):error\n", argv[1]);
 		return (EXIT_FAILURE);
 	}
