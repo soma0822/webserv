@@ -6,14 +6,35 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 10:11:08 by soma              #+#    #+#             */
-/*   Updated: 2023/12/03 15:16:54 by soma             ###   ########.fr       */
+/*   Updated: 2023/12/04 17:41:29 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "include.hpp"
 
+// クローズする最大ディスクリプタ値
+#define	MAXFD	64
+// コマンドライン引数、環境変数のアドレス保持用
+int *argc_;
+char ***argv_;
+char ***envp_;
+
+// シグナルハンドラ
+void	sig_hangup_handler(int sig) {
+	(void) fprintf(stderr, "sig_hangup_handler(%d)\n", sig);
+	// stdin,stdout,stderr以外をクローズ
+	for (int i = 3; i < MAXFD; i++) {
+		(void) close(i);
+	}
+	// 自プロセスの上書き
+	if (execve((*argv_)[0], (*argv_), (*envp_)) == -1) {
+		perror("execve");
+		exit(1);
+	}
+}
+
 // サーバーソケットの準備
-int		server_socket_by_hostname(const char *hostnm, const char *portnm) {
+int		server_socket(const char *portnm) {
 	char	nbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
 	struct	addrinfo hints, *res0;
 	int		soc, opt, errcode;
@@ -26,7 +47,7 @@ int		server_socket_by_hostname(const char *hostnm, const char *portnm) {
 	// ソケットがbind()を利用される予定であることを示す
 	hints.ai_flags = AI_PASSIVE;
 	// アドレス情報の決定
-	if ((errcode = getaddrinfo(hostnm, portnm, &hints, &res0) != 0)) {
+	if ((errcode = getaddrinfo(NULL, portnm, &hints, &res0) != 0)) {
 		(void) fprintf(stderr, "getaddrinfo():%s\n", gai_strerror(errcode));
 		return (-1);
 	}
@@ -158,17 +179,26 @@ void	send_recv_loop(int acc) {
 	}
 }
 
-int main(int args, char *argv[]) {
+int main(int args, char *argv[], char *envp[]) {
 	int soc;
-	
+	struct sigaction	sa;
 	// 引数にポート番号が指定されているか？
-	if (args <= 2) {
+	if (args <= 1) {
 		(void) fprintf(stderr, "server address port\n");
 		return (EXIT_FAILURE);
 	}
+	argc_ = &args;
+	argv_ = &argv;
+	envp_ = &envp;
 	
+	// シグナルハンドラ設定
+	sigaction(SIGHUP, (struct sigaction *) NULL, &sa);
+	sa.sa_handler = sig_hangup_handler;
+	sa.sa_flags = SA_NODEFER;
+	sigaction(SIGHUP, &sa, (struct sigaction *) NULL);
+	fprintf(stderr, "sigaction():end\n");
 	// サーバーソケットの準備
-	if ((soc = server_socket_by_hostname(argv[1], argv[2])) == -1) {
+	if ((soc = server_socket(argv[1])) == -1) {
 		(void) fprintf(stderr, "server_socket(%s):error\n", argv[1]);
 		return (EXIT_FAILURE);
 	}

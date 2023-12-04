@@ -2,3 +2,5 @@ build
 *.o
 server
 client
+daemon
+signaltest
