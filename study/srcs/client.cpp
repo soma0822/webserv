@@ -6,17 +6,38 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/02 17:25:17 by soma              #+#    #+#             */
-/*   Updated: 2023/12/02 18:36:10 by soma             ###   ########.fr       */
+/*   Updated: 2023/12/05 14:04:44 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "include.hpp"
 
+// ブロッキングモードのセット
+int	set_block(int fd, int flag) {
+	int flags;
+
+	if ((flags = fcntl(fd, F_GETFL, 0)) == -1) {
+		perror("fcntl");
+		return (-1);
+	}
+	if (flag == 1) {
+		// ブロッキングモード
+		fcntl(fd, F_SETFL, flags & ~O_NONBLOCK);
+	} else if (flag == 0) {
+		// ノンブロッキングモード
+		fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+	}
+	return (0);
+}
+
 // サーバーソケットに接続
-int	client_socket(const char *hostnm, const char *portnm) {
+int	client_socket_with_timeout(const char *hostnm, const char *portnm, int timeout_sec) {
 	char nbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
 	struct addrinfo hints, *res0;
-	int soc, errcode;
+	struct timeval timeout;
+	int soc, errcode, width, val;
+	socklen_t len;
+	fd_set mask, write_mask, read_mask;
 
 	// アドレス情報のヒントをゼロクリア
 	(void) memset(&hints, 0, sizeof(hints));
@@ -43,15 +64,92 @@ int	client_socket(const char *hostnm, const char *portnm) {
 		freeaddrinfo(res0);
 		return (-1);
 	}
-	// コネクト
-	if (connect(soc, res0->ai_addr, res0->ai_addrlen) == -1) {
-		perror("connect");
-		(void) close(soc);
+	if (timeout_sec < 0) {
+		// タイムアウトなし
+		// コネクト
+		if (connect(soc, res0->ai_addr, res0->ai_addrlen) == -1) {
+			perror("connect");
+			(void) close(soc);
+			freeaddrinfo(res0);
+			return (-1);
+		}
 		freeaddrinfo(res0);
-		return (-1);
+		return (soc);
+	} else {
+		// タイムアウトあり
+		// ノンブロッキングモード
+		set_block(soc, 0);
+		if (connect(soc, res0->ai_addr, res0->ai_addrlen) == -1) {
+			if (errno != EINPROGRESS) {
+				// エラー
+				perror("connect");
+				(void) close(soc);
+				freeaddrinfo(res0);
+				return (-1);
+			}
+		} else {
+			// コネクト完了
+			set_block(soc, 1);
+			freeaddrinfo(res0);
+			return (soc);
+			// NOT REACHED
+		}
+		// コネクト結果まち
+		width = 0;
+		FD_ZERO(&mask);
+		FD_SET(soc, &mask);
+		width = soc + 1;
+		timeout.tv_sec = timeout_sec;
+		timeout.tv_usec = 0;
+		for (;;) {
+			write_mask = mask;
+			read_mask = mask;
+			switch (select(width, &read_mask, &write_mask, NULL, &timeout)) {
+			case -1:
+				if (errno != EINTR) {
+					// selectエラー
+					perror("select");
+					close(soc);
+					freeaddrinfo(res0);
+					return (-1);
+				}
+				break;
+			case 0:
+				// selectタイムアウト
+				(void) fprintf(stderr, "connect:timeout\n");
+				close(soc);
+				freeaddrinfo(res0);
+				return (-1);
+				break;
+			default:
+				// ソケットレディ
+				if (FD_ISSET(soc, &read_mask) || FD_ISSET(soc, &write_mask)) {
+					len = sizeof(len);
+					if (getsockopt(soc, SOL_SOCKET, SO_ERROR, &val, &len) != -1) {
+						if (val == 0) {
+							// connect成功
+							set_block(soc, 1);
+							freeaddrinfo(res0);
+							return (soc);
+						} else {
+							// エラー
+							fprintf(stderr, "getsockopt:%d:%s\n", val, strerror(val));
+							close(soc);
+							freeaddrinfo(res0);
+							return (-1);
+						}
+					} else {
+						// getsockoptエラー
+						perror("getsockopt");
+						close(soc);
+						freeaddrinfo(res0);
+						return (-1);
+					}
+				}
+				break;
+			}
+		}
 	}
-	freeaddrinfo(res0);
-	return (soc);
 }
 
 void	send_recv_loop(int soc) {
@@ -131,14 +229,14 @@ void	send_recv_loop(int soc) {
 int main(int argc, char *argv[]) {
 	int soc;
 	
-	// 引数にホスト名とポート番号が指定されているか？
-	if (argc <= 2) {
-		(void) fprintf(stderr, "client server-host port\n");
+	// 引数にホスト名とポート番号、タイムアウトが指定されているか？
+	if (argc <= 3) {
+		(void) fprintf(stderr, "client server-host port timeout-sec\n");
 		return (EX_USAGE);
 	}
 	
 	// サーバーソケットに接続
-	if ((soc = client_socket(argv[1], argv[2])) == -1) {
+	if ((soc = client_socket_with_timeout(argv[1], argv[2], atoi(argv[3]))) == -1) {
 		(void) fprintf(stderr, "client_socket():error\n");
 		return (EXIT_FAILURE);
 	}
