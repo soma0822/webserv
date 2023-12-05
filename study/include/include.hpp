@@ -6,7 +6,7 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 09:54:57 by soma              #+#    #+#             */
-/*   Updated: 2023/12/03 16:49:20 by soma             ###   ########.fr       */
+/*   Updated: 2023/12/05 16:14:57 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,6 @@
 # include <syslog.h>
 # include <unistd.h>
 
-void	send_recv_loop(int acc);
+int	send_recv(int acc, int child_no);
 
 #endif

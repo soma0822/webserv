@@ -6,7 +6,7 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 10:11:08 by soma              #+#    #+#             */
-/*   Updated: 2023/12/04 17:41:29 by soma             ###   ########.fr       */
+/*   Updated: 2023/12/05 16:14:34 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 // クローズする最大ディスクリプタ値
 #define	MAXFD	64
+// 最大同時処理数
+#define	MAX_CHILD	20
 // コマンドライン引数、環境変数のアドレス保持用
 int *argc_;
 char ***argv_;
@@ -96,27 +98,97 @@ int		server_socket(const char *portnm) {
 // アクセプトループ
 void	accept_loop(int soc) {
 	char	hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
+	int	child[MAX_CHILD];
+	struct timeval timeout;
 	struct	sockaddr_storage from;
-	int acc;
+	int acc, child_no, width, i, count, pos, ret;
 	socklen_t len;
-	
+	fd_set mask;
+
+	// child配列の初期化
+	for (int i = 0; i < MAX_CHILD; i++) {
+		child[i] = -1;
+	}
+	child_no = 0;
 	for (;;) {
-		len = (socklen_t) sizeof(from);
-		// 接続受付
-		if ((acc = accept(soc, (struct sockaddr *) &from, &len)) == -1) {
-			if (errno != EINTR) {
-				perror("accept");
+		// select()用のマスクの作成
+		FD_ZERO(&mask);
+		FD_SET(soc, &mask);
+		width = soc + 1;
+		count = 0;
+		for (i = 0; i < child_no ; i++) {
+			if (child[i] != -1) {
+				FD_SET(child[i], &mask);
+				if (child[i] + 1 > width) {
+					width = child[i] + 1;
+					count ++;
+				}
 			}
-		} else {
-			(void) getnameinfo((struct sockaddr *) &from, len,
-								hbuf, sizeof(hbuf),
-								sbuf, sizeof(sbuf),
-								NI_NUMERICHOST | NI_NUMERICSERV);
-			(void)fprintf(stderr, "accept:%s:%s\n", hbuf, sbuf);
-			// 送受信ループ
-			send_recv_loop(acc);
-			// アクセプトソケットクローズ
-			acc = 0;
+		}
+		fprintf(stderr, "<<child count:%d>>\n", count);
+		// select()用タイムアウト値のセット
+		timeout.tv_sec = 10;
+		timeout.tv_usec = 0;
+		switch (select(width, (fd_set *) &mask, NULL, NULL, &timeout)) {
+		case -1:
+			// エラー
+			perror("select");
+			break;
+		case 0:
+			// タイムアウト
+			break;
+		default :
+			// レディ有り
+			if (FD_ISSET(soc, &mask)) {
+				// サーバソケットレディ
+				len = (socklen_t) sizeof(from);
+				// 接続受付
+				if ((acc = accept(soc, (struct sockaddr *) &from, &len)) == -1) {
+					if (errno != EINTR) {
+						perror("accept");
+					}
+				} else {
+					getnameinfo((struct sockaddr *) &from, len, hbuf, sizeof(hbuf), sbuf, sizeof(sbuf), NI_NUMERICHOST | NI_NUMERICSERV);
+					fprintf(stderr, "accept:%s:%s\n", hbuf, sbuf);
+					// childの空きを検索
+					pos = -1;
+					for (i = 0; i < child_no; i++) {
+						if (child[i] == -1) {
+							pos = i;
+							break;
+						}
+					}
+					if (pos == -1) {
+						// 空きがない
+						if (child_no + 1 >= MAX_CHILD) {
+							// childniにこれ以上格納できない
+							fprintf(stderr, "child is full : cannot accept\n");
+							(void) close(acc);
+						} else {
+							child_no++;
+							pos = child_no - 1;
+						}
+					}
+					if (pos != -1) {
+						// childに格納
+						child[pos] = acc;
+					}
+				}
+			}
+			// アクセプトしたソケットがレディ
+			for (i = 0; i < child_no; i++) {
+				if (child[i] != -1) {
+					if (FD_ISSET(child[i], &mask)) {
+						//  送受信
+						if ((ret = send_recv(child[i], i)) == -1) {
+							// エラーまたは切断
+							(void) close(child[i]);
+							child[i] = -1;
+						}
+					}
+				}
+			}
+			break;
 		}
 	}
 }
@@ -144,29 +216,27 @@ size_t	mystrlcat(char *dst, const char *src, size_t size) {
 }
 
 // 送受信ループ
-void	send_recv_loop(int acc) {
+int	send_recv(int acc, int child_no) {
 	char	buf[512], *ptr;
 	ssize_t	len;
 	
-	for (;;) {
 		// 受信
-		// 多重化するときはpoll()等を使う
 		if ((len = recv(acc, buf, sizeof(buf), 0)) == -1) {
 			// エラー
 			perror("recv");
-			break;
+			return (-1);
 		}
 		if (len == 0) { 
 			// エンド・オブ・ファイル
-			(void) fprintf(stderr, "recv:EOF\n");
-			break;
+			(void) fprintf(stderr, "[child%d]recv:EOF\n", child_no);
+			return (-1);
 		}
 		// 文字列化・表示
 		buf[len] = '\0';
 		if ((ptr = strpbrk(buf, "\r\n")) != NULL) {
 			*ptr = '\0';
 		}
-		(void) fprintf(stderr, "[client]%s\n", buf);
+		(void) fprintf(stderr, "[child%d]%s\n", child_no, buf);
 		// 応答文字列作成
 		(void) mystrlcat(buf, ":OK\r\n", sizeof(buf));
 		len = (ssize_t) strlen(buf);
@@ -174,9 +244,9 @@ void	send_recv_loop(int acc) {
 		if ((len = send(acc, buf, (size_t) len, 0)) == -1) {
 			// エラー
 			perror("send");
-			break;
+			return (-1);
 		}	
-	}
+	return (0);
 }
 
 int main(int args, char *argv[], char *envp[]) {
