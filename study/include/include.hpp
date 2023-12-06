@@ -6,13 +6,14 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 09:54:57 by soma              #+#    #+#             */
-/*   Updated: 2023/12/03 16:49:20 by soma             ###   ########.fr       */
+/*   Updated: 2023/12/06 16:19:55 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef INCLUDE_HPP
 # define INCLUDE_HPP
 
+# include <sys/epoll.h>
 # include <sys/param.h>
 # include <sys/socket.h>
 # include <sys/types.h>

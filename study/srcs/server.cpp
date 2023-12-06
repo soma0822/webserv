@@ -6,7 +6,7 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 10:11:08 by soma              #+#    #+#             */
-/*   Updated: 2023/12/04 17:41:29 by soma             ###   ########.fr       */
+/*   Updated: 2023/12/06 16:50:58 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,32 +93,92 @@ int		server_socket(const char *portnm) {
 	return (soc);
 }
 
+// 最大同時処理数
+#define	MAX_CHILD	(20)
 // アクセプトループ
 void	accept_loop(int soc) {
 	char	hbuf[NI_MAXHOST], sbuf[NI_MAXSERV];
 	struct	sockaddr_storage from;
-	int acc;
+	int acc, count, i, epollfd, nfds, ret;
 	socklen_t len;
-	
+	struct epoll_event ev, events[MAX_CHILD];
+
+	if ((epollfd = epoll_create(MAX_CHILD + 1)) == -1) {
+		perror("epoll_create");
+		return;
+	}
+	// EPOLL用データの作成
+	ev.data.fd = soc;
+	ev.events = EPOLLIN;
+	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, soc, &ev) == -1) {
+		perror("epoll_ctl");
+		close(epollfd);
+		return;
+	}
+	count = 0;
 	for (;;) {
-		len = (socklen_t) sizeof(from);
-		// 接続受付
-		if ((acc = accept(soc, (struct sockaddr *) &from, &len)) == -1) {
-			if (errno != EINTR) {
-				perror("accept");
+		fprintf(stderr, "<<child count:%d>>\n", count);
+		switch ((nfds = epoll_wait(epollfd, events, MAX_CHILD+1, 10 * 1000))) {
+		case -1:
+			// エラー
+			perror("epoll_wait");
+			break;
+		case 0:
+			// タイムアウト
+			break;
+		default:
+			// ソケットがレディ
+			for (i = 0; i < nfds; i++) {
+				if (events[i].data.fd == soc) {
+					// サーバーソケットレディ
+					len = (socklen_t) sizeof(from);
+					// 接続受付
+					if ((acc = accept(soc, (struct sockaddr *)&from, &len)) == -1) {
+						if (errno != EINTR) {
+							perror("accept");
+						}
+					}else {
+						getnameinfo((struct sockaddr *) &from, len,
+									hbuf, sizeof(hbuf),
+									sbuf, sizeof(sbuf),
+									NI_NUMERICHOST | NI_NUMERICSERV);
+						fprintf(stderr, "accept:%s:%s\n", hbuf, sbuf);
+						// 空きがない
+						if (count + 1 > MAX_CHILD) {
+							// これ以上接続できない
+							fprintf(stderr, "cnnection is full : cannot accept\n");
+							(void) close(acc);
+						} else {
+							ev.data.fd = acc;
+							ev.events = EPOLLIN;
+							if (epoll_ctl(epollfd, EPOLL_CTL_ADD, acc, &ev) == -1) {
+								perror("epoll_ctl");
+								close(acc);
+								close(epfd);
+								return;
+							}
+							count++;
+						}
+					}	
+				} else {
+					// 送受信
+					if ((ret = send_recv(events[i].data.fd, events[i].data.fd)) == -1) {
+						// エラーまたは切断
+						if (epoll_ctl(epollfd, EPOLL_CTL_DEL, events[i].data.fd, &ev) == -1) {
+							perror("epoll_ctl");
+							close(events[i].data.fd);
+							close(epfd);
+							return ;
+						}
+						close(events[i].data.fd);
+						count--;
+					}
+				}
 			}
-		} else {
-			(void) getnameinfo((struct sockaddr *) &from, len,
-								hbuf, sizeof(hbuf),
-								sbuf, sizeof(sbuf),
-								NI_NUMERICHOST | NI_NUMERICSERV);
-			(void)fprintf(stderr, "accept:%s:%s\n", hbuf, sbuf);
-			// 送受信ループ
-			send_recv_loop(acc);
-			// アクセプトソケットクローズ
-			acc = 0;
+			break;
 		}
 	}
+	close(epollfd);
 }
 
 // サイズ指定文字列連結
