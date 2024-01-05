@@ -6,7 +6,7 @@
 /*   By: soma <soma@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 09:54:57 by soma              #+#    #+#             */
-/*   Updated: 2023/12/05 16:14:57 by soma             ###   ########.fr       */
+/*   Updated: 2024/01/05 17:48:33 by soma             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <sys/stat.h>
+#include <sys/event.h>
+#include <sys/time.h>
 
 # include <arpa/inet.h>
 # include <netinet/in.h>

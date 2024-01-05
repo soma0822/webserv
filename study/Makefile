@@ -2,6 +2,10 @@ SERVER_NAME = server
 SERVER_SRCS = srcs/server.cpp
 SERVER_OBJS = $(patsubst srcs/%.cpp,objs/%.o,$(SERVER_SRCS))
 
+SERVER_K_NAME = server_k
+SERVER_K_SRCS = srcs/server_kqueue.cpp
+SERVER_K_OBJS = $(patsubst srcs/%.cpp,objs/%.o,$(SERVER_K_SRCS))
+
 CLIENT_NAME = client
 CLIENT_SRCS = srcs/client.cpp
 CLIENT_OBJS = $(patsubst srcs/%.cpp,objs/%.o,$(CLIENT_SRCS))
@@ -18,10 +22,13 @@ CC = c++
 CFLAGS = -Wall -Wextra -Werror -I./include -DUNIT_TEST -DUSE_SIGNAL
 RM = rm -rf
 
-all: $(SERVER_NAME) $(CLIENT_NAME) $(DAEMON_NAME) $(SIGNALTEST_NAME)
+all: $(SERVER_NAME) $(SERVER_K_NAME) $(CLIENT_NAME) $(DAEMON_NAME) $(SIGNALTEST_NAME)
 
 $(SERVER_NAME): $(SERVER_OBJS)
 	$(CC) $(CFLAGS) -o $(SERVER_NAME) $(SERVER_OBJS)
+	
+$(SERVER_K_NAME): $(SERVER_K_OBJS)
+	$(CC) $(CFLAGS) -o $(SERVER_K_NAME) $(SERVER_K_OBJS)
 
 $(CLIENT_NAME): $(CLIENT_OBJS)
 	$(CC) $(CFLAGS) -o $(CLIENT_NAME) $(CLIENT_OBJS)
@@ -40,7 +47,7 @@ clean:
 	$(RM) objs
 
 fclean: clean
-	$(RM) $(SERVER_NAME) $(CLIENT_NAME) $(DAEMON_NAME) $(SIGNALTEST_NAME)
+	$(RM) $(SERVER_NAME) $(SERVER_K_NAME) $(CLIENT_NAME) $(DAEMON_NAME) $(SIGNALTEST_NAME)
 
 re: fclean all
 
