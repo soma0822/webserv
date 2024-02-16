@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
-project(example_project) # TODO Rename project
+project(webserv)
 
-set(PROGRAM example_test) # TODO Rename program
+set(PROGRAM webserv)
 set(GTEST_VERSION 1.12.1)
 
 include(FetchContent)
@@ -27,5 +27,5 @@ target_link_libraries(${PROGRAM}
 )
 target_include_directories(${PROGRAM}
         PRIVATE
-        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/src
 )
