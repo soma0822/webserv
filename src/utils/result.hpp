@@ -78,6 +78,8 @@ private:
   OkT value_;
   ErrT error_;
   bool has_value_;
+
+  Result() : value_(OkT()), error_(ErrT()), has_value_(false) {}
 };
 
 namespace details {
@@ -93,13 +95,6 @@ public:
 
   Value(const Value &other) : value_(other.value_) {}
 
-  Value &operator=(const Value &other) {
-    if (this == &other) {
-      return *this;
-    }
-    value_ = other.value_;
-  }
-
   ~Value() {}
 
   template <typename U, typename F> operator Result<U, F>() const {
@@ -108,6 +103,13 @@ public:
 
 private:
   T value_;
+
+  Value &operator=(const Value &other) {
+    if (this == &other) {
+      return *this;
+    }
+    value_ = other.value_;
+  }
 };
 
 template <typename E> class Error {
@@ -116,23 +118,21 @@ public:
 
   Error(const Error &other) : error_(other.error_) {}
 
-  Error &operator=(const Error &other) {
-    if (this == &other) {
-      return *this;
-    }
-    error_ = other.error_;
-  }
-
   ~Error() {}
 
   template <typename U, typename F> operator Result<U, F>() const {
     return Result<U, F>(U(), error_, /* has_value= */ false);
   }
 
-  E error() const { return error_; }
-
 private:
   E error_;
+
+  Error &operator=(const Error &other) {
+    if (this == &other) {
+      return *this;
+    }
+    error_ = other.error_;
+  }
 };
 
 } // namespace details
