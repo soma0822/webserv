@@ -82,6 +82,51 @@ private:
   Result() : value_(OkT()), error_(ErrT()), has_value_(false) {}
 };
 
+// OkTがvoidの場合の特殊化
+template <typename ErrT> class Result<void, ErrT> {
+public:
+  Result(ErrT error, bool has_value) : error_(error), has_value_(has_value) {}
+
+  Result(const Result &other)
+      : error_(other.error_), has_value_(other.has_value_) {}
+
+  Result &operator=(const Result &other) {
+    if (this == &other) {
+      return *this;
+    }
+    error_ = other.error_;
+    has_value_ = other.has_value_;
+    return *this;
+  }
+
+  ~Result() {}
+
+  bool operator<(const Result &other) const { return error_ < other.error_; }
+
+  // Errに対してUnwrapを呼ぶと例外を投げる
+  void Unwrap() const {
+    if (!IsOk()) {
+      throw std::runtime_error("Result does not have a value");
+    }
+  }
+
+  // Okに対してUnwrapErrを呼ぶと例外を投げる
+  ErrT UnwrapErr() const {
+    if (!IsErr()) {
+      throw std::runtime_error("Result does not have an error");
+    }
+    return error_;
+  }
+
+  bool IsOk() const { return has_value_; }
+
+  bool IsErr() const { return !has_value_; }
+
+private:
+  ErrT error_;
+  bool has_value_;
+};
+
 namespace details {
 
 /*
@@ -112,6 +157,27 @@ private:
   }
 };
 
+// OkTがvoidの場合の特殊化
+template <> class Value<void> {
+public:
+  Value() {}
+
+  Value(const Value &other) {}
+
+  Value &operator=(const Value &other) { return *this; }
+
+  ~Value() {}
+
+  template <typename U, typename F> operator Result<U, F>() const {
+    return Result<U, F>(U(), F(), /* has_value= */ true);
+  }
+
+  // OkTがvoidの場合の特殊化
+  template <typename F> operator Result<void, F>() const {
+    return Result<void, F>(F(), /* has_value= */ true);
+  }
+};
+
 template <typename E> class Error {
 public:
   explicit Error(E error) : error_(error) {}
@@ -122,6 +188,11 @@ public:
 
   template <typename U, typename F> operator Result<U, F>() const {
     return Result<U, F>(U(), error_, /* has_value= */ false);
+  }
+
+  // OkTがvoidの場合の特殊化
+  template <typename F> operator Result<void, F>() const {
+    return Result<void, F>(error_, /* has_value= */ false);
   }
 
 private:
@@ -146,6 +217,8 @@ private:
 template <typename T> details::Value<T> Ok(T value) {
   return details::Value<T>(value);
 }
+
+details::Value<void> Ok() { return details::Value<void>(); }
 
 template <typename E> details::Error<E> Err(E error) {
   return details::Error<E>(error);
