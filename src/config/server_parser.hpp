@@ -21,6 +21,8 @@ private:
   static bool parse_index(const std::vector<std::string> &, ServerContext &);
   static bool parse_ip(const std::vector<std::string> &, ServerContext &);
   static bool parse_root(const std::vector<std::string> &, ServerContext &);
+  static bool parse_server_name(const std::vector<std::string> &, ServerContext &);
+  static bool parse_port(const std::vector<std::string> &, ServerContext &);
   static void remove_semicolon(std::string &);
 };
 

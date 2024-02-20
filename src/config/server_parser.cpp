@@ -2,7 +2,6 @@
 
 ServerContext ServerParser::parse_server(std::ifstream &inf){
   ServerContext server;
-  std::map<std::string, LocationContext> location;
   std::map<std::string, parseFunction> func;
   std::string line;
 
@@ -22,9 +21,7 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
         std::cerr << "Syntax error: " << line << std::endl;
         throw std::exception();
       }
-      LocationContext loc = LocationParser::parse_location();
-      if (location.find(value[1]) == location.end())
-        location[value[1]] = loc;
+      server.add_location(value[1], LocationParser::parse_location());
     }
     //それ以外
     std::map<std::string, parseFunction>::iterator it = func.find(key);
@@ -32,7 +29,13 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
       std::cerr << "Valid server content: " << key << std::endl;
       throw std::exception();
     }
-    (*it->second)(value, server);
+    if ((*it->second)(value, server) == false){  //対応した関数に適切な要素数と異なっている
+      std::cerr << "Valid server content: ";
+      for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
+        std::cerr << *it;
+      std::cerr << std::endl;
+      throw std::exception();
+    }
   }
   return server;
 }
@@ -67,6 +70,19 @@ bool ServerParser::parse_root(const std::vector<std::string> &value, ServerConte
   if (value.size() != 1)
     return false;
   server.set_root(value[0]);
+  return true;
+}
+bool parse_server_name(const std::vector<std::string> &value, ServerContext &server){
+  if (value.size() == 0)
+    return false;
+  for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
+    server.add_server_name(*it);
+  return true;
+}
+bool parse_port(const std::vector<std::string> &value, ServerContext &server){
+  if (value.size() != 1)
+    return false;
+  server.add_port(value[0]);
   return true;
 }
 
