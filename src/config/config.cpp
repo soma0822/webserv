@@ -17,6 +17,12 @@ Config &Config::operator=(const Config& other){
 	return *this;
 }
 
+// パーススタート
 void Config::parse_file(){
-	server_ = ConfigParser::parse(file_);
+  std::ifstream inf(file_);
+  if (!inf.is_open()){
+    std::cerr << "file could not open." << std::endl;
+    throw std::exception();
+  }
+	server_ = ConfigParser::parse(inf);
 }
