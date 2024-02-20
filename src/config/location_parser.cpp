@@ -45,8 +45,18 @@ void LocationParser::init_parse_func(std::map<std::string, parseFunction> &func)
 }
 
 
-bool LocationParser::parse_auto_index(const std::vector<std::string> &value, LocationContext &location);
-bool LocationParser::parse_limit_client_body(const std::vector<std::string> &value, LocationContext &location);
+bool LocationParser::parse_auto_index(const std::vector<std::string> &value, LocationContext &location){
+  if (value.size() != 1)
+    return false;
+  location.set_can_auto_index(value[0] == "on" ? true : false);
+  return true;
+}
+bool LocationParser::parse_limit_client_body(const std::vector<std::string> &value, LocationContext &location){
+  if (value.size() != 1)
+    return false;
+  location.set_limit_client_body(std::stoi(value[0]));
+  return true;
+}
 bool LocationParser::parse_return(const std::vector<std::string> &value, LocationContext &location){
   if (value.size() != 1)
 }
