@@ -13,11 +13,10 @@ std::vector<ServerContext> ConfigParser::parse(std::ifstream &inf){
       continue ;
     ss >> value;
     if (key + value == "server{" && ss.get() == std::char_traits<char>::eof())
-      ServerParser::parse_server(line);
+      server.push_back(ServerParser::parse_server(inf));
     else{
       std::cerr << "Syntax Error: not server" << std::endl;
       throw std::exception();
     }
-
 	}
 }

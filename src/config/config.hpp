@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <vector>
-
 #include "server_context.hpp"
 #include "config_parser.hpp"
 
