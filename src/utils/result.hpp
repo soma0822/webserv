@@ -96,6 +96,7 @@ public:
     }
     error_ = other.error_;
     has_value_ = other.has_value_;
+    return *this;
   }
 
   ~Result() {}
