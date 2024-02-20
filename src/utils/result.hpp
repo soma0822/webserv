@@ -6,6 +6,24 @@
 /*
  * RustライクなResultクラス
  * 値とエラーのどちらか一方を持つ
+ *
+ * Usage:
+ * Result<std::string, std::string> ProcessSomething(bool is_success) {
+ *    if (is_success) {
+ *      return Ok("Success");
+ *    }
+ *    return Err("Failure");
+ *  }
+ *
+ *  int main() {
+ *    Result<std::string, std::string> result = ProcessSomething(true);
+ *    if (result.IsOk()) {
+ *      std::cout << "Result: " << result.Unwrap() << std::endl;
+ *    } else {
+ *      std::cout << "Error: " << result.UnwrapErr() << std::endl;
+ *    }
+ *    return 0;
+ *  }
  */
 
 template <typename OkT, typename ErrT> class Result {
