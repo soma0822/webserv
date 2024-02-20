@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.26)
 project(webserv)
 
+<<<<<<< HEAD
 set(PROGRAM webserv)
+=======
+set(PROGRAM webserv_test)
+>>>>>>> origin
 set(GTEST_VERSION 1.12.1)
 
 include(FetchContent)
@@ -25,7 +29,8 @@ add_executable(${PROGRAM}
 target_link_libraries(${PROGRAM}
         gtest_main
 )
-target_include_directories(${PROGRAM}
-        PRIVATE
-        ${PROJECT_SOURCE_DIR}/src
-)
+file(GLOB_RECURSE INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src/*")
+foreach(DIR ${INCLUDE_DIRS})
+    get_filename_component(DIR_PATH ${DIR} PATH)
+    target_include_directories(${PROGRAM} PRIVATE ${DIR_PATH})
+endforeach()
