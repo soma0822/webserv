@@ -15,13 +15,14 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
     ss >> key;
     while (ss >> tmp)
       value.push_back(tmp);
-    
+    if (key == "}" && value.size() == 0)
+      break ;
     if (key == "location"){  // locationの時
       if (value.size() != 3 || value[2] != "{"){
         std::cerr << "Syntax error: " << line << std::endl;
         throw std::exception();
       }
-      server.add_location(value[1], LocationParser::parse_location());
+      server.add_location(value[1], LocationParser::parse_location(inf));
     }
     //それ以外
     std::map<std::string, parseFunction>::iterator it = func.find(key);
@@ -41,10 +42,12 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
 }
 
 void ServerParser::init_parse_func(std::map<std::string, parseFunction> &func){
-	func["ip"] = &ServerParser::parse_ip;
+	func["host"] = &ServerParser::parse_ip;
 	func["error_page"] = &ServerParser::parse_error_page;
 	func["index"] = &ServerParser::parse_index;
 	func["root"] = &ServerParser::parse_root;
+	func["server_name"] = &ServerParser::parse_server_name;
+	func["listen"] = &ServerParser::parse_port;
 }
 
 // パーサー

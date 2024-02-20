@@ -35,7 +35,7 @@ private:
   std::vector<std::string> port_;
   std::vector<std::string> server_name_;
   std::map<std::string, std::string>	error_page_;
-  
+  std::map<std::string, LocationContext> location_;
 };
 
 #endif
