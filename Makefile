@@ -1,7 +1,7 @@
 BASE_DIR := $(CURDIR)
 BUILD_DIR := build
 BUILD_PATH := $(BASE_DIR)/$(BUILD_DIR)
-TEST_EXE_PATH := $(BUILD_PATH)/example_test # Rename test executable
+TEST_EXE_PATH := $(BUILD_PATH)/webserv_test
 
 # Default target
 .PHONY: all
