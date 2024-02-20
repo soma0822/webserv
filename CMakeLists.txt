@@ -1,11 +1,7 @@
 cmake_minimum_required(VERSION 3.26)
 project(webserv)
 
-<<<<<<< HEAD
-set(PROGRAM webserv)
-=======
 set(PROGRAM webserv_test)
->>>>>>> origin
 set(GTEST_VERSION 1.12.1)
 
 include(FetchContent)
