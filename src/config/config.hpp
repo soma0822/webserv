@@ -6,7 +6,7 @@
 #include "server_context.hpp"
 #include "config_parser.hpp"
 
-#define DEFAULTCONF "default.conf"
+#define DEFAULTCONF "conf/default.conf"
 
 class Config{
 public : Config();

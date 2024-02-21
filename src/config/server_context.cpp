@@ -13,6 +13,7 @@ ServerContext &ServerContext::operator=(const ServerContext &other){
   ip_ = other.ip_;
   server_name_ = other.server_name_;
   location_ = other.location_;
+  return *this;
 }
 
 //ゲッター

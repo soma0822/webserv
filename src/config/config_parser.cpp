@@ -19,4 +19,5 @@ std::vector<ServerContext> ConfigParser::parse(std::ifstream &inf){
       throw std::exception();
     }
 	}
+  return server;
 }

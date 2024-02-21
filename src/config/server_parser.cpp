@@ -19,24 +19,24 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
     if (key == "}" && value.size() == 0)
       break ;
     if (key == "location"){  // locationの時
-      if (value.size() != 3 || value[2] != "{"){
+      if (value.size() != 2 || value[1] != "{"){
         std::cerr << "Syntax error: " << line << std::endl;
         throw std::exception();
       }
       server.add_location(value[1], LocationParser::parse_location(inf));
-    }
-    //それ以外
-    std::map<std::string, parseFunction>::iterator it = func.find(key);
-    if (it == func.end()){  //対応した関数が見つからない
-      std::cerr << "Valid server content: " << key << std::endl;
-      throw std::exception();
-    }
-    if ((*it->second)(value, server) == false){  //対応した関数に適切な要素数と異なっている
-      std::cerr << "Valid server content: ";
-      for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
-        std::cerr << *it;
-      std::cerr << std::endl;
-      throw std::exception();
+    } else {  //それ以外
+      std::map<std::string, parseFunction>::iterator it = func.find(key);
+      if (it == func.end()){  //対応した関数が見つからない
+        std::cerr << "Invalid server key: " << key << std::endl;
+        throw std::exception();
+      }
+      if ((*it->second)(value, server) == false){  //対応した関数に適切な要素数と異なっている
+        std::cerr << "Valid server value: ";
+        for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
+          std::cerr << *it << " ";
+        std::cerr << std::endl;
+        throw std::exception();
+      }
     }
   }
   return server;
@@ -76,14 +76,14 @@ bool ServerParser::parse_root(const std::vector<std::string> &value, ServerConte
   server.set_root(value[0]);
   return true;
 }
-bool parse_server_name(const std::vector<std::string> &value, ServerContext &server){
+bool ServerParser::parse_server_name(const std::vector<std::string> &value, ServerContext &server){
   if (value.size() == 0)
     return false;
   for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
     server.add_server_name(*it);
   return true;
 }
-bool parse_port(const std::vector<std::string> &value, ServerContext &server){
+bool ServerParser::parse_port(const std::vector<std::string> &value, ServerContext &server){
   if (value.size() != 1)
     return false;
   server.add_port(value[0]);

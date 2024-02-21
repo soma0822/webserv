@@ -35,15 +35,15 @@ LocationContext LocationParser::parse_location(std::ifstream &inf){
 }
 
 void LocationParser::init_parse_func(std::map<std::string, parseFunction> &func){
-  func["auto_index"] = &LocationParser::parse_auto_index;
+  func["autoindex"] = &LocationParser::parse_auto_index;
   func["limit_client_body"] = &LocationParser::parse_limit_client_body;
   func["return"] = &LocationParser::parse_return;
   func["alias"] = &LocationParser::parse_alias;
   func["root"] = &LocationParser::parse_root;
   func["index"] = &LocationParser::parse_index;
   func["cgi_path"] = &LocationParser::parse_cgi_path;
-  func["cgi_extention"] = &LocationParser::parse_cgi_extention;
-  func["allow_method"] = &LocationParser::parse_allow_method;
+  func["cgi_ext"] = &LocationParser::parse_cgi_extention;
+  func["allow_methods"] = &LocationParser::parse_allow_method;
   func["error_page"] = &LocationParser::parse_error_page;
 }
 
