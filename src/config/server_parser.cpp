@@ -9,6 +9,7 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
   while (std::getline(inf, line)){
     if (line.empty())
       continue;
+    remove_semicolon(line);
     std::stringstream ss(line);
     std::string key, tmp;
     std::vector<std::string> value;

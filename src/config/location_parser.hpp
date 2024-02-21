@@ -15,6 +15,7 @@ public:
 
 private:
   static void init_parse_func(std::map<std::string, parseFunction> &);
+  static void remove_semicolon(std::string &line);
   static bool parse_auto_index(const std::vector<std::string> &, LocationContext &);
   static bool parse_limit_client_body(const std::vector<std::string> &, LocationContext &);
   static bool parse_return(const std::vector<std::string> &, LocationContext &);
