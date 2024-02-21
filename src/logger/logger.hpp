@@ -4,6 +4,21 @@
 #include <fstream>
 #include <iostream>
 
+/*
+ * Loggerクラス
+ *
+ * SetHandler()でログ出力先を設定し、Info(), Warn(), Error()でログを出力する
+ * SetHandler()を呼び出さない場合は標準出力にログを出力する
+ *
+ * Usage:
+ *  if (log_to_file) {
+ *    Logger::SetHandler(new FileStreamWrapper("log.txt"));
+ *  }
+ *  Logger::Info() << "Info message" << std::endl;
+ *  Logger::Warn() << "Warn message" << std::endl;
+ *  Logger::Error() << "Error message" << std::endl;
+ */
+
 class ILoggerHandler;
 
 class Logger {
