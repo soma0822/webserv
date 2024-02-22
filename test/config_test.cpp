@@ -109,3 +109,8 @@ TEST(ConfigTest, ErrorPageError){
   Config config("conf/error_page_error.conf");
   ASSERT_THROW(config.parse_file(), std::exception);
 }
+
+TEST(ConfigTest, InvalidKeyTest){
+  Config config("conf/invalid_key.conf");
+  ASSERT_THROW(config.parse_file(), std::exception);
+}
