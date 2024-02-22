@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "config.hpp"
+#include <climits>
 
 TEST(ConfigTest, DefaultPath) {
   Config config;
