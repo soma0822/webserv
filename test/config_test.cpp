@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "config.hpp"
-#include <climits>
 
 TEST(ConfigTest, DefaultPath) {
   Config config;
@@ -43,7 +42,7 @@ TEST(ConfigTest, DefaultPath) {
   it2++;
   ASSERT_EQ(it2->first, "/cgi-bin");
   ASSERT_EQ(it2->second.get_can_auto_index(), false);
-  ASSERT_EQ(it2->second.get_limit_client_body(), INT_MAX);
+  ASSERT_EQ(it2->second.get_limit_client_body(), 2147483647);
   ASSERT_EQ(it2->second.get_return(), "");
   ASSERT_EQ(it2->second.get_alias(), "");
   ASSERT_EQ(it2->second.get_root(), "./");
@@ -65,7 +64,7 @@ TEST(ConfigTest, DefaultPath) {
   it2++;
   ASSERT_EQ(it2->first, "/red");
   ASSERT_EQ(it2->second.get_can_auto_index(), true);
-  ASSERT_EQ(it2->second.get_limit_client_body(), INT_MAX);
+  ASSERT_EQ(it2->second.get_limit_client_body(), 2147483647);
   ASSERT_EQ(it2->second.get_return(), "/tours");
   ASSERT_EQ(it2->second.get_alias(), "");
   ASSERT_EQ(it2->second.get_root(), "");
@@ -82,7 +81,7 @@ TEST(ConfigTest, DefaultPath) {
   it2++;
   ASSERT_EQ(it2->first, "/tours");
   ASSERT_EQ(it2->second.get_can_auto_index(), false);
-  ASSERT_EQ(it2->second.get_limit_client_body(), INT_MAX);
+  ASSERT_EQ(it2->second.get_limit_client_body(), 2147483647);
   ASSERT_EQ(it2->second.get_return(), "");
   ASSERT_EQ(it2->second.get_alias(), "");
   ASSERT_EQ(it2->second.get_root(), "");
