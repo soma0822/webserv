@@ -1,11 +1,11 @@
 #ifndef WEBSERV_SRC_LOGGER_LOGGER_HPP
 #define WEBSERV_SRC_LOGGER_LOGGER_HPP
 
+#include "null_stream.hpp"
 #include <fstream>
 #include <iostream>
 
 class ILoggerHandler;
-class NullBuffer;
 
 enum LogLevel {
   kInfo = 0,
@@ -24,6 +24,7 @@ enum LogLevel {
  *  if (log_to_file) {
  *    Logger::SetHandler(new FileStreamWrapper("log.txt"));
  *  }
+ *  Logger::SetLogLevel(kWarn);
  *  Logger::Info() << "Info message" << std::endl;
  *  Logger::Warn() << "Warn message" << std::endl;
  *  Logger::Error() << "Error message" << std::endl;
@@ -41,20 +42,16 @@ public:
 
 private:
   static ILoggerHandler *handler_;
-  static NullBuffer null_buffer_;
-  static std::ostream null_stream_;
   static LogLevel log_level_;
 
-  // 直接インスタンス化できないようにする
+  // コンストラクタ, デストラクタ, コピーコンストラクタ,
+  // コピー代入演算子はprivateにする
   Logger();
+  Logger(const Logger &other);
+  Logger &operator=(const Logger &other);
   ~Logger();
 
   static Logger &GetInstance();
-};
-
-class NullBuffer : public std::streambuf {
-public:
-  int overflow(int c);
 };
 
 /*
