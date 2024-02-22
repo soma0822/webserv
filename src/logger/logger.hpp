@@ -29,7 +29,6 @@ public:
   static std::ostream &Debug();
 
   static void SetHandler(ILoggerHandler *handler);
-  static ILoggerHandler *GetHandler();
 
 private:
   static ILoggerHandler *handler_;

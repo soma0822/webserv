@@ -1,5 +1,5 @@
 #include "logger.hpp"
-#include <fstream>
+#include <sstream>
 
 /*
  * Loggerクラス
@@ -8,35 +8,32 @@
 ILoggerHandler *Logger::handler_ = NULL;
 
 std::ostream &Logger::Info() {
-  return Logger::GetInstance().GetHandler()->GetStream() << "[INFO] ";
+  return Logger::GetInstance().handler_->GetStream() << "[INFO] ";
 }
 
 std::ostream &Logger::Warn() {
-  return Logger::GetInstance().GetHandler()->GetStream() << "[WARN] ";
+  return Logger::GetInstance().handler_->GetStream() << "[WARN] ";
 }
 
 std::ostream &Logger::Error() {
-  return Logger::GetInstance().GetHandler()->GetStream() << "[ERROR] ";
+  return Logger::GetInstance().handler_->GetStream() << "[ERROR] ";
 }
 
 std::ostream &Logger::Debug() {
-  return Logger::GetInstance().GetHandler()->GetStream() << "[DEBUG] ";
+  return Logger::GetInstance().handler_->GetStream() << "[DEBUG] ";
 }
 
 void Logger::SetHandler(ILoggerHandler *handler) {
-  ILoggerHandler *old_handler = Logger::GetInstance().GetHandler();
-  if (old_handler) {
-    delete old_handler;
-  }
+  Logger::GetInstance(); // handler_が初期化される
+  delete Logger::handler_;
   Logger::handler_ = handler;
 }
 
-ILoggerHandler *Logger::GetHandler() { return Logger::handler_; }
-
 Logger::Logger() { Logger::handler_ = new StdoutStreamWrapper(); }
 
-Logger::~Logger() {}
+Logger::~Logger() { delete Logger::handler_; }
 
+// GetInstance()の初回呼び出しではコンストラクタが呼ばれるため、handler_が初期化される
 Logger &Logger::GetInstance() {
   static Logger instance;
   return instance;
@@ -67,7 +64,4 @@ FileStreamWrapper::FileStreamWrapper(const std::string &filename)
 
 FileStreamWrapper::~FileStreamWrapper() { ostream_.close(); }
 
-std::ostream &FileStreamWrapper::GetStream() {
-  std::cout << "FileStreamWrapper::GetStream" << std::endl;
-  return ostream_;
-}
+std::ostream &FileStreamWrapper::GetStream() { return ostream_; }
