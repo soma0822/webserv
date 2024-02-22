@@ -5,11 +5,10 @@
 #include <streambuf>
 
 namespace null_stream {
-extern std::ostream null_stream;
-
 class NullStream : public std::streambuf, public std::ostream {
 public:
   NullStream();
+
 protected:
   int overflow(int c);
 };
