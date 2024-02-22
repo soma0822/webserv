@@ -90,6 +90,8 @@ bool LocationParser::parse_cgi_path(const std::vector<std::string> &value, Locat
   if (value.size() == 0)
     return false;
   for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++){
+    if (is_path(*it) == false)
+      return false;
     location.add_cgi_path(*it);
   }
   return true;

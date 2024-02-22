@@ -23,6 +23,10 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
         std::cerr << "Syntax error: " << line << std::endl;
         throw std::exception();
       }
+      if (is_path(value[0]) == false){
+        std::cerr << "Invalid location path: " << value[0] << std::endl;
+        throw std::exception();
+      }
       server.add_location(value[1], LocationParser::parse_location(inf));
     } else {  //それ以外
       std::map<std::string, parseFunction>::iterator it = func.find(key);
