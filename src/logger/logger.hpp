@@ -4,6 +4,16 @@
 #include <fstream>
 #include <iostream>
 
+class ILoggerHandler;
+class NullBuffer;
+
+enum LogLevel {
+  kInfo = 0,
+  kWarn = 1,
+  kError = 2,
+  kDebug = 3,
+};
+
 /*
  * Loggerクラス
  *
@@ -19,8 +29,6 @@
  *  Logger::Error() << "Error message" << std::endl;
  */
 
-class ILoggerHandler;
-
 class Logger {
 public:
   static std::ostream &Info();
@@ -29,9 +37,13 @@ public:
   static std::ostream &Debug();
 
   static void SetHandler(ILoggerHandler *handler);
+  static void SetLogLevel(LogLevel level);
 
 private:
   static ILoggerHandler *handler_;
+  static NullBuffer null_buffer_;
+  static std::ostream null_stream_;
+  static LogLevel log_level_;
 
   // 直接インスタンス化できないようにする
   Logger();

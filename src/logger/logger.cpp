@@ -6,20 +6,35 @@
  */
 
 ILoggerHandler *Logger::handler_ = NULL;
+NullBuffer Logger::null_buffer_;
+std::ostream Logger::null_stream_(&Logger::null_buffer_);
+LogLevel Logger::log_level_ = kInfo;
 
 std::ostream &Logger::Info() {
+  if (Logger::log_level_ > kInfo) {
+    return Logger::null_stream_;
+  }
   return Logger::GetInstance().handler_->GetStream() << "[INFO] ";
 }
 
 std::ostream &Logger::Warn() {
+  if (Logger::log_level_ > kWarn) {
+    return Logger::null_stream_;
+  }
   return Logger::GetInstance().handler_->GetStream() << "[WARN] ";
 }
 
 std::ostream &Logger::Error() {
+  if (Logger::log_level_ > kError) {
+    return Logger::null_stream_;
+  }
   return Logger::GetInstance().handler_->GetStream() << "[ERROR] ";
 }
 
 std::ostream &Logger::Debug() {
+  if (Logger::log_level_ > kDebug) {
+    return Logger::null_stream_;
+  }
   return Logger::GetInstance().handler_->GetStream() << "[DEBUG] ";
 }
 
@@ -28,6 +43,8 @@ void Logger::SetHandler(ILoggerHandler *handler) {
   delete Logger::handler_;
   Logger::handler_ = handler;
 }
+
+void Logger::SetLogLevel(LogLevel level) { Logger::log_level_ = level; }
 
 Logger::Logger() { Logger::handler_ = new StdoutStreamWrapper(); }
 
