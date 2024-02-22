@@ -99,3 +99,13 @@ TEST(ConfigTest, DefaultPath) {
   it2++;
   ASSERT_EQ(it2, config.get_server()[0].get_location().end());
 }
+
+TEST(ConfigTest, PortError){
+  Config config("conf/port_error.conf");
+  ASSERT_THROW(config.parse_file(), std::exception);
+}
+
+TEST(ConfigTest, ErrorPageError){
+  Config config("conf/error_page_error.conf");
+  ASSERT_THROW(config.parse_file(), std::exception);
+}
