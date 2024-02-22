@@ -104,17 +104,46 @@ std::ostream& operator<<(std::ostream& os, LocationContext& obj){
 	for (std::map<std::string, bool>::const_iterator it = allow_method.begin(); it != allow_method.end(); ++it) {
 		os << (it->second ? it->first + " " : "");
 	}
-	os << "\ncgiPath:";
-	for (std::vector<std::string>::const_iterator it = obj.get_cgi_path
+	os << "\ncgiPath: ";
+	for (std::vector<std::string>::const_iterator it = obj.get_cgi_path().begin(); it != obj.get_cgi_path().end(); it++){
+    os << *it << " ";
 	}
-	os << "\ncgiExtention:";
-	for (unsigned long long i = 0; i < obj.getCgiExtention().size(); i++){
-		os << " ";
-		os << obj.getCgiExtention()[i];
+	os << "\ncgiExtention: ";
+	for (std::vector<std::string>::const_iterator it = obj.get_cgi_extention().begin(); it != obj.get_cgi_extention().end(); it++){
+    os << *it << " ";
+  }
+	os << "\nautoindex: " << (obj.get_can_auto_index() == true ? "on" : "off");
+	os << "\nreturn: " << (!obj.get_return().empty() ? obj.get_return() : "no set");
+	os << "\nalias: " << (!obj.get_alias().empty() ? obj.get_alias() : "no set");
+	os << "\nlimit client body: " << obj.get_limit_client_body();
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const LocationContext& obj){
+	os << "index: ";
+  for (std::vector<std::string>::const_iterator it = obj.get_index().begin(); it != obj.get_index().end(); it++){
+    os << *it << " ";
+  }
+	os << "\nerror page: ";
+	for (std::map<std::string, std::string>::const_iterator it = obj.get_error_page().begin(); it != obj.get_error_page().end(); it++){
+		os << it->first << "[" << it->second << "]" << "    ";
 	}
-	os << "\nautoindex: " << (obj.getCanAutoIndex() == true ? "on" : "off");
-	os << "\nreturn: " << (!obj.getReturn().empty() ? obj.getReturn() : "no set");
-	os << "\nalias: " << (!obj.getAlias().empty() ? obj.getAlias() : "no set");
-	os << "\nlimit client body: " << obj.getLimitClientBody();
+	os << "\nroot: "<< obj.get_root();
+	const std::map<std::string, bool> allow_method = obj.get_allow_method();
+	for (std::map<std::string, bool>::const_iterator it = allow_method.begin(); it != allow_method.end(); ++it) {
+		os << (it->second ? it->first + " " : "");
+	}
+	os << "\ncgiPath: ";
+	for (std::vector<std::string>::const_iterator it = obj.get_cgi_path().begin(); it != obj.get_cgi_path().end(); it++){
+    os << *it << " ";
+	}
+	os << "\ncgiExtention: ";
+	for (std::vector<std::string>::const_iterator it = obj.get_cgi_extention().begin(); it != obj.get_cgi_extention().end(); it++){
+    os << *it << " ";
+  }
+	os << "\nautoindex: " << (obj.get_can_auto_index() == true ? "on" : "off");
+	os << "\nreturn: " << (!obj.get_return().empty() ? obj.get_return() : "no set");
+	os << "\nalias: " << (!obj.get_alias().empty() ? obj.get_alias() : "no set");
+	os << "\nlimit client body: " << obj.get_limit_client_body();
 	return os;
 }

@@ -45,4 +45,7 @@ private:
   std::map<std::string, bool> allow_method_;
   std::map<std::string, std::string> error_page_;
 };
+
+std::ostream& operator<<(std::ostream& os, LocationContext& obj);
+std::ostream& operator<<(std::ostream& os, const LocationContext& obj);
 #endif
