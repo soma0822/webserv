@@ -111,9 +111,13 @@ bool LocationParser::parse_allow_method(const std::vector<std::string> &value, L
   return true;
 }
 bool LocationParser::parse_error_page(const std::vector<std::string> &value, LocationContext &location){
-  if (value.size() != 2)
+  if (value.size() < 2)
     return false;
-  location.add_errorPage(value[0], value[1]);
+  for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end() - 1; it++){
+    if (is_num(*it) == false)
+      return false;
+    location.add_error_page(*it, *(value.end() - 1));
+  }
   return true;
 }
 

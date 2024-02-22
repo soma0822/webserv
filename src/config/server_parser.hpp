@@ -9,8 +9,9 @@
 #include "server_context.hpp"
 #include "location_context.hpp"
 #include "location_parser.hpp"
+#include "aparser.hpp"
 
-class ServerParser{
+class ServerParser: public AParser{
 public:
   typedef bool  (*parseFunction)(const std::vector<std::string> &, ServerContext &);
   static ServerContext parse_server(std::ifstream &);

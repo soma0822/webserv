@@ -7,8 +7,9 @@
 #include <string>
 #include <map>
 #include "location_context.hpp"
+#include "aparser.hpp"
 
-class LocationParser{
+class LocationParser: public AParser{
 public:
   typedef bool  (*parseFunction)(const std::vector<std::string> &, LocationContext &);
   static LocationContext parse_location(std::ifstream &);

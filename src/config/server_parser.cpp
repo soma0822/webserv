@@ -31,7 +31,7 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
         throw std::exception();
       }
       if ((*it->second)(value, server) == false){  //対応した関数に適切な要素数と異なっている
-        std::cerr << "Valid server value: ";
+        std::cerr << "Invalid server value: ";
         for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
           std::cerr << *it << " ";
         std::cerr << std::endl;
@@ -53,9 +53,13 @@ void ServerParser::init_parse_func(std::map<std::string, parseFunction> &func){
 
 // パーサー
 bool ServerParser::parse_error_page(const std::vector<std::string> &value, ServerContext &server){
-  if (value.size() != 2)
+  if (value.size() < 2)
     return false;
-  server.add_error_page(value[0], value[1]);
+  for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end() - 1; it++){
+    if (is_num(*it) == false)
+      return false;
+    server.add_error_page(*it, *(value.end() - 1));
+  }
   return true;
 }
 bool ServerParser::parse_index(const std::vector<std::string> &value, ServerContext &server){
