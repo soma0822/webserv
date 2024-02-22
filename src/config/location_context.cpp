@@ -88,3 +88,33 @@ void LocationContext::add_errorPage(const std::string &key, const std::string &v
   if (it == error_page_.end())
     error_page_[key] = value;
 }
+
+// 出力
+std::ostream& operator<<(std::ostream& os, LocationContext& obj){
+	os << "index: ";
+  for (std::vector<std::string>::const_iterator it = obj.get_index().begin(); it != obj.get_index().end(); it++){
+    os << *it << " ";
+  }
+	os << "\nerror page: ";
+	for (std::map<std::string, std::string>::const_iterator it = obj.get_error_page().begin(); it != obj.get_error_page().end(); it++){
+		os << it->first << "[" << it->second << "]" << "    ";
+	}
+	os << "\nroot: "<< obj.get_root();
+	const std::map<std::string, bool> allow_method = obj.get_allow_method();
+	for (std::map<std::string, bool>::const_iterator it = allow_method.begin(); it != allow_method.end(); ++it) {
+		os << (it->second ? it->first + " " : "");
+	}
+	os << "\ncgiPath:";
+	for (std::vector<std::string>::const_iterator it = obj.get_cgi_path
+	}
+	os << "\ncgiExtention:";
+	for (unsigned long long i = 0; i < obj.getCgiExtention().size(); i++){
+		os << " ";
+		os << obj.getCgiExtention()[i];
+	}
+	os << "\nautoindex: " << (obj.getCanAutoIndex() == true ? "on" : "off");
+	os << "\nreturn: " << (!obj.getReturn().empty() ? obj.getReturn() : "no set");
+	os << "\nalias: " << (!obj.getAlias().empty() ? obj.getAlias() : "no set");
+	os << "\nlimit client body: " << obj.getLimitClientBody();
+	return os;
+}

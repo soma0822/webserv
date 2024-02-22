@@ -6,6 +6,9 @@
 #include <vector>
 #include "location_context.hpp"
 
+#define LOCATION "\033[1;32m"
+#define SERVER "\033[1;33m"
+
 class ServerContext{
 public:
   ServerContext();
@@ -37,5 +40,8 @@ private:
   std::map<std::string, std::string>	error_page_;
   std::map<std::string, LocationContext> location_;
 };
+
+std::ostream &operator<<(std::ostream &os, ServerContext &obj);
+std::ostream &operator<<(std::ostream &os, const ServerContext &obj);
 
 #endif

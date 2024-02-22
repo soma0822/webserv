@@ -66,3 +66,36 @@ void ServerContext::add_location(const std::string &key, const LocationContext &
   if (it == location_.end())
     location_[key] = value;
 }
+
+std::ostream& operator<<(std::ostream& os, ServerContext& obj){
+  os << SERVER;
+  std::vector<std::string> tmp = obj.get_port();
+  os << "port: ";
+  for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++){
+    os << *it << " ";
+  }
+  tmp = obj.get_server_name();
+  os << "\nserver_name: ";
+  for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++){
+    os << *it << " ";
+  }
+  tmp = obj.get_index();
+  os << "\nindex: ";
+  for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++){
+    os << *it << " ";
+  }
+	os << "\nerror page: ";
+	for (std::map<std::string, std::string>::const_iterator it = obj.get_error_page().begin(); it != obj.get_error_page().end(); it++){
+		os << it->first << "[" << it->second << "]" << "    ";
+	}
+	os << "\nroot: "<< obj.get_root();
+	// os << "\nport: " << obj.getPort();
+	os << "\nip: " << obj.get_ip();
+	for (std::map<std::string, LocationContext>::const_iterator it = obj.get_location().begin(); it != obj.get_location().end(); it++){
+		os << LOCATION << "\nLocation: ";
+		os << it->first << "\n";
+		os << it->second << "\n";
+	}
+	return os;
+}
+std::ostream &operator<<(std::ostream &os, const ServerContext &obj);
