@@ -92,7 +92,7 @@ bool ServerParser::parse_server_name(const std::vector<std::string> &value, Serv
   return true;
 }
 bool ServerParser::parse_port(const std::vector<std::string> &value, ServerContext &server){
-  if (value.size() != 1)
+  if (value.size() != 1 || is_num(value[0]) == false)
     return false;
   server.add_port(value[0]);
   return true;
