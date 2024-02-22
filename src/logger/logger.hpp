@@ -41,6 +41,7 @@ public:
   static void SetLogLevel(LogLevel level);
 
 private:
+  static null_stream::NullStream null_stream_;
   static ILoggerHandler *handler_;
   static LogLevel log_level_;
 
@@ -89,6 +90,7 @@ public:
 
 private:
   std::ofstream ostream_;
+  null_stream::NullStream null_stream_;
 };
 
 #endif // WEBSERV_SRC_LOGGER_LOGGER_HPP

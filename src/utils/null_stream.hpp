@@ -7,8 +7,10 @@
 namespace null_stream {
 extern std::ostream null_stream;
 
-class NullBuffer : public std::streambuf {
+class NullStream : public std::streambuf, public std::ostream {
 public:
+  NullStream();
+protected:
   int overflow(int c);
 };
 } // namespace null_stream

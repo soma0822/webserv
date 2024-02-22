@@ -1,6 +1,5 @@
 #include "null_stream.hpp"
 
-static null_stream::NullBuffer null_buffer_;
-std::ostream null_stream::null_stream(&null_buffer_);
+null_stream::NullStream::NullStream() : std::ostream(this) {}
 
-int null_stream::NullBuffer::overflow(int c) { return c; }
+int null_stream::NullStream::overflow(int c) { return c; }
