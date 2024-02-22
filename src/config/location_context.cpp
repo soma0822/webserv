@@ -83,7 +83,7 @@ void LocationContext::add_cgi_extention(const std::string &cgi_extention){
 void LocationContext::add_allow_method(const std::string &key){
   allow_method_[key] = true;
 }
-void LocationContext::add_errorPage(const std::string &key, const std::string &value){
+void LocationContext::add_error_page(const std::string &key, const std::string &value){
   std::map<std::string, std::string>::iterator it = error_page_.find(key);
   if (it == error_page_.end())
     error_page_[key] = value;

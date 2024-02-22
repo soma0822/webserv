@@ -31,7 +31,7 @@ public:
   void add_cgi_path(const std::string &);
   void add_cgi_extention(const std::string &);
   void add_allow_method(const std::string &);
-  void add_errorPage(const std::string &, const std::string &);
+  void add_error_page(const std::string &, const std::string &);
 
 private:
   bool can_auto_index_;
