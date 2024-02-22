@@ -40,6 +40,11 @@ private:
   static Logger &GetInstance();
 };
 
+class NullBuffer : public std::streambuf {
+public:
+  int overflow(int c);
+};
+
 /*
  * ostream wrapper
  */

@@ -40,6 +40,12 @@ Logger &Logger::GetInstance() {
 }
 
 /*
+ * NullBufferクラス
+ */
+
+int NullBuffer::overflow(int c) { return c; }
+
+/*
  * ILoggerHandlerクラス
  */
 
