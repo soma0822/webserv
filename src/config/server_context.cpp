@@ -75,26 +75,38 @@ std::ostream& operator<<(std::ostream& os, ServerContext& obj){
   os << SERVER;
   std::vector<std::string> tmp = obj.get_port();
   os << "port: ";
-  for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++){
-    os << *it << " ";
+  if (tmp.size() == 0)
+    os << "no set";
+  else {
+    for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
+      os << *it << " ";
   }
   tmp = obj.get_server_name();
   os << "\nserver_name: ";
-  for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++){
-    os << *it << " ";
+  if (tmp.size() == 0)
+    os << "no set";
+  else {
+    for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
+      os << *it << " ";
   }
   tmp = obj.get_index();
   os << "\nindex: ";
-  for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++){
-    os << *it << " ";
+  if (tmp.size() == 0)
+    os << "no set";
+  else {
+    for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
+      os << *it << " ";
   }
 	os << "\nerror page: ";
-	for (std::map<std::string, std::string>::const_iterator it = obj.get_error_page().begin(); it != obj.get_error_page().end(); it++){
-		os << it->first << "[" << it->second << "]" << "    ";
-	}
-	os << "\nroot: "<< obj.get_root();
+  if (obj.get_error_page().size() == 0)
+    os << "no set";
+  else {
+    for (std::map<std::string, std::string>::const_iterator it = obj.get_error_page().begin(); it != obj.get_error_page().end(); it++)
+      os << it->first << "[" << it->second << "]" << "    ";
+  }
+	os << "\nroot: "<< (obj.get_root().empty() ? "no set" : obj.get_root());
 	// os << "\nport: " << obj.getPort();
-	os << "\nip: " << obj.get_ip();
+	os << "\nip: " << (obj.get_ip().empty() ? "no set" : obj.get_ip());
 	for (std::map<std::string, LocationContext>::const_iterator it = obj.get_location().begin(); it != obj.get_location().end(); it++){
 		os << LOCATION << "\nLocation: ";
 		os << it->first << "\n";
@@ -106,31 +118,47 @@ std::ostream& operator<<(std::ostream& os, ServerContext& obj){
 
 std::ostream& operator<<(std::ostream& os, const ServerContext& obj){
   os << SERVER;
+  std::vector<std::string> tmp = obj.get_port();
   os << "port: ";
-  for (std::vector<std::string>::const_iterator it = obj.get_port().begin(); it != obj.get_port().end(); it++){
-    os << *it << " ";
+  if (tmp.size() == 0)
+    os << "no set";
+  else {
+    for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
+      os << *it << " ";
   }
+  tmp = obj.get_server_name();
   os << "\nserver_name: ";
-  for (std::vector<std::string>::const_iterator it = obj.get_server_name().begin(); it != obj.get_server_name().end(); it++){
-    os << *it << " ";
+  if (tmp.size() == 0)
+    os << "no set";
+  else {
+    for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
+      os << *it << " ";
   }
+  tmp = obj.get_index();
   os << "\nindex: ";
-  for (std::vector<std::string>::const_iterator it = obj.get_index().begin(); it != obj.get_index().end(); it++){
-    os << *it << " ";
+  if (tmp.size() == 0)
+    os << "no set";
+  else {
+    for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
+      os << *it << " ";
   }
 	os << "\nerror page: ";
-	for (std::map<std::string, std::string>::const_iterator it = obj.get_error_page().begin(); it != obj.get_error_page().end(); it++){
-		os << it->first << "[" << it->second << "]" << "    ";
-	}
-	os << "\nroot: "<< obj.get_root();
+  if (obj.get_error_page().size() == 0)
+    os << "no set";
+  else {
+    for (std::map<std::string, std::string>::const_iterator it = obj.get_error_page().begin(); it != obj.get_error_page().end(); it++)
+      os << it->first << "[" << it->second << "]" << "    ";
+  }
+	os << "\nroot: "<< (obj.get_root().empty() ? "no set" : obj.get_root());
 	// os << "\nport: " << obj.getPort();
-	os << "\nip: " << obj.get_ip();
+	os << "\nip: " << (obj.get_ip().empty() ? "no set" : obj.get_ip());
 	for (std::map<std::string, LocationContext>::const_iterator it = obj.get_location().begin(); it != obj.get_location().end(); it++){
 		os << LOCATION << "\nLocation: ";
-		os << it->first;
-    os << " {\n";
+		os << it->first << "\n";
 		os << it->second << "\n";
     os << "}\n";
 	}
 	return os;
 }
+
+

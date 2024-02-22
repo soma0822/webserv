@@ -121,25 +121,38 @@ std::ostream& operator<<(std::ostream& os, LocationContext& obj){
 
 std::ostream& operator<<(std::ostream& os, const LocationContext& obj){
 	os << "index: ";
-  for (std::vector<std::string>::const_iterator it = obj.get_index().begin(); it != obj.get_index().end(); it++){
-    os << *it << " ";
+  if (obj.get_index().size() == 0)
+    os << "no set";
+  else {
+    for (std::vector<std::string>::const_iterator it = obj.get_index().begin(); it != obj.get_index().end(); it++)
+      os << *it << " ";
   }
 	os << "\nerror page: ";
-	for (std::map<std::string, std::string>::const_iterator it = obj.get_error_page().begin(); it != obj.get_error_page().end(); it++){
-		os << it->first << "[" << it->second << "]" << "    ";
-	}
-	os << "\nroot: "<< obj.get_root();
+  if (obj.get_error_page().size() == 0)
+    os << "no set";
+  else {
+    for (std::map<std::string, std::string>::const_iterator it = obj.get_error_page().begin(); it != obj.get_error_page().end(); it++)
+      os << it->first << "[" << it->second << "]" << "    ";
+  }
+	os << "\nroot: "<< (obj.get_root().empty() ? "no set" : obj.get_root());
+  os << "\nallow method: ";
 	const std::map<std::string, bool> allow_method = obj.get_allow_method();
 	for (std::map<std::string, bool>::const_iterator it = allow_method.begin(); it != allow_method.end(); ++it) {
 		os << (it->second ? it->first + " " : "");
 	}
 	os << "\ncgiPath: ";
-	for (std::vector<std::string>::const_iterator it = obj.get_cgi_path().begin(); it != obj.get_cgi_path().end(); it++){
-    os << *it << " ";
-	}
+  if (obj.get_cgi_path().size() == 0)
+    os << "no set";
+  else {
+    for (std::vector<std::string>::const_iterator it = obj.get_cgi_path().begin(); it != obj.get_cgi_path().end(); it++)
+      os << *it << " ";
+  }
 	os << "\ncgiExtention: ";
-	for (std::vector<std::string>::const_iterator it = obj.get_cgi_extention().begin(); it != obj.get_cgi_extention().end(); it++){
-    os << *it << " ";
+  if (obj.get_cgi_extention().size() == 0)
+    os << "no set";
+  else {
+    for (std::vector<std::string>::const_iterator it = obj.get_cgi_extention().begin(); it != obj.get_cgi_extention().end(); it++)
+      os << *it << " ";
   }
 	os << "\nautoindex: " << (obj.get_can_auto_index() == true ? "on" : "off");
 	os << "\nreturn: " << (!obj.get_return().empty() ? obj.get_return() : "no set");
