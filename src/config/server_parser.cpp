@@ -27,7 +27,7 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
         std::cerr << "Invalid location path: " << value[0] << std::endl;
         throw std::exception();
       }
-      server.add_location(value[1], LocationParser::parse_location(inf));
+      server.add_location(value[0], LocationParser::parse_location(inf));
     } else {  //それ以外
       std::map<std::string, parseFunction>::iterator it = func.find(key);
       if (it == func.end()){  //対応した関数が見つからない

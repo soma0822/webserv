@@ -11,7 +11,11 @@ ServerContext &ServerContext::operator=(const ServerContext &other){
     return *this;
   }
   ip_ = other.ip_;
+  root_ = other.root_;
+  index_ = other.index_;
+  port_ = other.port_;
   server_name_ = other.server_name_;
+  error_page_ = other.error_page_;
   location_ = other.location_;
   return *this;
 }
@@ -102,19 +106,16 @@ std::ostream& operator<<(std::ostream& os, ServerContext& obj){
 
 std::ostream& operator<<(std::ostream& os, const ServerContext& obj){
   os << SERVER;
-  std::vector<std::string> tmp = obj.get_port();
   os << "port: ";
-  for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++){
+  for (std::vector<std::string>::const_iterator it = obj.get_port().begin(); it != obj.get_port().end(); it++){
     os << *it << " ";
   }
-  tmp = obj.get_server_name();
   os << "\nserver_name: ";
-  for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++){
+  for (std::vector<std::string>::const_iterator it = obj.get_server_name().begin(); it != obj.get_server_name().end(); it++){
     os << *it << " ";
   }
-  tmp = obj.get_index();
   os << "\nindex: ";
-  for (std::vector<std::string>::const_iterator it = tmp.begin(); it != tmp.end(); it++){
+  for (std::vector<std::string>::const_iterator it = obj.get_index().begin(); it != obj.get_index().end(); it++){
     os << *it << " ";
   }
 	os << "\nerror page: ";
