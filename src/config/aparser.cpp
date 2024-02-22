@@ -15,3 +15,18 @@ bool AParser::is_path(const std::string &str){
   }
   return true;
 }
+
+int AParser::strtoi(std::string const &str){
+    long long ret = 0;
+
+    for (unsigned long i = 0; i < str.length(); i++){
+        if (str[i] >= '0' && str[i] <= '9'){
+            if (ret > INT_MAX / 10 ||(ret == INT_MAX / 10 && str[i] > INT_MAX % 10))
+                throw std::exception();
+            ret = ret * 10 + (str[i] - '0');
+        } else {
+            throw std::exception();
+        }
+    }
+    return ret;
+}

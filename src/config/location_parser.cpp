@@ -57,7 +57,7 @@ bool LocationParser::parse_auto_index(const std::vector<std::string> &value, Loc
 bool LocationParser::parse_limit_client_body(const std::vector<std::string> &value, LocationContext &location){
   if (value.size() != 1)
     return false;
-  location.set_limit_client_body(std::stoi(value[0]));
+  location.set_limit_client_body(strtoi(value[0]));
   return true;
 }
 bool LocationParser::parse_return(const std::vector<std::string> &value, LocationContext &location){
