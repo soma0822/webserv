@@ -6,7 +6,7 @@
 #include "server_context.hpp"
 #include "config_parser.hpp"
 
-#define DEFAULTCONF "conf/default.conf"
+#define DEFAULTCONF "../../conf/default.conf"
 
 class Config{
 public : Config();
@@ -15,10 +15,14 @@ public : Config();
   ~Config();
   Config &operator=(const Config &other);
   void parse_file();
+  const std::vector<ServerContext> &get_server() const;
 
 private:
   std::string file_;
   std::vector<ServerContext> server_;
 };
+
+std::ostream &operator<<(std::ostream &os, Config &config);
+std::ostream &operator<<(std::ostream &os, const Config &config);
 
 #endif
