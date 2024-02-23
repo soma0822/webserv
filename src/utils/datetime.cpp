@@ -2,7 +2,7 @@
 
 namespace datetime {
 std::string GetDatetimeString() {
-  time_t t = std::time(NULL);
+  time_t t = time(NULL);
   struct tm *local = std::localtime(&t);
 
   char buf[20];
