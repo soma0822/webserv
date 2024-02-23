@@ -49,9 +49,12 @@ null_stream::NullStream Logger::null_stream_;
 // コピー代入演算子はprivateにする
 Logger::Logger() { Logger::handler_ = new StdoutStreamWrapper(); }
 
-Logger::Logger(const Logger &other) {}
+Logger::Logger(const Logger &other) { (void)other; }
 
-Logger &Logger::operator=(const Logger &other) { return *this; }
+Logger &Logger::operator=(const Logger &other) {
+  (void)other;
+  return *this;
+}
 
 Logger::~Logger() { delete Logger::handler_; }
 
