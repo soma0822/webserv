@@ -1,7 +1,8 @@
+#include "logger.hpp"
+
 #include <sstream>
 
 #include "datetime.hpp"
-#include "logger.hpp"
 
 /*
  * Loggerクラス
@@ -36,7 +37,7 @@ std::ostream &Logger::Debug() {
 }
 
 void Logger::SetHandler(ILoggerHandler *handler) {
-  Logger::GetInstance(); // handler_が初期化される
+  Logger::GetInstance();  // handler_が初期化される
   delete Logger::handler_;
   Logger::handler_ = handler;
 }

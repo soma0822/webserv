@@ -6,12 +6,12 @@
 
 namespace null_stream {
 class NullStream : public std::streambuf, public std::ostream {
-public:
+ public:
   NullStream();
 
-protected:
+ protected:
   int overflow(int c);
 };
-} // namespace null_stream
+}  // namespace null_stream
 
-#endif // WEVSERV_SRC_UTILS_NULL_STREAM_HPP_
+#endif  // WEVSERV_SRC_UTILS_NULL_STREAM_HPP_

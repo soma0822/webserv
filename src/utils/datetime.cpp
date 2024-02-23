@@ -9,4 +9,4 @@ std::string GetDatetimeString() {
   strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%S", local);
   return std::string(buf);
 }
-} // namespace datetime
+}  // namespace datetime

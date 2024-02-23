@@ -2,4 +2,4 @@
 
 namespace datetime {
 std::string GetDatetimeString();
-} // namespace datetime
+}  // namespace datetime
