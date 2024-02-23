@@ -35,10 +35,10 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
         throw std::invalid_argument("Invalid server key: " + key);
       }
       if ((*it->second)(value, server) == false){  //対応した関数に適切な要素数と異なっている
-        std::string error = "Invalid server value: ";
+        std::string error = "Invalid server value:";
         for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
-          error += *it + " ";
-        throw std::invalid_argument("Invalid server value: " + error);
+          error += " " + *it;
+        throw std::invalid_argument(error);
       }
     }
   }
