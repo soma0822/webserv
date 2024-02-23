@@ -23,11 +23,11 @@ LocationContext LocationParser::parse_location(std::ifstream &inf){
       throw std::invalid_argument("Invalid location key: " + key);
     }
     if ((*it->second)(value, location) == false){  //対応した関数に適切な要素数と異なっている
-      std::string error = "Invalid location value: ";
+      std::string error = "Invalid location value:";
       for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++){
-        error += *it + " ";
+        error += " " + *it;
       }
-      throw std::invalid_argument("Invalid location value: " + error);
+      throw std::invalid_argument(error);
     }
   }
   return location; 
