@@ -84,11 +84,13 @@ public:
 class FileStreamWrapper : public ILoggerHandler {
 public:
   FileStreamWrapper(const std::string &filename);
+  FileStreamWrapper();
   ~FileStreamWrapper();
 
   std::ostream &GetStream();
 
 private:
+  static const std::string kDefaultLogDir;
   std::ofstream ostream_;
   null_stream::NullStream null_stream_;
 };

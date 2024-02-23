@@ -1,5 +1,7 @@
-#include "logger.hpp"
 #include <sstream>
+
+#include "datetime.hpp"
+#include "logger.hpp"
 
 /*
  * Loggerクラス
@@ -87,6 +89,10 @@ std::ostream &StdoutStreamWrapper::GetStream() { return std::cout; }
 FileStreamWrapper::FileStreamWrapper(const std::string &filename)
     : ostream_(filename) {}
 
+FileStreamWrapper::FileStreamWrapper() {
+  ostream_.open(kDefaultLogDir + datetime::GetDatetimeString() + ".log");
+}
+
 FileStreamWrapper::~FileStreamWrapper() { ostream_.close(); }
 
 std::ostream &FileStreamWrapper::GetStream() {
@@ -95,3 +101,5 @@ std::ostream &FileStreamWrapper::GetStream() {
   }
   return ostream_;
 }
+
+const std::string FileStreamWrapper::kDefaultLogDir = "log/";
