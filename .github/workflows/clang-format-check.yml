@@ -14,5 +14,5 @@ jobs:
 
       - name: Check format
         run: |
-          find . -name './src/*.cpp' -o -name './include/*.hpp' | xargs clang-format -i
+          find ./src -name "*.cpp" -o -name "*.hpp" | xargs clang-format -i
           git diff --exit-code
