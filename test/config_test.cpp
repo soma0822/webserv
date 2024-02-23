@@ -3,7 +3,7 @@
 #include "config.hpp"
 
 TEST(ConfigTest, DefaultPath) {
-  Config config;
+  Config config("test/conf_test/default.conf");
   config.parse_file();
   ASSERT_EQ(config.get_server().size(), 1);
   ASSERT_EQ(config.get_server()[0].get_ip(), "127.0.0.1");
@@ -101,16 +101,16 @@ TEST(ConfigTest, DefaultPath) {
 }
 
 TEST(ConfigTest, PortError){
-  Config config("conf/port_error.conf");
+  Config config("test/conf_test/port_error.conf");
   ASSERT_THROW(config.parse_file(), std::exception);
 }
 
 TEST(ConfigTest, ErrorPageError){
-  Config config("conf/error_page_error.conf");
+  Config config("test/conf_test/error_page_error.conf");
   ASSERT_THROW(config.parse_file(), std::exception);
 }
 
 TEST(ConfigTest, InvalidKeyTest){
-  Config config("conf/invalid_key.conf");
+  Config config("test/conf_test/invalid_key.conf");
   ASSERT_THROW(config.parse_file(), std::exception);
 }
