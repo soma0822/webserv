@@ -42,7 +42,7 @@ fclean: clean
 re: fclean all
 
 
-# Debug ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+# Debug +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: debug
 
 NAME_DEBUG  = $(NAME)_debug
@@ -64,13 +64,13 @@ $(OBJDIR)/%.o.debug: $(SRCDIR)/%.cpp
 format:
 	clang-format --style=Google -i $(SRCS) $(HEADERS)
 
-# Test ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+# Test ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: test
 
-BASE_DIR := $(CURDIR)
-BUILD_DIR := build
-BUILD_PATH := $(BASE_DIR)/$(BUILD_DIR)
-TEST_EXE_PATH := $(BUILD_PATH)/webserv_test
+BASE_DIR      = $(CURDIR)
+BUILD_DIR     = build
+BUILD_PATH    = $(BASE_DIR)/$(BUILD_DIR)
+TEST_EXE_PATH = $(BUILD_PATH)/webserv_test
 
 # Run all tests
 test:
@@ -80,6 +80,14 @@ test:
 	@cmake --build $(BUILD_PATH) || exit 1
 	@# Execute the test
 	@$(TEST_EXE_PATH) || exit 1
+
+# Clean log file -+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+.PHONY: logclean
+
+LOGDIR = log
+
+logclean:
+	$(RM) $(LOGDIR)/*.log
 
 -include $(DEPENDS)
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
