@@ -22,10 +22,10 @@ int AParser::strtoi(std::string const &str){
     for (unsigned long i = 0; i < str.length(); i++){
         if (str[i] >= '0' && str[i] <= '9'){
             if (ret > INT_MAX / 10 ||(ret == INT_MAX / 10 && str[i] > INT_MAX % 10))
-                throw std::invalid_argument((str + " is too large").c_str());
+                throw std::invalid_argument(str + " is too large");
             ret = ret * 10 + (str[i] - '0');
         } else {
-            throw std::invalid_argument((str + " is not a number").c_str());
+            throw std::invalid_argument(str + " is not a number");
         }
     }
     return ret;
