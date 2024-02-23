@@ -21,8 +21,7 @@ Config &Config::operator=(const Config& other){
 void Config::parse_file(){
   std::ifstream inf(file_);
   if (!inf.is_open()){
-    std::cerr << "file could not open." << std::endl;
-    throw std::exception();
+    throw std::invalid_argument("File could not open: " + file_);
   }
 	server_ = ConfigParser::parse(inf);
 }

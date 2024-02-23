@@ -20,15 +20,14 @@ LocationContext LocationParser::parse_location(std::ifstream &inf){
       break ;
     std::map<std::string, parseFunction>::iterator it = func.find(key);
     if (it == func.end()){  //対応した関数が見つからない
-      std::cerr << "Invalid location key: " << key << std::endl;
-      throw std::exception();
+      throw std::invalid_argument("Invalid location key: " + key);
     }
     if ((*it->second)(value, location) == false){  //対応した関数に適切な要素数と異なっている
-      std::cerr << "Invalid location value: ";
-      for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
-        std::cerr << *it;
-      std::cerr << std::endl;
-      throw std::exception();
+      std::string error = "Invalid location value: ";
+      for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++){
+        error += *it + " ";
+      }
+      throw std::invalid_argument("Invalid location value: " + error);
     }
   }
   return location; 
@@ -134,6 +133,5 @@ void LocationParser::remove_semicolon(std::string &line){
 		line.pop_back();
 		return ;
 	}
-	std::cerr << "Syntax error: semicolon." << std::endl;
-  throw std::exception();
+  throw std::invalid_argument("Syntax error: semicolon: " + line);
 }

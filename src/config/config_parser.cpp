@@ -15,8 +15,7 @@ std::vector<ServerContext> ConfigParser::parse(std::ifstream &inf){
     if (key + value == "server{" && ss.get() == std::char_traits<char>::eof())
       server.push_back(ServerParser::parse_server(inf));
     else{
-      std::cerr << "Syntax Error: not server" << std::endl;
-      throw std::exception();
+      throw std::invalid_argument("Invalid key: " + line);
     }
 	}
   return server;

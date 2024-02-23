@@ -20,26 +20,25 @@ ServerContext ServerParser::parse_server(std::ifstream &inf){
       break ;
     if (key == "location"){  // locationの時
       if (value.size() != 2 || value[1] != "{"){
-        std::cerr << "Syntax error: " << line << std::endl;
-        throw std::exception();
+        throw std::invalid_argument("Syntax error: " + line);
       }
       if (is_path(value[0]) == false){
-        std::cerr << "Invalid location path: " << value[0] << std::endl;
-        throw std::exception();
+        std::string error = "Invalid location path: ";
+        for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
+          error += *it + " ";
+        throw std::invalid_argument("Invalid location path: " + value[0]);
       }
       server.add_location(value[0], LocationParser::parse_location(inf));
     } else {  //それ以外
       std::map<std::string, parseFunction>::iterator it = func.find(key);
       if (it == func.end()){  //対応した関数が見つからない
-        std::cerr << "Invalid server key: " << key << std::endl;
-        throw std::exception();
+        throw std::invalid_argument("Invalid server key: " + key);
       }
       if ((*it->second)(value, server) == false){  //対応した関数に適切な要素数と異なっている
-        std::cerr << "Invalid server value: ";
+        std::string error = "Invalid server value: ";
         for (std::vector<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
-          std::cerr << *it << " ";
-        std::cerr << std::endl;
-        throw std::exception();
+          error += *it + " ";
+        throw std::invalid_argument("Invalid server value: " + error);
       }
     }
   }
@@ -109,6 +108,5 @@ void ServerParser::remove_semicolon(std::string &line){
 		line.pop_back();
 		return ;
 	}
-	std::cerr << "Syntax error: semicolon." << std::endl;
-  throw std::exception();
+  throw std::invalid_argument("Syntax error: semicolon: " + line);
 }

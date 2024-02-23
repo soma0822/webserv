@@ -5,7 +5,7 @@ int main() {
   Config config;
   try{
     config.parse_file();
-  } catch (std::exception){
-    return 1;
+  } catch (std::exception &e){
+    std::cerr << e.what() << std::endl;
   }
 }
