@@ -100,17 +100,92 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2, config.get_server()[0].get_location().end());
 }
 
-TEST(ConfigTest, PortError){
-  Config config("test/conf_test/port_error.conf");
-  ASSERT_THROW(config.parse_file(), std::exception);
+TEST(ConfigTest, TooLargePortTest){
+  Config config("test/conf_test/too_large_port.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "20000000000000 is too large");
+  }
 }
 
-TEST(ConfigTest, ErrorPageError){
-  Config config("test/conf_test/error_page_error.conf");
-  ASSERT_THROW(config.parse_file(), std::exception);
+TEST(ConfigTest, NotNumberPortTest){
+  Config config("test/conf_test/not_num_port.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "200a is not a number");
+  }
 }
 
-TEST(ConfigTest, InvalidKeyTest){
-  Config config("test/conf_test/invalid_key.conf");
-  ASSERT_THROW(config.parse_file(), std::exception);
+TEST(ConfigTest, InvalidServerTest){
+  Config config("test/conf_test/invalid_server.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "Invalid key: servera {");
+  }
+}
+
+TEST(ConfigTest, NoFileTest){
+  Config config("test/conf_test/no_file.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "File could not open: test/conf_test/no_file.conf");
+  }
+}
+
+TEST(ConfigTest, InvalidLocationKeyTest){
+  Config config("test/conf_test/invalid_location_key.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "Invalid location key: tokazaki");
+  }
+}
+
+TEST(ConfigTest, InvalidLocationValueTest){
+  Config config("test/conf_test/invalid_location_value.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "Invalid location value: /usr/share/nginx/html /usr/share/nginx/html");
+  }
+}
+
+TEST(ConfigTest, LocationSyntaxErrorTest){
+  Config config("test/conf_test/location_syntax_error.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "Syntax error: semicolon: \t\troot /usr/share/nginx/html");
+  }
+}
+
+TEST(ConfigTest, ServerSyntaxErrorTest){
+  Config config("test/conf_test/server_syntax_error.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "Syntax error: 	location / ");
+  }
+}
+
+TEST(ConfigTest, InvalidServerKeyTest){
+  Config config("test/conf_test/invalid_server_key.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "Invalid server key: tkuramot");
+  }
+}
+
+TEST(ConfigTest, InvalidServerValueTest){
+  Config config("test/conf_test/invalid_server_value.conf");
+  try {
+    config.parse_file();
+  } catch (std::exception &e) {
+    ASSERT_STREQ(e.what(), "Invalid server value: kuramoto okazaki");
+  }
 }
