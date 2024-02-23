@@ -4,13 +4,14 @@
 #include <iostream>
 #include <map>
 #include <vector>
+
 #include "location_context.hpp"
 
 #define LOCATION "\033[1;32m"
 #define SERVER "\033[1;33m"
 
-class ServerContext{
-public:
+class ServerContext {
+ public:
   ServerContext();
   ServerContext(const ServerContext &other);
   ServerContext &operator=(const ServerContext &other);
@@ -31,13 +32,13 @@ public:
   void add_error_page(const std::string &, const std::string &);
   void add_location(const std::string &, const LocationContext &);
 
-private:
+ private:
   std::string ip_;
-  std::string	root_;
+  std::string root_;
   std::vector<std::string> index_;
   std::vector<std::string> port_;
   std::vector<std::string> server_name_;
-  std::map<std::string, std::string>	error_page_;
+  std::map<std::string, std::string> error_page_;
   std::map<std::string, LocationContext> location_;
 };
 

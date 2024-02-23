@@ -7,12 +7,12 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+
 #include "server_context.hpp"
 #include "server_parser.hpp"
 
-
-class ConfigParser{
-public:
+class ConfigParser {
+ public:
   static std::vector<ServerContext> parse(std::ifstream &);
 };
 

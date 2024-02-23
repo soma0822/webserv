@@ -4,13 +4,15 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-#include "server_context.hpp"
+
 #include "config_parser.hpp"
+#include "server_context.hpp"
 
 #define DEFAULTCONF "conf/default.conf"
 
-class Config{
-public : Config();
+class Config {
+ public:
+  Config();
   Config(const std::string &);
   Config(const Config &other);
   ~Config();
@@ -18,7 +20,7 @@ public : Config();
   void parse_file();
   const std::vector<ServerContext> &get_server() const;
 
-private:
+ private:
   std::string file_;
   std::vector<ServerContext> server_;
 };
