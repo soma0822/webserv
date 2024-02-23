@@ -1,10 +1,10 @@
 #ifndef LOCATION_CONTEXT_HPP
 #define LOCATION_CONTEXT_HPP
 
-#include <iostream>
-#include <vector>
-#include <map>
 #include <climits>
+#include <iostream>
+#include <map>
+#include <vector>
 
 class LocationContext{
 public:

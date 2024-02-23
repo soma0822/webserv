@@ -2,6 +2,7 @@
 #define CONFIG_HPP
 
 #include <iostream>
+#include <stdexcept>
 #include <vector>
 #include "server_context.hpp"
 #include "config_parser.hpp"

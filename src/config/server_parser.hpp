@@ -5,11 +5,12 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <stdexcept>
 #include <string>
-#include "server_context.hpp"
+#include "aparser.hpp"
 #include "location_context.hpp"
 #include "location_parser.hpp"
-#include "aparser.hpp"
+#include "server_context.hpp"
 
 class ServerParser: public AParser{
 public:

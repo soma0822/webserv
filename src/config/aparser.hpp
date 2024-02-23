@@ -3,6 +3,7 @@
 
 #include <string>
 #include <climits>
+#include <stdexcept>
 
 class AParser{
 protected:
