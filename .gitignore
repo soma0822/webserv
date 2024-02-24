@@ -1,2 +1,6 @@
 build
+webserv
+*.log
+*.o
+*.d
 *.pdf
