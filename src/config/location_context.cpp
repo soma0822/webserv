@@ -31,7 +31,9 @@ LocationContext& LocationContext::operator=(const LocationContext& other) {
 }
 // ゲッター
 bool LocationContext::GetCnaAutoIndex() const { return can_auto_index_; }
-int LocationContext::GetLimitClientBody() const { return limit_client_body_bytes_; }
+int LocationContext::GetLimitClientBody() const {
+  return limit_client_body_bytes_;
+}
 const std::string& LocationContext::GetReturn() const { return return_; }
 const std::string& LocationContext::GetAlias() const { return alias_; }
 const std::string& LocationContext::GetRoot() const { return root_; }
