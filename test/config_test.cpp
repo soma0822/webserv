@@ -42,7 +42,7 @@ TEST(ConfigTest, DefaultPath) {
   it2++;
   ASSERT_EQ(it2->first, "/cgi-bin");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
-  ASSERT_EQ(it2->second.GetLimitClientBody(), 2147483647);
+  ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "./");
@@ -64,7 +64,7 @@ TEST(ConfigTest, DefaultPath) {
   it2++;
   ASSERT_EQ(it2->first, "/red");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), true);
-  ASSERT_EQ(it2->second.GetLimitClientBody(), 2147483647);
+  ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   ASSERT_EQ(it2->second.GetReturn(), "/tours");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
@@ -81,7 +81,7 @@ TEST(ConfigTest, DefaultPath) {
   it2++;
   ASSERT_EQ(it2->first, "/tours");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
-  ASSERT_EQ(it2->second.GetLimitClientBody(), 2147483647);
+  ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");

@@ -93,7 +93,7 @@ bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
-  if (value.size() != 1 || StrToI(value.at(0)) > 65535 ||
+  if (value.size() != 1 || StrToI(value.at(0)) > kMaxPort ||
       StrToI(value.at(0)) < 0)
     return false;
   server.AddPort(value.at(0));
