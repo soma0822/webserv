@@ -48,31 +48,31 @@ void LocationParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
 bool LocationParser::ParseAutoIndex(const std::vector<std::string> &value,
                                     LocationContext &location) {
   if (value.size() != 1) return false;
-  location.SetCanAutoIndex(value[0] == "on" ? true : false);
+  location.SetCanAutoIndex(value.at(0) == "on" ? true : false);
   return true;
 }
 bool LocationParser::ParseLimitClientBody(const std::vector<std::string> &value,
                                           LocationContext &location) {
   if (value.size() != 1) return false;
-  location.SetLimitClientBody(StrToI(value[0]));
+  location.SetLimitClientBody(StrToI(value.at(0)));
   return true;
 }
 bool LocationParser::ParseReturn(const std::vector<std::string> &value,
                                  LocationContext &location) {
   if (value.size() != 1) return false;
-  location.SetReturn(value[0]);
+  location.SetReturn(value.at(0));
   return true;
 }
 bool LocationParser::ParseAlias(const std::vector<std::string> &value,
                                 LocationContext &location) {
   if (value.size() != 1) return false;
-  location.SetAlias(value[0]);
+  location.SetAlias(value.at(0));
   return true;
 }
 bool LocationParser::ParseRoot(const std::vector<std::string> &value,
                                LocationContext &location) {
   if (value.size() != 1) return false;
-  location.SetRoot(value[0]);
+  location.SetRoot(value.at(0));
   return true;
 }
 bool LocationParser::ParseIndex(const std::vector<std::string> &value,

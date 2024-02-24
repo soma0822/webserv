@@ -26,14 +26,11 @@ const std::string &ServerContext::GetRoot() const { return root_; }
 const std::vector<std::string> &ServerContext::GetIndex() const {
   return index_;
 }
-const std::vector<std::string> &ServerContext::GetPort() const {
-  return port_;
-}
+const std::vector<std::string> &ServerContext::GetPort() const { return port_; }
 const std::vector<std::string> &ServerContext::GetServerName() const {
   return server_name_;
 }
-const std::map<std::string, std::string> &ServerContext::GetErrorPage()
-    const {
+const std::map<std::string, std::string> &ServerContext::GetErrorPage() const {
   return error_page_;
 }
 const std::map<std::string, LocationContext> &ServerContext::GetLocation()
@@ -54,12 +51,12 @@ void ServerContext::AddServerName(const std::string &server_name) {
   server_name_.push_back(server_name);
 }
 void ServerContext::AddErrorPage(const std::string &key,
-                                   const std::string &value) {
+                                 const std::string &value) {
   std::map<std::string, std::string>::iterator it = error_page_.find(key);
   if (it == error_page_.end()) error_page_[key] = value;
 }
 void ServerContext::AddLocation(const std::string &key,
-                                 const LocationContext &value) {
+                                const LocationContext &value) {
   std::map<std::string, LocationContext>::iterator it = location_.find(key);
   if (it == location_.end()) location_[key] = value;
 }

@@ -16,17 +16,17 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
     while (ss >> tmp) value.push_back(tmp);
     if (key == "}" && value.size() == 0) break;
     if (key == "location") {  // locationの時
-      if (value.size() != 2 || value[1] != "{") {
+      if (value.size() != 2 || value.at(1) != "{") {
         throw std::invalid_argument("Syntax error: " + line);
       }
-      if (IsPath(value[0]) == false) {
+      if (IsPath(value.at(0)) == false) {
         std::string error = "Invalid location path: ";
         for (std::vector<std::string>::const_iterator it = value.begin();
              it != value.end(); it++)
           error += *it + " ";
-        throw std::invalid_argument("Invalid location path: " + value[0]);
+        throw std::invalid_argument("Invalid location path: " + value.at(0));
       }
-      server.AddLocation(value[0], LocationParser::ParseLocation(inf));
+      server.AddLocation(value.at(0), LocationParser::ParseLocation(inf));
     } else {  // それ以外
       std::map<std::string, parseFunction>::iterator it = func.find(key);
       if (it == func.end()) {  // 対応した関数が見つからない
@@ -68,19 +68,19 @@ bool ServerParser::ParseErrorPage(const std::vector<std::string> &value,
 bool ServerParser::ParseIndex(const std::vector<std::string> &value,
                               ServerContext &server) {
   if (value.size() == 0) return false;
-  server.AddIndex(value[0]);
+  server.AddIndex(value.at(0));
   return true;
 }
 bool ServerParser::ParseIp(const std::vector<std::string> &value,
                            ServerContext &server) {
   if (value.size() != 1) return false;
-  server.SetIp(value[0]);
+  server.SetIp(value.at(0));
   return true;
 }
 bool ServerParser::ParseRoot(const std::vector<std::string> &value,
                              ServerContext &server) {
   if (value.size() != 1) return false;
-  server.SetRoot(value[0]);
+  server.SetRoot(value.at(0));
   return true;
 }
 bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
@@ -93,9 +93,10 @@ bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
-  if (value.size() != 1 || StrToI(value[0]) > 65535 || StrToI(value[0]) < 0)
+  if (value.size() != 1 || StrToI(value.at(0)) > 65535 ||
+      StrToI(value.at(0)) < 0)
     return false;
-  server.AddPort(value[0]);
+  server.AddPort(value.at(0));
   return true;
 }
 

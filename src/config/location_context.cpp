@@ -31,9 +31,7 @@ LocationContext& LocationContext::operator=(const LocationContext& other) {
 }
 // ゲッター
 bool LocationContext::GetCnaAutoIndex() const { return can_auto_index_; }
-int LocationContext::GetLimitClientBody() const {
-  return limit_client_body_;
-}
+int LocationContext::GetLimitClientBody() const { return limit_client_body_; }
 const std::string& LocationContext::GetReturn() const { return return_; }
 const std::string& LocationContext::GetAlias() const { return alias_; }
 const std::string& LocationContext::GetRoot() const { return root_; }
@@ -76,7 +74,7 @@ void LocationContext::AddAllowMethod(const std::string& key) {
   allow_method_[key] = true;
 }
 void LocationContext::AddErrorPage(const std::string& key,
-                                     const std::string& value) {
+                                   const std::string& value) {
   std::map<std::string, std::string>::iterator it = error_page_.find(key);
   if (it == error_page_.end()) error_page_[key] = value;
 }
@@ -113,8 +111,7 @@ std::ostream& operator<<(std::ostream& os, LocationContext& obj) {
     os << *it << " ";
   }
   os << "\nautoindex: " << (obj.GetCnaAutoIndex() == true ? "on" : "off");
-  os << "\nreturn: "
-     << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
+  os << "\nreturn: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
   os << "\nalias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
   os << "\nlimit client body: " << obj.GetLimitClientBody();
   return os;
@@ -150,8 +147,7 @@ std::ostream& operator<<(std::ostream& os, const LocationContext& obj) {
   if (obj.GetCgiPath().size() == 0)
     os << "no set";
   else {
-    for (std::vector<std::string>::const_iterator it =
-             obj.GetCgiPath().begin();
+    for (std::vector<std::string>::const_iterator it = obj.GetCgiPath().begin();
          it != obj.GetCgiPath().end(); it++)
       os << *it << " ";
   }
@@ -165,8 +161,7 @@ std::ostream& operator<<(std::ostream& os, const LocationContext& obj) {
       os << *it << " ";
   }
   os << "\nautoindex: " << (obj.GetCnaAutoIndex() == true ? "on" : "off");
-  os << "\nreturn: "
-     << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
+  os << "\nreturn: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
   os << "\nalias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
   os << "\nlimit client body: " << obj.GetLimitClientBody();
   return os;
