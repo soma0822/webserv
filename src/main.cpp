@@ -1,8 +1,11 @@
-#include "example.hpp"
-#include <iostream>
+#include "logger.hpp"
 
 int main() {
-  std::cout << add(1, 3) << std::endl;
-  std::cout << subtract(1, 3) << std::endl;
+  Logger::SetHandler(new FileStreamWrapper());
+  Logger::SetLogLevel(kDebug);
+  Logger::Info() << "Info message" << std::endl;
+  Logger::Warn() << "Warn message" << std::endl;
+  Logger::Error() << "Error message" << std::endl;
+  Logger::Debug() << "Debug message" << std::endl;
   return 0;
 }
