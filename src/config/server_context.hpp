@@ -16,21 +16,21 @@ class ServerContext {
   ServerContext(const ServerContext &other);
   ServerContext &operator=(const ServerContext &other);
 
-  const std::string &get_ip() const;
-  const std::string &get_root() const;
-  const std::vector<std::string> &get_index() const;
-  const std::vector<std::string> &get_port() const;
-  const std::vector<std::string> &get_server_name() const;
-  const std::map<std::string, std::string> &get_error_page() const;
-  const std::map<std::string, LocationContext> &get_location() const;
+  const std::string &GetIp() const;
+  const std::string &GetRoot() const;
+  const std::vector<std::string> &GetIndex() const;
+  const std::vector<std::string> &GetPort() const;
+  const std::vector<std::string> &GetServerName() const;
+  const std::map<std::string, std::string> &GetErrorPage() const;
+  const std::map<std::string, LocationContext> &GetLocation() const;
 
-  void set_ip(const std::string &);
-  void set_root(const std::string &);
-  void add_index(const std::string &);
-  void add_port(const std::string &);
-  void add_server_name(const std::string &);
-  void add_error_page(const std::string &, const std::string &);
-  void add_location(const std::string &, const LocationContext &);
+  void SetIp(const std::string &);
+  void SetRoot(const std::string &);
+  void AddIndex(const std::string &);
+  void AddPort(const std::string &);
+  void AddServerName(const std::string &);
+  void AddErrorPage(const std::string &, const std::string &);
+  void AddLocation(const std::string &, const LocationContext &);
 
  private:
   std::string ip_;

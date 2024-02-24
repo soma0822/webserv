@@ -48,31 +48,31 @@ void LocationParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
 bool LocationParser::ParseAutoIndex(const std::vector<std::string> &value,
                                     LocationContext &location) {
   if (value.size() != 1) return false;
-  location.set_can_auto_index(value[0] == "on" ? true : false);
+  location.SetCanAutoIndex(value[0] == "on" ? true : false);
   return true;
 }
 bool LocationParser::ParseLimitClientBody(const std::vector<std::string> &value,
                                           LocationContext &location) {
   if (value.size() != 1) return false;
-  location.set_limit_client_body(StrToI(value[0]));
+  location.SetLimitClientBody(StrToI(value[0]));
   return true;
 }
 bool LocationParser::ParseReturn(const std::vector<std::string> &value,
                                  LocationContext &location) {
   if (value.size() != 1) return false;
-  location.set_return(value[0]);
+  location.SetReturn(value[0]);
   return true;
 }
 bool LocationParser::ParseAlias(const std::vector<std::string> &value,
                                 LocationContext &location) {
   if (value.size() != 1) return false;
-  location.set_alias(value[0]);
+  location.SetAlias(value[0]);
   return true;
 }
 bool LocationParser::ParseRoot(const std::vector<std::string> &value,
                                LocationContext &location) {
   if (value.size() != 1) return false;
-  location.set_root(value[0]);
+  location.SetRoot(value[0]);
   return true;
 }
 bool LocationParser::ParseIndex(const std::vector<std::string> &value,
@@ -80,7 +80,7 @@ bool LocationParser::ParseIndex(const std::vector<std::string> &value,
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
-    location.add_index(*it);
+    location.AddIndex(*it);
   }
   return true;
 }
@@ -90,7 +90,7 @@ bool LocationParser::ParseCgiPath(const std::vector<std::string> &value,
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
     if (IsPath(*it) == false) return false;
-    location.add_cgi_path(*it);
+    location.AddCgiPath(*it);
   }
   return true;
 }
@@ -99,7 +99,7 @@ bool LocationParser::ParseCgiExtention(const std::vector<std::string> &value,
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
-    location.add_cgi_extention(*it);
+    location.AddCgiExtention(*it);
   }
   return true;
 }
@@ -108,7 +108,7 @@ bool LocationParser::ParseAllowMethod(const std::vector<std::string> &value,
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
-    location.add_allow_method(*it);
+    location.AddAllowMethod(*it);
   }
   return true;
 }
@@ -118,7 +118,7 @@ bool LocationParser::ParseErrorPage(const std::vector<std::string> &value,
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end() - 1; it++) {
     if (IsNum(*it) == false) return false;
-    location.add_error_page(*it, *(value.end() - 1));
+    location.AddErrorPage(*it, *(value.end() - 1));
   }
   return true;
 }

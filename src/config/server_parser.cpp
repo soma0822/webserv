@@ -26,7 +26,7 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
           error += *it + " ";
         throw std::invalid_argument("Invalid location path: " + value[0]);
       }
-      server.add_location(value[0], LocationParser::ParseLocation(inf));
+      server.AddLocation(value[0], LocationParser::ParseLocation(inf));
     } else {  // それ以外
       std::map<std::string, parseFunction>::iterator it = func.find(key);
       if (it == func.end()) {  // 対応した関数が見つからない
@@ -61,26 +61,26 @@ bool ServerParser::ParseErrorPage(const std::vector<std::string> &value,
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end() - 1; it++) {
     if (IsNum(*it) == false) return false;
-    server.add_error_page(*it, *(value.end() - 1));
+    server.AddErrorPage(*it, *(value.end() - 1));
   }
   return true;
 }
 bool ServerParser::ParseIndex(const std::vector<std::string> &value,
                               ServerContext &server) {
   if (value.size() == 0) return false;
-  server.add_index(value[0]);
+  server.AddIndex(value[0]);
   return true;
 }
 bool ServerParser::ParseIp(const std::vector<std::string> &value,
                            ServerContext &server) {
   if (value.size() != 1) return false;
-  server.set_ip(value[0]);
+  server.SetIp(value[0]);
   return true;
 }
 bool ServerParser::ParseRoot(const std::vector<std::string> &value,
                              ServerContext &server) {
   if (value.size() != 1) return false;
-  server.set_root(value[0]);
+  server.SetRoot(value[0]);
   return true;
 }
 bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
@@ -88,14 +88,14 @@ bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++)
-    server.add_server_name(*it);
+    server.AddServerName(*it);
   return true;
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
   if (value.size() != 1 || StrToI(value[0]) > 65535 || StrToI(value[0]) < 0)
     return false;
-  server.add_port(value[0]);
+  server.AddPort(value[0]);
   return true;
 }
 

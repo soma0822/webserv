@@ -27,12 +27,12 @@ void Config::ParseFile() {
   server_ = ConfigParser::Parse(inf);
 }
 
-const std::vector<ServerContext> &Config::get_server() const { return server_; }
+const std::vector<ServerContext> &Config::GetServer() const { return server_; }
 
 std::ostream &operator<<(std::ostream &os, Config &config) {
   for (std::vector<ServerContext>::const_iterator it =
-           config.get_server().begin();
-       it != config.get_server().end(); it++) {
+           config.GetServer().begin();
+       it != config.GetServer().end(); it++) {
     os << *it << std::endl;
   }
   return os;
@@ -40,8 +40,8 @@ std::ostream &operator<<(std::ostream &os, Config &config) {
 
 std::ostream &operator<<(std::ostream &os, const Config &config) {
   for (std::vector<ServerContext>::const_iterator it =
-           config.get_server().begin();
-       it != config.get_server().end(); it++) {
+           config.GetServer().begin();
+       it != config.GetServer().end(); it++) {
     os << *it << std::endl;
   }
   return os;

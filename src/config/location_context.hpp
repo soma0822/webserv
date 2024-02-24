@@ -12,27 +12,27 @@ class LocationContext {
   LocationContext(const LocationContext& other);
   LocationContext& operator=(const LocationContext& other);
   // ゲッター
-  bool get_can_auto_index() const;
-  int get_limit_client_body() const;
-  const std::string& get_return() const;
-  const std::string& get_alias() const;
-  const std::string& get_root() const;
-  const std::vector<std::string>& get_index() const;
-  const std::vector<std::string>& get_cgi_path() const;
-  const std::vector<std::string>& get_cgi_extention() const;
-  const std::map<std::string, bool>& get_allow_method() const;
-  const std::map<std::string, std::string>& get_error_page() const;
+  bool GetCnaAutoIndex() const;
+  int GetLimitClientBody() const;
+  const std::string& GetReturn() const;
+  const std::string& GetAlias() const;
+  const std::string& GetRoot() const;
+  const std::vector<std::string>& GetIndex() const;
+  const std::vector<std::string>& GetCgiPath() const;
+  const std::vector<std::string>& GetCgiExtention() const;
+  const std::map<std::string, bool>& GetAllowMethod() const;
+  const std::map<std::string, std::string>& GetErrorPage() const;
   // セッター
-  void set_can_auto_index(bool);
-  void set_limit_client_body(int);
-  void set_return(const std::string&);
-  void set_alias(const std::string&);
-  void set_root(const std::string&);
-  void add_index(const std::string&);
-  void add_cgi_path(const std::string&);
-  void add_cgi_extention(const std::string&);
-  void add_allow_method(const std::string&);
-  void add_error_page(const std::string&, const std::string&);
+  void SetCanAutoIndex(bool);
+  void SetLimitClientBody(int);
+  void SetReturn(const std::string&);
+  void SetAlias(const std::string&);
+  void SetRoot(const std::string&);
+  void AddIndex(const std::string&);
+  void AddCgiPath(const std::string&);
+  void AddCgiExtention(const std::string&);
+  void AddAllowMethod(const std::string&);
+  void AddErrorPage(const std::string&, const std::string&);
 
  private:
   bool can_auto_index_;
