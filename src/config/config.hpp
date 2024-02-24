@@ -1,5 +1,5 @@
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
+#ifndef WEBSERV_SRC_CONFIG_CONFIG_HPP
+#define WEBSERV_SRC_CONFIG_CONFIG_HPP
 
 #include <iostream>
 #include <stdexcept>

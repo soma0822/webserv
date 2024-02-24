@@ -1,5 +1,5 @@
-#ifndef APARSER_HPP
-#define APARSER_HPP
+#ifndef WEBSERV_SRC_CONFIG_APARSER_HPP
+#define WEBSERV_SRC_CONFIG_APARSER_HPP
 
 #include <climits>
 #include <stdexcept>

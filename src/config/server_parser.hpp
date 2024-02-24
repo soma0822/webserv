@@ -1,5 +1,5 @@
-#ifndef SERVER_PARSER_HPP
-#define SERVER_PARSER_HPP
+#ifndef WEBSERV_SRC_CONFIG_SERVER_PARSER_HPP
+#define WEBSERV_SRC_CONFIG_SERVER_PARSER_HPP
 
 #include <fstream>
 #include <iostream>

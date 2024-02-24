@@ -1,5 +1,5 @@
-#ifndef SERVER_CONTEXT_HPP
-#define SERVER_CONTEXT_HPP
+#ifndef WEBSERV_SRC_CONFIG_SERVER_CONTEXT_HPP
+#define WEBSERV_SRC_CONFIG_SERVER_CONTEXT_HPP
 
 #include <iostream>
 #include <map>

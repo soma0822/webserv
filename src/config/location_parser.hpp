@@ -1,5 +1,5 @@
-#ifndef LOCATION_PARSER_HPP
-#define LOCATION_PARSER_HPP
+#ifndef WEBSERV_SRC_CONFIG_LOCATION_PARSER_HPP
+#define WEBSERV_SRC_CONFIG_LOCATION_PARSER_HPP
 
 #include <fstream>
 #include <iostream>
