@@ -36,7 +36,7 @@ class LocationContext {
 
  private:
   bool can_auto_index_;
-  int limit_client_body_;
+  int limit_client_body_bytes_;
   std::string return_;
   std::string alias_;
   std::string root_;

@@ -2,7 +2,7 @@
 
 LocationContext::LocationContext()
     : can_auto_index_(false),
-      limit_client_body_(INT_MAX),
+      limit_client_body_bytes_(1000),
       return_(""),
       alias_(""),
       root_("") {
@@ -18,7 +18,7 @@ LocationContext& LocationContext::operator=(const LocationContext& other) {
     return *this;
   }
   can_auto_index_ = other.can_auto_index_;
-  limit_client_body_ = other.limit_client_body_;
+  limit_client_body_bytes_ = other.limit_client_body_bytes_;
   return_ = other.return_;
   alias_ = other.alias_;
   root_ = other.root_;
@@ -31,7 +31,7 @@ LocationContext& LocationContext::operator=(const LocationContext& other) {
 }
 // ゲッター
 bool LocationContext::GetCnaAutoIndex() const { return can_auto_index_; }
-int LocationContext::GetLimitClientBody() const { return limit_client_body_; }
+int LocationContext::GetLimitClientBody() const { return limit_client_body_bytes_; }
 const std::string& LocationContext::GetReturn() const { return return_; }
 const std::string& LocationContext::GetAlias() const { return alias_; }
 const std::string& LocationContext::GetRoot() const { return root_; }
@@ -55,8 +55,8 @@ const std::map<std::string, std::string>& LocationContext::GetErrorPage()
 void LocationContext::SetCanAutoIndex(bool can_auto_index) {
   can_auto_index_ = can_auto_index;
 }
-void LocationContext::SetLimitClientBody(int limit_client_body) {
-  limit_client_body_ = limit_client_body;
+void LocationContext::SetLimitClientBody(int limit_client_body_bytes_) {
+  limit_client_body_bytes_ = limit_client_body_bytes_;
 }
 void LocationContext::SetReturn(const std::string& ret) { return_ = ret; }
 void LocationContext::SetAlias(const std::string& alias) { alias_ = alias; }
