@@ -13,7 +13,7 @@
 
 class ConfigParser {
  public:
-  static std::vector<ServerContext> parse(std::ifstream &);
+  static std::vector<ServerContext> Parse(std::ifstream &);
 };
 
 #endif

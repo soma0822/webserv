@@ -1,6 +1,6 @@
 #include "config_parser.hpp"
 
-std::vector<ServerContext> ConfigParser::parse(std::ifstream &inf) {
+std::vector<ServerContext> ConfigParser::Parse(std::ifstream &inf) {
   std::vector<ServerContext> server;
   std::string line;
 
@@ -12,7 +12,7 @@ std::vector<ServerContext> ConfigParser::parse(std::ifstream &inf) {
     if (key.empty()) continue;
     ss >> value;
     if (key + value == "server{" && ss.get() == std::char_traits<char>::eof())
-      server.push_back(ServerParser::parse_server(inf));
+      server.push_back(ServerParser::ParseServer(inf));
     else {
       throw std::invalid_argument("Invalid key: " + line);
     }

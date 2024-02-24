@@ -15,27 +15,26 @@ class LocationParser : public AParser {
  public:
   typedef bool (*parseFunction)(const std::vector<std::string> &,
                                 LocationContext &);
-  static LocationContext parse_location(std::ifstream &);
+  static LocationContext ParseLocation(std::ifstream &);
 
  private:
-  static void init_parse_func(std::map<std::string, parseFunction> &);
-  static void remove_semicolon(std::string &line);
-  static bool parse_auto_index(const std::vector<std::string> &,
-                               LocationContext &);
-  static bool parse_limit_client_body(const std::vector<std::string> &,
-                                      LocationContext &);
-  static bool parse_return(const std::vector<std::string> &, LocationContext &);
-  static bool parse_alias(const std::vector<std::string> &, LocationContext &);
-  static bool parse_root(const std::vector<std::string> &, LocationContext &);
-  static bool parse_index(const std::vector<std::string> &, LocationContext &);
-  static bool parse_cgi_path(const std::vector<std::string> &,
+  static void ParseFuncInit(std::map<std::string, parseFunction> &);
+  static void RemoveSemicolon(std::string &line);
+  static bool ParseAutoIndex(const std::vector<std::string> &,
                              LocationContext &);
-  static bool parse_cgi_extention(const std::vector<std::string> &,
-                                  LocationContext &);
-  static bool parse_allow_method(const std::vector<std::string> &,
-                                 LocationContext &);
-  static bool parse_error_page(const std::vector<std::string> &,
+  static bool ParseLimitClientBody(const std::vector<std::string> &,
+                                   LocationContext &);
+  static bool ParseReturn(const std::vector<std::string> &, LocationContext &);
+  static bool ParseAlias(const std::vector<std::string> &, LocationContext &);
+  static bool ParseRoot(const std::vector<std::string> &, LocationContext &);
+  static bool ParseIndex(const std::vector<std::string> &, LocationContext &);
+  static bool ParseCgiPath(const std::vector<std::string> &, LocationContext &);
+  static bool ParseCgiExtention(const std::vector<std::string> &,
+                                LocationContext &);
+  static bool ParseAllowMethod(const std::vector<std::string> &,
                                LocationContext &);
+  static bool ParseErrorPage(const std::vector<std::string> &,
+                             LocationContext &);
 };
 
 #endif

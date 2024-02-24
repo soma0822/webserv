@@ -17,19 +17,18 @@ class ServerParser : public AParser {
  public:
   typedef bool (*parseFunction)(const std::vector<std::string> &,
                                 ServerContext &);
-  static ServerContext parse_server(std::ifstream &);
+  static ServerContext ParseServer(std::ifstream &);
 
  private:
-  static void init_parse_func(std::map<std::string, parseFunction> &);
-  static bool parse_error_page(const std::vector<std::string> &,
+  static void ParseFuncInit(std::map<std::string, parseFunction> &);
+  static bool ParseErrorPage(const std::vector<std::string> &, ServerContext &);
+  static bool ParseIndex(const std::vector<std::string> &, ServerContext &);
+  static bool ParseIp(const std::vector<std::string> &, ServerContext &);
+  static bool ParseRoot(const std::vector<std::string> &, ServerContext &);
+  static bool ParseServer_name(const std::vector<std::string> &,
                                ServerContext &);
-  static bool parse_index(const std::vector<std::string> &, ServerContext &);
-  static bool parse_ip(const std::vector<std::string> &, ServerContext &);
-  static bool parse_root(const std::vector<std::string> &, ServerContext &);
-  static bool parse_server_name(const std::vector<std::string> &,
-                                ServerContext &);
-  static bool parse_port(const std::vector<std::string> &, ServerContext &);
-  static void remove_semicolon(std::string &);
+  static bool ParsePort(const std::vector<std::string> &, ServerContext &);
+  static void RemoveSemicolon(std::string &);
 };
 
 #endif

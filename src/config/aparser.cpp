@@ -1,6 +1,6 @@
 #include "aparser.hpp"
 
-bool AParser::is_num(const std::string &str) {
+bool AParser::IsNum(const std::string &str) {
   for (size_t i = 0; i < str.size(); i++) {
     if (!std::isdigit(str[i])) {
       return false;
@@ -9,14 +9,14 @@ bool AParser::is_num(const std::string &str) {
   return true;
 }
 
-bool AParser::is_path(const std::string &str) {
+bool AParser::IsPath(const std::string &str) {
   if (str[0] != '/') {
     return false;
   }
   return true;
 }
 
-int AParser::strtoi(std::string const &str) {
+int AParser::StrToI(std::string const &str) {
   long long ret = 0;
 
   for (unsigned long i = 0; i < str.length(); i++) {

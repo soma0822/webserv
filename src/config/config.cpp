@@ -19,12 +19,12 @@ Config &Config::operator=(const Config &other) {
 }
 
 // パーススタート
-void Config::parse_file() {
+void Config::ParseFile() {
   std::ifstream inf(file_);
   if (!inf.is_open()) {
     throw std::invalid_argument("File could not open: " + file_);
   }
-  server_ = ConfigParser::parse(inf);
+  server_ = ConfigParser::Parse(inf);
 }
 
 const std::vector<ServerContext> &Config::get_server() const { return server_; }

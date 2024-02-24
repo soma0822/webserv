@@ -1,14 +1,14 @@
 #include "location_parser.hpp"
 
-LocationContext LocationParser::parse_location(std::ifstream &inf) {
+LocationContext LocationParser::ParseLocation(std::ifstream &inf) {
   LocationContext location;
   std::map<std::string, parseFunction> func;
   std::string line;
 
-  init_parse_func(func);
+  ParseFuncInit(func);
   while (std::getline(inf, line)) {
     if (line.empty()) continue;
-    remove_semicolon(line);
+    RemoveSemicolon(line);
     std::stringstream ss(line);
     std::string key, tmp;
     std::vector<std::string> value;
@@ -32,52 +32,51 @@ LocationContext LocationParser::parse_location(std::ifstream &inf) {
   return location;
 }
 
-void LocationParser::init_parse_func(
-    std::map<std::string, parseFunction> &func) {
-  func["autoindex"] = &LocationParser::parse_auto_index;
-  func["limit_client_body"] = &LocationParser::parse_limit_client_body;
-  func["return"] = &LocationParser::parse_return;
-  func["alias"] = &LocationParser::parse_alias;
-  func["root"] = &LocationParser::parse_root;
-  func["index"] = &LocationParser::parse_index;
-  func["cgi_path"] = &LocationParser::parse_cgi_path;
-  func["cgi_ext"] = &LocationParser::parse_cgi_extention;
-  func["allow_methods"] = &LocationParser::parse_allow_method;
-  func["error_page"] = &LocationParser::parse_error_page;
+void LocationParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
+  func["autoindex"] = &LocationParser::ParseAutoIndex;
+  func["limit_client_body"] = &LocationParser::ParseLimitClientBody;
+  func["return"] = &LocationParser::ParseReturn;
+  func["alias"] = &LocationParser::ParseAlias;
+  func["root"] = &LocationParser::ParseRoot;
+  func["index"] = &LocationParser::ParseIndex;
+  func["cgi_path"] = &LocationParser::ParseCgiPath;
+  func["cgi_ext"] = &LocationParser::ParseCgiExtention;
+  func["allow_methods"] = &LocationParser::ParseAllowMethod;
+  func["error_page"] = &LocationParser::ParseErrorPage;
 }
 
-bool LocationParser::parse_auto_index(const std::vector<std::string> &value,
-                                      LocationContext &location) {
+bool LocationParser::ParseAutoIndex(const std::vector<std::string> &value,
+                                    LocationContext &location) {
   if (value.size() != 1) return false;
   location.set_can_auto_index(value[0] == "on" ? true : false);
   return true;
 }
-bool LocationParser::parse_limit_client_body(
-    const std::vector<std::string> &value, LocationContext &location) {
+bool LocationParser::ParseLimitClientBody(const std::vector<std::string> &value,
+                                          LocationContext &location) {
   if (value.size() != 1) return false;
-  location.set_limit_client_body(strtoi(value[0]));
+  location.set_limit_client_body(StrToI(value[0]));
   return true;
 }
-bool LocationParser::parse_return(const std::vector<std::string> &value,
-                                  LocationContext &location) {
+bool LocationParser::ParseReturn(const std::vector<std::string> &value,
+                                 LocationContext &location) {
   if (value.size() != 1) return false;
   location.set_return(value[0]);
   return true;
 }
-bool LocationParser::parse_alias(const std::vector<std::string> &value,
-                                 LocationContext &location) {
+bool LocationParser::ParseAlias(const std::vector<std::string> &value,
+                                LocationContext &location) {
   if (value.size() != 1) return false;
   location.set_alias(value[0]);
   return true;
 }
-bool LocationParser::parse_root(const std::vector<std::string> &value,
-                                LocationContext &location) {
+bool LocationParser::ParseRoot(const std::vector<std::string> &value,
+                               LocationContext &location) {
   if (value.size() != 1) return false;
   location.set_root(value[0]);
   return true;
 }
-bool LocationParser::parse_index(const std::vector<std::string> &value,
-                                 LocationContext &location) {
+bool LocationParser::ParseIndex(const std::vector<std::string> &value,
+                                LocationContext &location) {
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
@@ -85,18 +84,18 @@ bool LocationParser::parse_index(const std::vector<std::string> &value,
   }
   return true;
 }
-bool LocationParser::parse_cgi_path(const std::vector<std::string> &value,
-                                    LocationContext &location) {
+bool LocationParser::ParseCgiPath(const std::vector<std::string> &value,
+                                  LocationContext &location) {
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
-    if (is_path(*it) == false) return false;
+    if (IsPath(*it) == false) return false;
     location.add_cgi_path(*it);
   }
   return true;
 }
-bool LocationParser::parse_cgi_extention(const std::vector<std::string> &value,
-                                         LocationContext &location) {
+bool LocationParser::ParseCgiExtention(const std::vector<std::string> &value,
+                                       LocationContext &location) {
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
@@ -104,8 +103,8 @@ bool LocationParser::parse_cgi_extention(const std::vector<std::string> &value,
   }
   return true;
 }
-bool LocationParser::parse_allow_method(const std::vector<std::string> &value,
-                                        LocationContext &location) {
+bool LocationParser::ParseAllowMethod(const std::vector<std::string> &value,
+                                      LocationContext &location) {
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
@@ -113,18 +112,18 @@ bool LocationParser::parse_allow_method(const std::vector<std::string> &value,
   }
   return true;
 }
-bool LocationParser::parse_error_page(const std::vector<std::string> &value,
-                                      LocationContext &location) {
+bool LocationParser::ParseErrorPage(const std::vector<std::string> &value,
+                                    LocationContext &location) {
   if (value.size() < 2) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end() - 1; it++) {
-    if (is_num(*it) == false) return false;
+    if (IsNum(*it) == false) return false;
     location.add_error_page(*it, *(value.end() - 1));
   }
   return true;
 }
 
-void LocationParser::remove_semicolon(std::string &line) {
+void LocationParser::RemoveSemicolon(std::string &line) {
   std::stringstream ss(line);
   std::string key;
   ss >> key;
