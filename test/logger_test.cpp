@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "logger.hpp"
+
+#include <gtest/gtest.h>
 
 TEST(Logger, InfoStdOut) {
   Logger::SetHandler(new StdoutStreamWrapper());

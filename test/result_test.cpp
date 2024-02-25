@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "result.hpp"
+
+#include <gtest/gtest.h>
 
 /*
  * Resultクラスのテスト
@@ -16,7 +16,7 @@ TEST(ResultTest, ResultConstructor) {
 TEST(ResultTest, ResultCopyConstructor) {
   Result<int, std::string> result(10, "", true);
   Result<int, std::string> result2(result);
-  (void)result; // 未使用変数の警告を回避する
+  (void)result;  // 未使用変数の警告を回避する
   ASSERT_EQ(result2.Unwrap(), 10);
 }
 
@@ -24,7 +24,7 @@ TEST(ResultTest, ResultCopyConstructor) {
 TEST(ResultTest, ResultCopyAssignmentOperator) {
   Result<int, std::string> result(10, "", true);
   Result<int, std::string> result2 = result;
-  (void)result; // 未使用変数の警告を回避する
+  (void)result;  // 未使用変数の警告を回避する
   ASSERT_EQ(result2.Unwrap(), 10);
 }
 

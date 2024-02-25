@@ -1,4 +1,5 @@
 #include "null_stream.hpp"
+
 #include <gtest/gtest.h>
 
 TEST(NullStreamTest, NothingPrintedToStdout) {
