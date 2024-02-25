@@ -2,9 +2,7 @@
 
 Config::Config() {}
 
-Config::Config(const Config &other){
-  *this = other;
-}
+Config::Config(const Config &other) { *this = other; }
 
 Config::~Config() {}
 
