@@ -8,12 +8,13 @@
 #include <string>
 #include <vector>
 
+#include "config.hpp"
 #include "server_context.hpp"
 #include "server_parser.hpp"
 
 class ConfigParser {
  public:
-  static std::vector<ServerContext> Parse(std::ifstream &);
+  static Config Parse(const std::string &);
 };
 
 #endif

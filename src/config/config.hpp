@@ -17,8 +17,8 @@ class Config {
   Config(const Config &other);
   ~Config();
   Config &operator=(const Config &other);
-  void ParseFile();
   const std::vector<ServerContext> &GetServer() const;
+  void addServer(const ServerContext &);
 
  private:
   std::string file_;
