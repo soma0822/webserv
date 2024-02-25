@@ -1,6 +1,6 @@
 #include "config_parser.hpp"
 
-Config Parse(const std::string &file) {
+Config ConfigParser::Parse(const std::string &file) {
   Config config;
   std::vector<ServerContext> server;
   std::string line;

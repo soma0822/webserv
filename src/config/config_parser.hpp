@@ -12,6 +12,8 @@
 #include "server_context.hpp"
 #include "server_parser.hpp"
 
+class Config;
+
 class ConfigParser {
  public:
   static Config Parse(const std::string &);
