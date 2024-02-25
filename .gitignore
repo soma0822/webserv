@@ -4,3 +4,9 @@ webserv
 *.o
 *.d
 *.pdf
+.vscode
+a.out
+*.un~
+*.json
+.DS*
+.swp
