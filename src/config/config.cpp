@@ -14,7 +14,7 @@ Config &Config::operator=(const Config &other) {
   return *this;
 }
 
-void Config::addServer(const ServerContext &server) {
+void Config::AddServer(const ServerContext &server) {
   server_.push_back(server);
 }
 

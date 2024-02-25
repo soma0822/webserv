@@ -16,7 +16,7 @@ class Config {
   ~Config();
   Config &operator=(const Config &other);
   const std::vector<ServerContext> &GetServer() const;
-  void addServer(const ServerContext &);
+  void AddServer(const ServerContext &);
 
  private:
   std::vector<ServerContext> server_;
