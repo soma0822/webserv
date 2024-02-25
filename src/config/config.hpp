@@ -8,20 +8,17 @@
 #include "config_parser.hpp"
 #include "server_context.hpp"
 
-#define DEFAULTCONF "conf/default.conf"
-
+class ConfigParser;
 class Config {
  public:
   Config();
-  Config(const std::string &);
   Config(const Config &other);
   ~Config();
   Config &operator=(const Config &other);
-  void ParseFile();
   const std::vector<ServerContext> &GetServer() const;
+  void AddServer(const ServerContext &);
 
  private:
-  std::string file_;
   std::vector<ServerContext> server_;
 };
 

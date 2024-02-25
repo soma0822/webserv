@@ -1,9 +1,15 @@
 #include "config_parser.hpp"
 
-std::vector<ServerContext> ConfigParser::Parse(std::ifstream &inf) {
+const std::string ConfigParser::default_file_ = "./conf/default.conf";
+
+Config ConfigParser::Parse(const std::string &file) {
+  Config config;
   std::vector<ServerContext> server;
   std::string line;
-
+  std::ifstream inf(file);
+  if (!inf.is_open()) {
+    throw std::invalid_argument("File could not open: " + file);
+  }
   while (std::getline(inf, line)) {
     std::stringstream ss(line);
     std::string key;
@@ -12,10 +18,10 @@ std::vector<ServerContext> ConfigParser::Parse(std::ifstream &inf) {
     if (key.empty()) continue;
     ss >> value;
     if (key + value == "server{" && ss.get() == std::char_traits<char>::eof())
-      server.push_back(ServerParser::ParseServer(inf));
+      config.AddServer(ServerParser::ParseServer(inf));
     else {
       throw std::invalid_argument("Invalid key: " + line);
     }
   }
-  return server;
+  return config;
 }

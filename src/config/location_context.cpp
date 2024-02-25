@@ -57,8 +57,8 @@ const std::map<std::string, std::string>& LocationContext::GetErrorPage()
 void LocationContext::SetCanAutoIndex(bool can_auto_index) {
   can_auto_index_ = can_auto_index;
 }
-void LocationContext::SetLimitClientBody(int limit_client_body_bytes_) {
-  limit_client_body_bytes_ = limit_client_body_bytes_;
+void LocationContext::SetLimitClientBody(int limit_client_body_bytes) {
+  limit_client_body_bytes_ = limit_client_body_bytes;
 }
 void LocationContext::SetReturn(const std::string& ret) { return_ = ret; }
 void LocationContext::SetAlias(const std::string& alias) { alias_ = alias; }
