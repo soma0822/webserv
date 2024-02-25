@@ -1,12 +1,12 @@
 build
+.vscode
 webserv
-*.log
+a.out
 *.o
 *.d
+*.log
 *.pdf
-.vscode
-a.out
 *.un~
 *.json
+*.swp
 .DS*
-.swp
