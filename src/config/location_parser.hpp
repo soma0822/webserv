@@ -10,6 +10,7 @@
 
 #include "aparser.hpp"
 #include "location_context.hpp"
+#include "merge_string_and_container.hpp"
 
 class LocationParser : public AParser {
  public:

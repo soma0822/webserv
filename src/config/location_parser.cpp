@@ -19,14 +19,9 @@ LocationContext LocationParser::ParseLocation(std::ifstream &inf) {
     if (it == func.end()) {  // 対応した関数が見つからない
       throw std::invalid_argument("Invalid location key: " + key);
     }
-    if ((*it->second)(value, location) ==
-        false) {  // 対応した関数に適切な要素数と異なっている
-      std::string error = "Invalid location value:";
-      for (std::vector<std::string>::const_iterator it = value.begin();
-           it != value.end(); it++) {
-        error += " " + *it;
-      }
-      throw std::invalid_argument(error);
+    if ((*it->second)(value, location) == false) {  // 関数が失敗した場合
+      throw std::invalid_argument(
+          MergeStringAndContainer("Invalid location value: ", value));
     }
   }
   return location;
