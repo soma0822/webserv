@@ -52,7 +52,7 @@ bool ServerParser::ParseErrorPage(const std::vector<std::string> &value,
   if (value.size() < 2) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end() - 1; it++) {
-    if (IsNum(*it) == false) return false;
+    if (validation::IsNumber(*it) == false) return false;
     server.AddErrorPage(*it, *(value.end() - 1));
   }
   return true;

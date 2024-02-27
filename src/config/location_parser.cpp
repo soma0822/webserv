@@ -84,7 +84,7 @@ bool LocationParser::ParseCgiPath(const std::vector<std::string> &value,
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
-    if (IsPath(*it) == false) return false;
+    if (validation::IsPath(*it) == false) return false;
     location.AddCgiPath(*it);
   }
   return true;

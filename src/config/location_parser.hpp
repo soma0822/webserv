@@ -8,11 +8,11 @@
 #include <stdexcept>
 #include <string>
 
-#include "aparser.hpp"
 #include "location_context.hpp"
 #include "merge_string_and_container.hpp"
+#include "validation.hpp"
 
-class LocationParser : public AParser {
+class LocationParser {
  public:
   typedef bool (*parseFunction)(const std::vector<std::string> &,
                                 LocationContext &);

@@ -46,7 +46,7 @@ bool IsPort(const std::string &str) {
 	return false;
   }
   int num = std::stoi(str);
-  if (num < 0 || num > 65535) {
+  if (num < 0 || num > kMaxPort) {
 	return false;
   }
   return true;
