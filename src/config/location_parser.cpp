@@ -49,7 +49,9 @@ bool LocationParser::ParseAutoIndex(const std::vector<std::string> &value,
 bool LocationParser::ParseLimitClientBody(const std::vector<std::string> &value,
                                           LocationContext &location) {
   if (value.size() != 1) return false;
-  location.SetLimitClientBody(StrToI(value.at(0)));
+  Result<int, std::string> result = StrToI(value.at(0));
+  if (result.IsErr()) return false;
+  location.SetLimitClientBody(result.Unwrap());
   return true;
 }
 bool LocationParser::ParseReturn(const std::vector<std::string> &value,
@@ -112,7 +114,7 @@ bool LocationParser::ParseErrorPage(const std::vector<std::string> &value,
   if (value.size() < 2) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end() - 1; it++) {
-    if (IsNum(*it) == false) return false;
+    if (validation::IsNumber(*it) == false) return false;
     location.AddErrorPage(*it, *(value.end() - 1));
   }
   return true;

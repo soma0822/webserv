@@ -30,10 +30,12 @@ bool IsIp(const std::string &str) {
 	return false;
   }
   for (size_t i = 0; i < parts.size(); i++) {
-	if (!IsNumber(parts[i]) || parts[i].size() > 3) {
+	if (parts[i].size() > 3) {
 	  return false;
 	}
-	int num = std::stoi(parts[i]);
+	Result<int, std::string> result = StrToI(parts[i]);
+	if (result.IsErr()) return false;
+	int num = result.Unwrap();
 	if (num < 0 || num > 255) {
 	  return false;
 	}
@@ -45,7 +47,9 @@ bool IsPort(const std::string &str) {
   if (!IsNumber(str)) {
 	return false;
   }
-  int num = std::stoi(str);
+  Result<int, std::string> result = StrToI(str);
+  if (result.IsErr()) return false;
+  int num = result.Unwrap();
   if (num < 0 || num > kMaxPort) {
 	return false;
   }

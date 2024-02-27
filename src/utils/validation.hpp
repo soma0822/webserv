@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 #include <sstream>
-
+#include "str_to_i.hpp"
+#include "result.hpp"
 namespace validation {
 bool IsNumber(const std::string &);
 bool IsPath(const std::string &);

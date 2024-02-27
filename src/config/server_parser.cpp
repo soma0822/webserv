@@ -19,7 +19,7 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
       if (value.size() != 2 || value.at(1) != "{") {
         throw std::invalid_argument("Syntax error: " + line);
       }
-      if (IsPath(value.at(0)) == false) {
+      if (validation::IsPath(value.at(0)) == false) {
         throw std::invalid_argument("Invalid location path: " + value.at(0));
       }
       server.AddLocation(value.at(0), LocationParser::ParseLocation(inf));
@@ -85,9 +85,8 @@ bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
-  if (value.size() != 1 || StrToI(value.at(0)) > kMaxPort ||
-      StrToI(value.at(0)) < 0)
-    return false;
+  if (value.size() != 1) return false;
+  if (validation::IsPort(value.at(0)) == false) return false;
   server.AddPort(value.at(0));
   return true;
 }
