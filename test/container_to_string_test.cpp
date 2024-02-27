@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <list>
-#include <vect
+#include <vector>
 #include "container_to_string.hpp"
 
 TEST(ContainerToString, VectorInt) {
