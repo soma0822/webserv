@@ -20,10 +20,6 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
         throw std::invalid_argument("Syntax error: " + line);
       }
       if (IsPath(value.at(0)) == false) {
-        std::string error = "Invalid location path: ";
-        for (std::vector<std::string>::const_iterator it = value.begin();
-             it != value.end(); it++)
-          error += *it + " ";
         throw std::invalid_argument("Invalid location path: " + value.at(0));
       }
       server.AddLocation(value.at(0), LocationParser::ParseLocation(inf));
@@ -33,12 +29,8 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
         throw std::invalid_argument("Invalid server key: " + key);
       }
       if ((*it->second)(value, server) ==
-          false) {  // 対応した関数に適切な要素数と異なっている
-        std::string error = "Invalid server value:";
-        for (std::vector<std::string>::const_iterator it = value.begin();
-             it != value.end(); it++)
-          error += " " + *it;
-        throw std::invalid_argument(error);
+          false) {  // 関数が失敗した場合
+        throw std::invalid_argument(MergeStringAndContainer("Invalid server value: ", value));
       }
     }
   }

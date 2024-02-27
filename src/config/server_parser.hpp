@@ -11,6 +11,7 @@
 #include "aparser.hpp"
 #include "location_context.hpp"
 #include "location_parser.hpp"
+#include "merge_string_and_container.hpp"
 #include "server_context.hpp"
 
 class ServerParser : public AParser {
