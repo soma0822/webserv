@@ -7,7 +7,7 @@ Result<int, std::string> StrToI(const std::string &str) {
     return Err(str + " is not a number");
   }
   for (unsigned long i = 0; i < str.length(); i++) {
-    if (ret > INT_MAX / 10 || (ret == INT_MAX / 10 && str.at(i) > INT_MAX % 10))
+    if (ret > INT_MAX / 10 || (ret == INT_MAX / 10 && (str.at(i) - '0') > INT_MAX % 10))
       return Err(str + " is too large");
     ret = ret * 10 + (str.at(i) - '0');
   }
