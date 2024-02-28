@@ -168,9 +168,12 @@ class Value<void> {
  public:
   Value() {}
 
-  Value(const Value &other) {}
+  Value(const Value &other) { (void)other; }
 
-  Value &operator=(const Value &other) { return *this; }
+  Value &operator=(const Value &other) {
+    (void)other;
+    return *this;
+  }
 
   ~Value() {}
 
@@ -230,8 +233,7 @@ details::Value<T> Ok(T value) {
   return details::Value<T>(value);
 }
 
-details::Value<void> Ok() { return details::Value<void>(); }
-
+details::Value<void> Ok();
 template <typename E>
 details::Error<E> Err(E error) {
   return details::Error<E>(error);
