@@ -1,6 +1,7 @@
+#include "config.hpp"
+
 #include <gtest/gtest.h>
 
-#include "config.hpp"
 #include "config_parser.hpp"
 
 TEST(ConfigTest, DefaultPath) {
@@ -12,14 +13,16 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(config.GetServer()[0].GetPort()[0], "8002");
   ASSERT_EQ(config.GetServer()[0].GetServerName()[0], "localhost");
   ASSERT_EQ(config.GetServer()[0].GetErrorPage().size(), 2);
-  std::map<std::string, std::string>::const_iterator it = config.GetServer()[0].GetErrorPage().begin();
-  ASSERT_EQ(it->first, "404"); 
-  ASSERT_EQ(it->second, "error_pages/404.html"); 
+  std::map<std::string, std::string>::const_iterator it =
+      config.GetServer()[0].GetErrorPage().begin();
+  ASSERT_EQ(it->first, "404");
+  ASSERT_EQ(it->second, "error_pages/404.html");
   it++;
-  ASSERT_EQ(it->first, "405"); 
+  ASSERT_EQ(it->first, "405");
   ASSERT_EQ(it->second, "error_pages/404.html");
   ASSERT_EQ(config.GetServer()[0].GetLocation().size(), 4);
-  std::map<std::string, LocationContext>::const_iterator it2 = config.GetServer()[0].GetLocation().begin();
+  std::map<std::string, LocationContext>::const_iterator it2 =
+      config.GetServer()[0].GetLocation().begin();
   ASSERT_EQ(it2->first, "/");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
@@ -29,14 +32,16 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetIndex().size(), 0);
   ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 0);
-  std::map<std::string, bool>::const_iterator it3 = it2->second.GetAllowMethod().begin();
+  std::map<std::string, bool>::const_iterator it3 =
+      it2->second.GetAllowMethod().begin();
   ASSERT_EQ(it3->second, true);
   it3++;
   ASSERT_EQ(it3->second, true);
   it3++;
   ASSERT_EQ(it3->second, true);
   ASSERT_EQ(it2->second.GetErrorPage().size(), 1);
-  std::map<std::string, std::string>::const_iterator it4 = it2->second.GetErrorPage().begin();
+  std::map<std::string, std::string>::const_iterator it4 =
+      it2->second.GetErrorPage().begin();
   ASSERT_EQ(it4->first, "404");
   ASSERT_EQ(it4->second, "error_pages/404.html");
   it2++;
@@ -54,7 +59,8 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 2);
   ASSERT_EQ(it2->second.GetCgiExtention()[0], ".py");
   ASSERT_EQ(it2->second.GetCgiExtention()[1], ".sh");
-  std::map<std::string, bool>::const_iterator it5 = it2->second.GetAllowMethod().begin();
+  std::map<std::string, bool>::const_iterator it5 =
+      it2->second.GetAllowMethod().begin();
   ASSERT_EQ(it5->second, true);
   it5++;
   ASSERT_EQ(it5->second, true);
@@ -71,7 +77,8 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetIndex().size(), 0);
   ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 0);
-  std::map<std::string, bool>::const_iterator it6 = it2->second.GetAllowMethod().begin();
+  std::map<std::string, bool>::const_iterator it6 =
+      it2->second.GetAllowMethod().begin();
   ASSERT_EQ(it6->second, false);
   it6++;
   ASSERT_EQ(it6->second, false);
@@ -89,7 +96,8 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetIndex()[0], "tours1.html");
   ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 0);
-  std::map<std::string, bool>::const_iterator it7 = it2->second.GetAllowMethod().begin();
+  std::map<std::string, bool>::const_iterator it7 =
+      it2->second.GetAllowMethod().begin();
   ASSERT_EQ(it7->second, false);
   it7++;
   ASSERT_EQ(it7->second, true);
@@ -100,7 +108,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2, config.GetServer()[0].GetLocation().end());
 }
 
-TEST(ConfigTest, TooLargePortTest){
+TEST(ConfigTest, TooLargePortTest) {
   try {
     Config config = ConfigParser::Parse("test/conf_test/too_large_port.conf");
   } catch (std::exception &e) {
@@ -108,7 +116,7 @@ TEST(ConfigTest, TooLargePortTest){
   }
 }
 
-TEST(ConfigTest, NotNumberPortTest){
+TEST(ConfigTest, NotNumberPortTest) {
   try {
     Config config = ConfigParser::Parse("test/conf_test/not_num_port.conf");
   } catch (std::exception &e) {
@@ -116,7 +124,7 @@ TEST(ConfigTest, NotNumberPortTest){
   }
 }
 
-TEST(ConfigTest, InvalidServerTest){
+TEST(ConfigTest, InvalidServerTest) {
   try {
     Config config = ConfigParser::Parse("test/conf_test/invalid_server.conf");
   } catch (std::exception &e) {
@@ -124,7 +132,7 @@ TEST(ConfigTest, InvalidServerTest){
   }
 }
 
-TEST(ConfigTest, NoFileTest){
+TEST(ConfigTest, NoFileTest) {
   try {
     Config config = ConfigParser::Parse("test/conf_test/no_file.conf");
   } catch (std::exception &e) {
@@ -132,49 +140,58 @@ TEST(ConfigTest, NoFileTest){
   }
 }
 
-TEST(ConfigTest, InvalidLocationKeyTest){
+TEST(ConfigTest, InvalidLocationKeyTest) {
   try {
-    Config config = ConfigParser::Parse("test/conf_test/invalid_location_key.conf");
+    Config config =
+        ConfigParser::Parse("test/conf_test/invalid_location_key.conf");
   } catch (std::exception &e) {
     ASSERT_STREQ(e.what(), "Invalid location key: tokazaki");
   }
 }
 
-TEST(ConfigTest, InvalidLocationValueTest){
+TEST(ConfigTest, InvalidLocationValueTest) {
   try {
-    Config config = ConfigParser::Parse("test/conf_test/invalid_location_value.conf");
+    Config config =
+        ConfigParser::Parse("test/conf_test/invalid_location_value.conf");
   } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "Invalid location value: /usr/share/nginx/html /usr/share/nginx/html");
+    ASSERT_STREQ(
+        e.what(),
+        "Invalid location value: /usr/share/nginx/html /usr/share/nginx/html");
   }
 }
 
-TEST(ConfigTest, LocationSyntaxErrorTest){
+TEST(ConfigTest, LocationSyntaxErrorTest) {
   try {
-    Config config = ConfigParser::Parse("test/conf_test/location_syntax_error.conf");
+    Config config =
+        ConfigParser::Parse("test/conf_test/location_syntax_error.conf");
   } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "Syntax error: semicolon: \t\troot /usr/share/nginx/html");
+    ASSERT_STREQ(e.what(),
+                 "Syntax error: semicolon: \t\troot /usr/share/nginx/html");
   }
 }
 
-TEST(ConfigTest, ServerSyntaxErrorTest){
+TEST(ConfigTest, ServerSyntaxErrorTest) {
   try {
-    Config config = ConfigParser::Parse("test/conf_test/server_syntax_error.conf");
+    Config config =
+        ConfigParser::Parse("test/conf_test/server_syntax_error.conf");
   } catch (std::exception &e) {
     ASSERT_STREQ(e.what(), "Syntax error: 	location / ");
   }
 }
 
-TEST(ConfigTest, InvalidServerKeyTest){
+TEST(ConfigTest, InvalidServerKeyTest) {
   try {
-    Config config = ConfigParser::Parse("test/conf_test/invalid_server_key.conf");
+    Config config =
+        ConfigParser::Parse("test/conf_test/invalid_server_key.conf");
   } catch (std::exception &e) {
     ASSERT_STREQ(e.what(), "Invalid server key: tkuramot");
   }
 }
 
-TEST(ConfigTest, InvalidServerValueTest){
+TEST(ConfigTest, InvalidServerValueTest) {
   try {
-    Config config = ConfigParser::Parse("test/conf_test/invalid_server_value.conf");
+    Config config =
+        ConfigParser::Parse("test/conf_test/invalid_server_value.conf");
   } catch (std::exception &e) {
     ASSERT_STREQ(e.what(), "Invalid server value: kuramoto okazaki");
   }

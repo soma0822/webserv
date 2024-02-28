@@ -15,4 +15,5 @@ jobs:
       - name: Check format
         run: |
           find ./src -name "*.cpp" -o -name "*.hpp" | xargs clang-format -i
+          find ./test -name "*.cpp" -o -name "*.hpp" | xargs clang-format -i
           git diff --exit-code
