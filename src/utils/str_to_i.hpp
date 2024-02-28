@@ -1,7 +1,7 @@
 #ifndef WEBSERV_UTILS_STR_TO_I_HPP
 #define WEBSERV_UTILS_STR_TO_I_HPP
 
-#include <limits>
+#include <climits>
 #include <string>
 
 #include "result.hpp"
