@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.26)
-project(webserv)
+project(webserv LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_compile_options(-Wall -Wextra -Werror)
 
 set(PROGRAM webserv_test)
 set(GTEST_VERSION 1.12.1)
