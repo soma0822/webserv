@@ -168,9 +168,12 @@ class Value<void> {
  public:
   Value() {}
 
-  Value(const Value &other) {}
+  Value(const Value &other) { (void)other; }
 
-  Value &operator=(const Value &other) { return *this; }
+  Value &operator=(const Value &other) {
+    (void)other;
+    return *this;
+  }
 
   ~Value() {}
 
