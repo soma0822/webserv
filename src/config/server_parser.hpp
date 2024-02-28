@@ -30,7 +30,6 @@ class ServerParser {
                                ServerContext &);
   static bool ParsePort(const std::vector<std::string> &, ServerContext &);
   static void RemoveSemicolon(std::string &);
-  static const int kMaxPort = 65535;
 };
 
 #endif
