@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "validation.hpp"
+
+#include <gtest/gtest.h>
 
 TEST(ValidationTest, IsNumber) {
   EXPECT_TRUE(validation::IsNumber("123"));
