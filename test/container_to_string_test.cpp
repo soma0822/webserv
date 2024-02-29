@@ -2,6 +2,7 @@
 
 #include <list>
 #include <vector>
+
 #include "container.hpp"
 
 TEST(ContainerMerge, VectorInt) {
