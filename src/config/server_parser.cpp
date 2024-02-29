@@ -30,7 +30,7 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
       }
       if ((*it->second)(value, server) == false) {  // 関数が失敗した場合
         throw std::invalid_argument("Invalid server value: " +
-                                    MergeContainer(value, " "));
+                                    container::MergeContainer(value, " "));
       }
     }
   }

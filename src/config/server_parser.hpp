@@ -8,9 +8,9 @@
 #include <stdexcept>
 #include <string>
 
+#include "container.hpp"
 #include "location_context.hpp"
 #include "location_parser.hpp"
-#include "merge_container.hpp"
 #include "server_context.hpp"
 #include "validation.hpp"
 

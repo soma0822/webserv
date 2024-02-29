@@ -2,24 +2,24 @@
 
 #include <list>
 #include <vector>
-#include "merge_container.hpp"
+#include "container.hpp"
 
-TEST(ContainerToString, VectorInt) {
+TEST(ContainerMerge, VectorInt) {
   std::vector<int> v = {1, 2, 3, 4, 5};
-  ASSERT_EQ("1 2 3 4 5", MergeContainer(v, " "));
+  ASSERT_EQ("1 2 3 4 5", container::MergeContainer(v, " "));
 }
 
-TEST(ContainerToString, VectorString) {
+TEST(ContainerMerge, VectorString) {
   std::vector<std::string> v = {"Hello", "World", "!"};
-  ASSERT_EQ("Hello World !", MergeContainer(v, " "));
+  ASSERT_EQ("Hello World !", container::MergeContainer(v, " "));
 }
 
-TEST(ContainerToString, ListInt) {
+TEST(ContainerMerge, ListInt) {
   std::list<int> v = {1, 2, 3, 4, 5};
-  ASSERT_EQ("1\n2\n3\n4\n5", MergeContainer(v, "\n"));
+  ASSERT_EQ("1\n2\n3\n4\n5", container::MergeContainer(v, "\n"));
 }
 
-TEST(ContainerToString, ListString) {
+TEST(ContainerMerge, ListString) {
   std::list<std::string> v = {"Hello", "World", "!"};
-  ASSERT_EQ("Hello\nWorld\n!", MergeContainer(v, "\n"));
+  ASSERT_EQ("Hello\nWorld\n!", container::MergeContainer(v, "\n"));
 }
