@@ -1,5 +1,5 @@
-#ifndef WEBSERV_UTILS_STRING_HPP
-#define WEBSERV_UTILS_STRING_HPP
+#ifndef WEBSERV_UTILS_STRING_UTILS_HPP
+#define WEBSERV_UTILS_STRING_UTILS_HPP
 
 #include <climits>
 #include <string>
