@@ -29,8 +29,8 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
         throw std::invalid_argument("Invalid server key: " + key);
       }
       if ((*it->second)(value, server) == false) {  // 関数が失敗した場合
-        throw std::invalid_argument(
-            MergeStringAndContainer("Invalid server value: ", value));
+        throw std::invalid_argument("Invalid server value: "
+            + MergeContainer(value, " "));
       }
     }
   }

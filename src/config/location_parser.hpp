@@ -9,7 +9,7 @@
 #include <string>
 
 #include "location_context.hpp"
-#include "merge_string_and_container.hpp"
+#include "merge_container.hpp"
 #include "result.hpp"
 #include "string.hpp"
 #include "validation.hpp"

@@ -20,8 +20,8 @@ LocationContext LocationParser::ParseLocation(std::ifstream &inf) {
       throw std::invalid_argument("Invalid location key: " + key);
     }
     if ((*it->second)(value, location) == false) {  // 関数が失敗した場合
-      throw std::invalid_argument(
-          MergeStringAndContainer("Invalid location value: ", value));
+      throw std::invalid_argument("Invalid location value: "
+          + MergeContainer(value, " "));
     }
   }
   return location;
