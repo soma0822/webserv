@@ -112,7 +112,7 @@ TEST(ConfigTest, TooLargePortTest) {
   try {
     Config config = ConfigParser::Parse("test/conf_test/too_large_port.conf");
   } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "20000000000000 is too large");
+    ASSERT_STREQ(e.what(), "Invalid server value: 20000000000000");
   }
 }
 
@@ -120,7 +120,7 @@ TEST(ConfigTest, NotNumberPortTest) {
   try {
     Config config = ConfigParser::Parse("test/conf_test/not_num_port.conf");
   } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "200a is not a number");
+    ASSERT_STREQ(e.what(), "Invalid server value: 200a");
   }
 }
 

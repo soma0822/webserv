@@ -8,12 +8,13 @@
 #include <stdexcept>
 #include <string>
 
-#include "aparser.hpp"
+#include "container.hpp"
 #include "location_context.hpp"
 #include "location_parser.hpp"
 #include "server_context.hpp"
+#include "validation.hpp"
 
-class ServerParser : public AParser {
+class ServerParser {
  public:
   typedef bool (*parseFunction)(const std::vector<std::string> &,
                                 ServerContext &);
@@ -29,7 +30,6 @@ class ServerParser : public AParser {
                                ServerContext &);
   static bool ParsePort(const std::vector<std::string> &, ServerContext &);
   static void RemoveSemicolon(std::string &);
-  static const int kMaxPort = 65535;
 };
 
 #endif

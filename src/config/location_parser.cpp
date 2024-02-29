@@ -19,14 +19,9 @@ LocationContext LocationParser::ParseLocation(std::ifstream &inf) {
     if (it == func.end()) {  // 対応した関数が見つからない
       throw std::invalid_argument("Invalid location key: " + key);
     }
-    if ((*it->second)(value, location) ==
-        false) {  // 対応した関数に適切な要素数と異なっている
-      std::string error = "Invalid location value:";
-      for (std::vector<std::string>::const_iterator it = value.begin();
-           it != value.end(); it++) {
-        error += " " + *it;
-      }
-      throw std::invalid_argument(error);
+    if ((*it->second)(value, location) == false) {  // 関数が失敗した場合
+      throw std::invalid_argument("Invalid location value: " +
+                                  container::MergeContainer(value, " "));
     }
   }
   return location;
@@ -54,7 +49,9 @@ bool LocationParser::ParseAutoIndex(const std::vector<std::string> &value,
 bool LocationParser::ParseLimitClientBody(const std::vector<std::string> &value,
                                           LocationContext &location) {
   if (value.size() != 1) return false;
-  location.SetLimitClientBody(StrToI(value.at(0)));
+  Result<int, std::string> result = string_utils::StrToI(value.at(0));
+  if (result.IsErr()) return false;
+  location.SetLimitClientBody(result.Unwrap());
   return true;
 }
 bool LocationParser::ParseReturn(const std::vector<std::string> &value,
@@ -89,7 +86,7 @@ bool LocationParser::ParseCgiPath(const std::vector<std::string> &value,
   if (value.size() == 0) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end(); it++) {
-    if (IsPath(*it) == false) return false;
+    if (validation::IsPath(*it) == false) return false;
     location.AddCgiPath(*it);
   }
   return true;
@@ -117,7 +114,7 @@ bool LocationParser::ParseErrorPage(const std::vector<std::string> &value,
   if (value.size() < 2) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end() - 1; it++) {
-    if (IsNum(*it) == false) return false;
+    if (validation::IsNumber(*it) == false) return false;
     location.AddErrorPage(*it, *(value.end() - 1));
   }
   return true;

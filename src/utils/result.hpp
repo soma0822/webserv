@@ -233,8 +233,7 @@ details::Value<T> Ok(T value) {
   return details::Value<T>(value);
 }
 
-details::Value<void> Ok() { return details::Value<void>(); }
-
+details::Value<void> Ok();
 template <typename E>
 details::Error<E> Err(E error) {
   return details::Error<E>(error);

@@ -19,11 +19,7 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
       if (value.size() != 2 || value.at(1) != "{") {
         throw std::invalid_argument("Syntax error: " + line);
       }
-      if (IsPath(value.at(0)) == false) {
-        std::string error = "Invalid location path: ";
-        for (std::vector<std::string>::const_iterator it = value.begin();
-             it != value.end(); it++)
-          error += *it + " ";
+      if (validation::IsPath(value.at(0)) == false) {
         throw std::invalid_argument("Invalid location path: " + value.at(0));
       }
       server.AddLocation(value.at(0), LocationParser::ParseLocation(inf));
@@ -32,13 +28,9 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
       if (it == func.end()) {  // 対応した関数が見つからない
         throw std::invalid_argument("Invalid server key: " + key);
       }
-      if ((*it->second)(value, server) ==
-          false) {  // 対応した関数に適切な要素数と異なっている
-        std::string error = "Invalid server value:";
-        for (std::vector<std::string>::const_iterator it = value.begin();
-             it != value.end(); it++)
-          error += " " + *it;
-        throw std::invalid_argument(error);
+      if ((*it->second)(value, server) == false) {  // 関数が失敗した場合
+        throw std::invalid_argument("Invalid server value: " +
+                                    container::MergeContainer(value, " "));
       }
     }
   }
@@ -60,7 +52,7 @@ bool ServerParser::ParseErrorPage(const std::vector<std::string> &value,
   if (value.size() < 2) return false;
   for (std::vector<std::string>::const_iterator it = value.begin();
        it != value.end() - 1; it++) {
-    if (IsNum(*it) == false) return false;
+    if (validation::IsNumber(*it) == false) return false;
     server.AddErrorPage(*it, *(value.end() - 1));
   }
   return true;
@@ -93,9 +85,8 @@ bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
-  if (value.size() != 1 || StrToI(value.at(0)) > kMaxPort ||
-      StrToI(value.at(0)) < 0)
-    return false;
+  if (value.size() != 1) return false;
+  if (validation::IsPort(value.at(0)) == false) return false;
   server.AddPort(value.at(0));
   return true;
 }
