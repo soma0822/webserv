@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "result.hpp"
-#include "str_to_i.hpp"
+#include "string.hpp"
 namespace validation {
 bool IsNumber(const std::string &);
 bool IsPath(const std::string &);

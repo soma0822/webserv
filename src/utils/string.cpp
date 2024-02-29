@@ -1,5 +1,6 @@
-#include "str_to_i.hpp"
+#include "string.hpp"
 
+namespace string {
 Result<int, std::string> StrToI(const std::string &str) {
   long long ret = 0;
 
@@ -14,3 +15,4 @@ Result<int, std::string> StrToI(const std::string &str) {
   }
   return Ok(ret);
 }
+}  // namespace string

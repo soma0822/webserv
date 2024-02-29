@@ -11,7 +11,7 @@
 #include "location_context.hpp"
 #include "merge_string_and_container.hpp"
 #include "result.hpp"
-#include "str_to_i.hpp"
+#include "string.hpp"
 #include "validation.hpp"
 
 class LocationParser {

@@ -33,7 +33,7 @@ bool IsIp(const std::string &str) {
     if (parts[i].size() > 3) {
       return false;
     }
-    Result<int, std::string> result = StrToI(parts[i]);
+    Result<int, std::string> result = string::StrToI(parts[i]);
     if (result.IsErr()) return false;
     int num = result.Unwrap();
     if (num < 0 || num > 255) {
@@ -47,7 +47,7 @@ bool IsPort(const std::string &str) {
   if (!IsNumber(str)) {
     return false;
   }
-  Result<int, std::string> result = StrToI(str);
+  Result<int, std::string> result = string::StrToI(str);
   if (result.IsErr()) return false;
   int num = result.Unwrap();
   if (num < 0 || num > kMaxPort) {
