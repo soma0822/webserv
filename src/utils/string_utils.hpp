@@ -9,5 +9,5 @@
 
 namespace string_utils {
 Result<int, std::string> StrToI(const std::string &str);
-}  // namespace string
+}  // namespace string_utils
 #endif

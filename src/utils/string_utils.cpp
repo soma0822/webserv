@@ -15,4 +15,4 @@ Result<int, std::string> StrToI(const std::string &str) {
   }
   return Ok(ret);
 }
-}  // namespace string
+}  // namespace string_utils
