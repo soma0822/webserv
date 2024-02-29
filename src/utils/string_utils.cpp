@@ -1,6 +1,6 @@
-#include "string.hpp"
+#include "string_utils.hpp"
 
-namespace string {
+namespace string_utils {
 Result<int, std::string> StrToI(const std::string &str) {
   long long ret = 0;
 

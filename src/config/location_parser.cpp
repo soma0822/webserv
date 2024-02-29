@@ -49,7 +49,7 @@ bool LocationParser::ParseAutoIndex(const std::vector<std::string> &value,
 bool LocationParser::ParseLimitClientBody(const std::vector<std::string> &value,
                                           LocationContext &location) {
   if (value.size() != 1) return false;
-  Result<int, std::string> result = string::StrToI(value.at(0));
+  Result<int, std::string> result = string_utils::StrToI(value.at(0));
   if (result.IsErr()) return false;
   location.SetLimitClientBody(result.Unwrap());
   return true;
