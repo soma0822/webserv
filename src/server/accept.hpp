@@ -3,7 +3,7 @@
 
 // struct sockaddr_in
 #include <arpa/inet.h>
-//socket
+// socket
 #include <sys/socket.h>
 
 #include "io_task.hpp"
@@ -12,16 +12,15 @@
 #include "string_utils.hpp"
 
 class Accept : public AIOTask {
-public:
+ public:
   Accept(const std::string &);
   virtual ~Accept();
   virtual Result<int, std::string> Execute();
 
-private:
+ private:
   Accept();
   Accept(const Accept &);
   Accept &operator=(const Accept &);
 };
-
 
 #endif

@@ -6,7 +6,7 @@
 #include "result.hpp"
 
 class AIOTask {
-public:
+ public:
   AIOTask();
   virtual ~AIOTask();
   virtual Result<int, std::string> Execute() = 0;
@@ -14,7 +14,7 @@ public:
   int GetEvent();
   const std::string &GetPort();
 
-protected:
+ protected:
   int fd_;
   int event_;
   std::string port_;

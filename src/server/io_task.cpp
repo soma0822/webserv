@@ -1,8 +1,8 @@
 #include "io_task.hpp"
 
-AIOTask::AIOTask(){}
+AIOTask::AIOTask() {}
 
-AIOTask::~AIOTask(){}
+AIOTask::~AIOTask() {}
 
 int AIOTask::GetFd() { return fd_; }
 

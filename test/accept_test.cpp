@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "accept.hpp"
+
+#include <gtest/gtest.h>
 
 /*
  * Acceptクラスのテスト
@@ -23,6 +23,4 @@ TEST(Accept, AcceptError) {
   }
 }
 
-//TODO: acceptのテストを書く
-
-
+// TODO: acceptのテストを書く
