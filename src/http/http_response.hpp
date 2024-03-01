@@ -5,9 +5,6 @@
 #include <string>
 
 #include "http_status_code.hpp"
-#include "result.hpp"
-
-namespace http {
 
 class HTTPResponse {
  public:
@@ -17,8 +14,8 @@ class HTTPResponse {
   ~HTTPResponse();
 
   // アクセサー
-  void SetStatusCode(StatusCode status_code);
-  StatusCode GetStatusCode() const;
+  void SetStatusCode(http::StatusCode status_code);
+  http::StatusCode GetStatusCode() const;
   void SetHeader(const std::string &key, const std::string &value);
   std::string GetHeader(const std::string &key);
   void SetBody(const std::string &body);
@@ -27,11 +24,9 @@ class HTTPResponse {
   std::string ToString() const;
 
  private:
-  StatusCode status_code_;
+  http::StatusCode status_code_;
   std::map<std::string, std::string> headers_;
   std::string body_;
 };
-
-}  // namespace http
 
 #endif  // WEBSERV_SRC_HTTP_HTTP_RESPONSE_HPP_
