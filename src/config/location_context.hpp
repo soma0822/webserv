@@ -23,16 +23,16 @@ class LocationContext {
   const std::map<std::string, bool>& GetAllowMethod() const;
   const std::map<std::string, std::string>& GetErrorPage() const;
   // セッター
-  void SetCanAutoIndex(bool);
-  void SetLimitClientBody(int);
-  void SetReturn(const std::string&);
-  void SetAlias(const std::string&);
-  void SetRoot(const std::string&);
-  void AddIndex(const std::string&);
-  void AddCgiPath(const std::string&);
-  void AddCgiExtention(const std::string&);
-  void AddAllowMethod(const std::string&);
-  void AddErrorPage(const std::string&, const std::string&);
+  void SetCanAutoIndex(bool can_auto_inde);
+  void SetLimitClientBody(int limit_client_body_bytes);
+  void SetReturn(const std::string& ret);
+  void SetAlias(const std::string& alias);
+  void SetRoot(const std::string& root);
+  void AddIndex(const std::string& index);
+  void AddCgiPath(const std::string& cgi_path);
+  void AddCgiExtention(const std::string& cgi_extention);
+  void AddAllowMethod(const std::string& key);
+  void AddErrorPage(const std::string& key, const std::string& value);
 
  private:
   bool can_auto_index_;

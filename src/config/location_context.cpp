@@ -10,10 +10,10 @@ LocationContext::LocationContext()
   allow_method_["POST"] = false;
   allow_method_["DELETE"] = false;
 }
-LocationContext::LocationContext(const LocationContext& other) {
+LocationContext::LocationContext(const LocationContext &other) {
   *this = other;
 }
-LocationContext& LocationContext::operator=(const LocationContext& other) {
+LocationContext &LocationContext::operator=(const LocationContext &other) {
   if (this == &other) {
     return *this;
   }
@@ -34,22 +34,22 @@ bool LocationContext::GetCnaAutoIndex() const { return can_auto_index_; }
 int LocationContext::GetLimitClientBody() const {
   return limit_client_body_bytes_;
 }
-const std::string& LocationContext::GetReturn() const { return return_; }
-const std::string& LocationContext::GetAlias() const { return alias_; }
-const std::string& LocationContext::GetRoot() const { return root_; }
-const std::vector<std::string>& LocationContext::GetIndex() const {
+const std::string &LocationContext::GetReturn() const { return return_; }
+const std::string &LocationContext::GetAlias() const { return alias_; }
+const std::string &LocationContext::GetRoot() const { return root_; }
+const std::vector<std::string> &LocationContext::GetIndex() const {
   return index_;
 }
-const std::vector<std::string>& LocationContext::GetCgiPath() const {
+const std::vector<std::string> &LocationContext::GetCgiPath() const {
   return cgi_path_;
 }
-const std::vector<std::string>& LocationContext::GetCgiExtention() const {
+const std::vector<std::string> &LocationContext::GetCgiExtention() const {
   return cgi_extention_;
 }
-const std::map<std::string, bool>& LocationContext::GetAllowMethod() const {
+const std::map<std::string, bool> &LocationContext::GetAllowMethod() const {
   return allow_method_;
 }
-const std::map<std::string, std::string>& LocationContext::GetErrorPage()
+const std::map<std::string, std::string> &LocationContext::GetErrorPage()
     const {
   return error_page_;
 }
@@ -60,29 +60,29 @@ void LocationContext::SetCanAutoIndex(bool can_auto_index) {
 void LocationContext::SetLimitClientBody(int limit_client_body_bytes) {
   limit_client_body_bytes_ = limit_client_body_bytes;
 }
-void LocationContext::SetReturn(const std::string& ret) { return_ = ret; }
-void LocationContext::SetAlias(const std::string& alias) { alias_ = alias; }
-void LocationContext::SetRoot(const std::string& root) { root_ = root; }
-void LocationContext::AddIndex(const std::string& index) {
+void LocationContext::SetReturn(const std::string &ret) { return_ = ret; }
+void LocationContext::SetAlias(const std::string &alias) { alias_ = alias; }
+void LocationContext::SetRoot(const std::string &root) { root_ = root; }
+void LocationContext::AddIndex(const std::string &index) {
   index_.push_back(index);
 }
-void LocationContext::AddCgiPath(const std::string& cgi_path) {
+void LocationContext::AddCgiPath(const std::string &cgi_path) {
   cgi_path_.push_back(cgi_path);
 }
-void LocationContext::AddCgiExtention(const std::string& cgi_extention) {
+void LocationContext::AddCgiExtention(const std::string &cgi_extention) {
   cgi_extention_.push_back(cgi_extention);
 }
-void LocationContext::AddAllowMethod(const std::string& key) {
+void LocationContext::AddAllowMethod(const std::string &key) {
   allow_method_[key] = true;
 }
-void LocationContext::AddErrorPage(const std::string& key,
-                                   const std::string& value) {
+void LocationContext::AddErrorPage(const std::string &key,
+                                   const std::string &value) {
   std::map<std::string, std::string>::iterator it = error_page_.find(key);
   if (it == error_page_.end()) error_page_[key] = value;
 }
 
 // 出力
-std::ostream& operator<<(std::ostream& os, LocationContext& obj) {
+std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
   os << "index: ";
   for (std::vector<std::string>::const_iterator it = obj.GetIndex().begin();
        it != obj.GetIndex().end(); it++) {
@@ -119,7 +119,7 @@ std::ostream& operator<<(std::ostream& os, LocationContext& obj) {
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const LocationContext& obj) {
+std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
   os << "index: ";
   if (obj.GetIndex().size() == 0)
     os << "no set";

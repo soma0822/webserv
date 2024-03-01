@@ -24,13 +24,13 @@ class ServerContext {
   const std::map<std::string, std::string> &GetErrorPage() const;
   const std::map<std::string, LocationContext> &GetLocation() const;
 
-  void SetIp(const std::string &);
-  void SetRoot(const std::string &);
-  void AddIndex(const std::string &);
-  void AddPort(const std::string &);
-  void AddServerName(const std::string &);
-  void AddErrorPage(const std::string &, const std::string &);
-  void AddLocation(const std::string &, const LocationContext &);
+  void SetIp(const std::string &ip);
+  void SetRoot(const std::string &root);
+  void AddIndex(const std::string &index);
+  void AddPort(const std::string &port);
+  void AddServerName(const std::string &server_name);
+  void AddErrorPage(const std::string &key, const std::string &value);
+  void AddLocation(const std::string &key, const LocationContext &value);
 
  private:
   std::string ip_;

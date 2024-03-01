@@ -12,7 +12,7 @@ class ConfigParser;
 class Config {
  public:
   static void Clear();
-  static void AddServer(const ServerContext &);
+  static void AddServer(const ServerContext &server);
   static const std::vector<ServerContext> &GetServer();
 
  private:
