@@ -16,7 +16,7 @@ Accept::Accept(const std::string &port) {
   if (listen(sock, SOMAXCONN) == -1)
     throw std::invalid_argument(port + " : listenエラー");
   Logger::Info() << port << " : リッスン開始" << std::endl;
-  event_ = POLL_IN;
+  event_ = POLLIN;
   port_ = port;
   fd_ = sock;
 }
