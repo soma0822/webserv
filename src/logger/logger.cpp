@@ -104,3 +104,13 @@ std::ostream &FileStreamWrapper::GetStream() {
 }
 
 const std::string FileStreamWrapper::kDefaultLogDir = "log/";
+
+/*
+ * NullStreamラッパー
+ */
+
+NullStreamWrapper::NullStreamWrapper() {}
+
+NullStreamWrapper::~NullStreamWrapper() {}
+
+std::ostream &NullStreamWrapper::GetStream() { return null_stream_; }

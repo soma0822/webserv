@@ -96,4 +96,19 @@ class FileStreamWrapper : public ILoggerHandler {
   null_stream::NullStream null_stream_;
 };
 
+/*
+ * Nullストリームラッパー
+ */
+
+class NullStreamWrapper : public ILoggerHandler {
+ public:
+  NullStreamWrapper();
+  ~NullStreamWrapper();
+
+  std::ostream &GetStream();
+
+ private:
+  null_stream::NullStream null_stream_;
+};
+
 #endif  // WEBSERV_SRC_LOGGER_LOGGER_HPP
