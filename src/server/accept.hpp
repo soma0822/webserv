@@ -19,11 +19,13 @@ class Accept : public AIOTask {
   Accept(const std::string &);
   virtual ~Accept();
   virtual Result<int, std::string> Execute();
+  const std::string &GetPort() const;
 
  private:
   Accept();
   Accept(const Accept &other);
   Accept &operator=(const Accept &other);
+  std::string port_;
 };
 
 #endif

@@ -10,14 +10,12 @@ class AIOTask {
   AIOTask();
   virtual ~AIOTask();
   virtual Result<int, std::string> Execute() = 0;
-  int GetFd();
-  int GetEvent();
-  const std::string &GetPort();
+  int GetFd() const;
+  int GetEvent() const;
 
  protected:
   int fd_;
   int event_;
-  std::string port_;
 };
 
 #endif

@@ -36,3 +36,5 @@ Result<int, std::string> Accept::Execute() {
   //  IOTaskManager::AddTask(new ReadRequestFromClient(client_sock, port_));
   return Ok(0);
 }
+
+const std::string &Accept::GetPort() const { return port_; }
