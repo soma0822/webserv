@@ -6,6 +6,6 @@ AIOTask::~AIOTask(){}
 
 int AIOTask::GetFd() { return fd_; }
 
-int AIOTask::GetEvent { return event_; }
+int AIOTask::GetEvent() { return event_; }
 
-const std::string &AIOTask::GetPort { return port_; }
+const std::string &AIOTask::GetPort() { return port_; }
