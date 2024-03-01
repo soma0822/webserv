@@ -14,7 +14,8 @@ Accept::Accept(const std::string &port){
   if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1)
     throw std::invalid_argument(port + " : bindエラー");
   if (listen(sock, SOMAXCONN) == -1)
-    throw std::invalid_argument(port + " : listenエラー"); 
+    throw std::invalid_argument(port + " : listenエラー");
+  Logger::Info() << port << " : リッスン開始" << std::endl; 
   event_ = POLL_IN;
   port_ = port;
   fd_ = sock;
@@ -33,4 +34,5 @@ Result<int, std::string> Accept::Execute(){
   Logger::Info() << port_ << " : 接続しました" << std::endl;
   //TODO: IOTaskManagerクラスとReadRequestFromClientクラスの実装
   // IOTaskManager::AddTask(new ReadRequestFromClient(client_sock, port_));
+  return Ok(0);
 }
