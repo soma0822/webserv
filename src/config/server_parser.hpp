@@ -16,20 +16,25 @@
 
 class ServerParser {
  public:
-  typedef bool (*parseFunction)(const std::vector<std::string> &,
-                                ServerContext &);
-  static ServerContext ParseServer(std::ifstream &);
+  typedef bool (*parseFunction)(const std::vector<std::string> &value,
+                                ServerContext &server);
+  static ServerContext ParseServer(std::ifstream &inf);
 
  private:
-  static void ParseFuncInit(std::map<std::string, parseFunction> &);
-  static bool ParseErrorPage(const std::vector<std::string> &, ServerContext &);
-  static bool ParseIndex(const std::vector<std::string> &, ServerContext &);
-  static bool ParseIp(const std::vector<std::string> &, ServerContext &);
-  static bool ParseRoot(const std::vector<std::string> &, ServerContext &);
-  static bool ParseServer_name(const std::vector<std::string> &,
-                               ServerContext &);
-  static bool ParsePort(const std::vector<std::string> &, ServerContext &);
-  static void RemoveSemicolon(std::string &);
+  static void ParseFuncInit(std::map<std::string, parseFunction> &func);
+  static bool ParseErrorPage(const std::vector<std::string> &value,
+                             ServerContext &server);
+  static bool ParseIndex(const std::vector<std::string> &value,
+                         ServerContext &server);
+  static bool ParseIp(const std::vector<std::string> &value,
+                      ServerContext &server);
+  static bool ParseRoot(const std::vector<std::string> &value,
+                        ServerContext &server);
+  static bool ParseServer_name(const std::vector<std::string> &value,
+                               ServerContext &server);
+  static bool ParsePort(const std::vector<std::string> &value,
+                        ServerContext &server);
+  static void RemoveSemicolon(std::string &line);
 };
 
 #endif
