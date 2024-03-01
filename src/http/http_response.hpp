@@ -16,8 +16,8 @@ class HTTPResponse {
   // アクセサー
   void SetStatusCode(http::StatusCode status_code);
   http::StatusCode GetStatusCode() const;
-  void SetHeader(const std::string &key, const std::string &value);
-  std::string GetHeader(const std::string &key);
+  void AddHeader(const std::string &key, const std::string &value);
+  const std::map<std::string, std::string> &GetHeaders() const;
   void SetBody(const std::string &body);
   const std::string &GetBody() const;
 
