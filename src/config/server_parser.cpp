@@ -20,16 +20,16 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
         throw std::invalid_argument("Syntax error: " + line);
       }
       if (validation::IsPath(value.at(0)) == false) {
-        throw std::invalid_argument("Invalid location path: " + value.at(0));
+        throw std::invalid_argument("無効なlocationパス: " + value.at(0));
       }
       server.AddLocation(value.at(0), LocationParser::ParseLocation(inf));
     } else {  // それ以外
       std::map<std::string, parseFunction>::iterator it = func.find(key);
       if (it == func.end()) {  // 対応した関数が見つからない
-        throw std::invalid_argument("Invalid server key: " + key);
+        throw std::invalid_argument("無効なserverキー: " + key);
       }
       if ((*it->second)(value, server) == false) {  // 関数が失敗した場合
-        throw std::invalid_argument("Invalid server value: " +
+        throw std::invalid_argument("無効なserver値: " +
                                     container::MergeContainer(value, " "));
       }
     }
@@ -102,5 +102,5 @@ void ServerParser::RemoveSemicolon(std::string &line) {
     line.pop_back();
     return;
   }
-  throw std::invalid_argument("Syntax error: semicolon: " + line);
+  throw std::invalid_argument("Syntaxエラー: semicolon: " + line);
 }
