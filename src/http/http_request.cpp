@@ -1,43 +1,43 @@
 #include "http_request.hpp"
 
-HttpRequest::HttpRequest() {}
-HttpRequest::~HttpRequest() {}
+HTTPRequest::HTTPRequest() {}
+HTTPRequest::~HTTPRequest() {}
 
 // request line setters
-void HttpRequest::SetMethod(const std::string &method) {
+void HTTPRequest::SetMethod(const std::string &method) {
   this->method_ = method;
 }
-void HttpRequest::SetUri(const std::string &uri) { this->uri_ = uri; }
-void HttpRequest::SetProtocol(const std::string &protocol) {
+void HTTPRequest::SetUri(const std::string &uri) { this->uri_ = uri; }
+void HTTPRequest::SetProtocol(const std::string &protocol) {
   this->protocol_ = protocol;
 }
-void HttpRequest::SetVersion(const std::string &version) {
+void HTTPRequest::SetVersion(const std::string &version) {
   this->version_ = version;
 }
 
 // header fields setters
-void HttpRequest::SetHostHeader(const std::string &host_header) {
+void HTTPRequest::SetHostHeader(const std::string &host_header) {
   this->host_header_ = host_header;
 }
-void HttpRequest::SetHeaders(
+void HTTPRequest::SetHeaders(
     const std::map<std::string, std::string> &headers) {
   this->headers_ = headers;
 }
 
 // body setters
-void HttpRequest::SetBody(const std::string &body) { this->body_ = body; }
+void HTTPRequest::SetBody(const std::string &body) { this->body_ = body; }
 
 // request line getters
-std::string HttpRequest::GetMethod() const { return this->method_; }
-std::string HttpRequest::GetUri() const { return this->uri_; }
-std::string HttpRequest::GetProtocol() const { return this->protocol_; }
-std::string HttpRequest::GetVersion() const { return this->version_; }
+std::string HTTPRequest::GetMethod() const { return this->method_; }
+std::string HTTPRequest::GetUri() const { return this->uri_; }
+std::string HTTPRequest::GetProtocol() const { return this->protocol_; }
+std::string HTTPRequest::GetVersion() const { return this->version_; }
 
 // header fields getters
-std::string HttpRequest::GetHostHeader() const { return this->host_header_; }
-std::map<std::string, std::string> HttpRequest::GetHeaders() const {
+std::string HTTPRequest::GetHostHeader() const { return this->host_header_; }
+std::map<std::string, std::string> HTTPRequest::GetHeaders() const {
   return this->headers_;
 }
 
 // body getters
-std::string HttpRequest::GetBody() const { return this->body_; }
+std::string HTTPRequest::GetBody() const { return this->body_; }

@@ -4,10 +4,10 @@
 #include <map>
 #include <string>
 
-class HttpRequest {
+class HTTPRequest {
  public:
-  HttpRequest();
-  ~HttpRequest();
+  HTTPRequest();
+  ~HTTPRequest();
   void SetMethod(const std::string &method);
   void SetUri(const std::string &uri);
   void SetProtocol(const std::string &protocol);
