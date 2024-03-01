@@ -1,5 +1,5 @@
-#ifndef WEBSERV_SRC_IO_TASK_HPP
-#define WEBSERV_SRC_IO_TASK_HPP
+#ifndef WEBSERV_SRC_SERVER_IO_TASK_HPP
+#define WEBSERV_SRC_SERVER_IO_TASK_HPP
 
 #include <string>
 
