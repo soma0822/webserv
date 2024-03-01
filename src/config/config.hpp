@@ -11,18 +11,14 @@
 class ConfigParser;
 class Config {
  public:
+  static void AddServer(const ServerContext &);
+  static const std::vector<ServerContext> &GetServer();
+
+ private:
   Config();
   Config(const Config &other);
   ~Config();
-  Config &operator=(const Config &other);
-  const std::vector<ServerContext> &GetServer() const;
-  void AddServer(const ServerContext &);
-
- private:
-  std::vector<ServerContext> server_;
+  static std::vector<ServerContext> server_;
 };
-
-std::ostream &operator<<(std::ostream &os, Config &config);
-std::ostream &operator<<(std::ostream &os, const Config &config);
 
 #endif

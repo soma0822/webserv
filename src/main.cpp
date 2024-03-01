@@ -16,8 +16,11 @@ int main(int ac, char **av) {
   }
   Logger::Info() << "Reading " << config_file << std::endl;
   try {
-    Config config = ConfigParser::Parse(config_file);
-    std::cout << config << std::endl;
+    ConfigParser::Parse(config_file);
+    std::vector<ServerContext> m = Config::GetServer();
+    for (std::vector<ServerContext>::const_iterator it = m.begin(); it != m.end(); it++){
+      std::cout << *it << std::endl;
+    }
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
   }

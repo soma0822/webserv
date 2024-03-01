@@ -6,23 +6,23 @@
 
 TEST(ConfigTest, DefaultPath) {
   Config config = ConfigParser::Parse("test/conf_test/default.conf");
-  ASSERT_EQ(config.GetServer().size(), 1);
-  ASSERT_EQ(config.GetServer()[0].GetIp(), "127.0.0.1");
-  ASSERT_EQ(config.GetServer()[0].GetRoot(), "docs/fusion_web/");
-  ASSERT_EQ(config.GetServer()[0].GetIndex()[0], "index.html");
-  ASSERT_EQ(config.GetServer()[0].GetPort()[0], "8002");
-  ASSERT_EQ(config.GetServer()[0].GetServerName()[0], "localhost");
-  ASSERT_EQ(config.GetServer()[0].GetErrorPage().size(), 2);
+  ASSERT_EQ(Config::GetServer().size(), 1);
+  ASSERT_EQ(Config::GetServer()[0].GetIp(), "127.0.0.1");
+  ASSERT_EQ(Config::GetServer()[0].GetRoot(), "docs/fusion_web/");
+  ASSERT_EQ(Config::GetServer()[0].GetIndex()[0], "index.html");
+  ASSERT_EQ(Config::GetServer()[0].GetPort()[0], "8002");
+  ASSERT_EQ(Config::GetServer()[0].GetServerName()[0], "localhost");
+  ASSERT_EQ(Config::GetServer()[0].GetErrorPage().size(), 2);
   std::map<std::string, std::string>::const_iterator it =
-      config.GetServer()[0].GetErrorPage().begin();
+      Config::GetServer()[0].GetErrorPage().begin();
   ASSERT_EQ(it->first, "404");
   ASSERT_EQ(it->second, "error_pages/404.html");
   it++;
   ASSERT_EQ(it->first, "405");
   ASSERT_EQ(it->second, "error_pages/404.html");
-  ASSERT_EQ(config.GetServer()[0].GetLocation().size(), 4);
+  ASSERT_EQ(Config::GetServer()[0].GetLocation().size(), 4);
   std::map<std::string, LocationContext>::const_iterator it2 =
-      config.GetServer()[0].GetLocation().begin();
+      Config::GetServer()[0].GetLocation().begin();
   ASSERT_EQ(it2->first, "/");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
@@ -105,7 +105,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it7->second, true);
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   it2++;
-  ASSERT_EQ(it2, config.GetServer()[0].GetLocation().end());
+  ASSERT_EQ(it2, Config::GetServer()[0].GetLocation().end());
 }
 
 TEST(ConfigTest, TooLargePortTest) {
