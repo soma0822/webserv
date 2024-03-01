@@ -2,7 +2,12 @@
 
 #include <gtest/gtest.h>
 
-TEST(Logger, InfoStdOut) {
+class LoggerTest : public ::testing::Test {
+ protected:
+  void TearDown() override { Logger::SetHandler(new NullStreamWrapper()); }
+};
+
+TEST_F(LoggerTest, InfoStdOut) {
   Logger::SetHandler(new StdoutStreamWrapper());
   testing::internal::CaptureStdout();
   Logger::Info() << "This is an info message" << std::endl;
@@ -10,7 +15,7 @@ TEST(Logger, InfoStdOut) {
                    testing::internal::GetCapturedStdout().c_str());
 }
 
-TEST(Logger, WarnStdOut) {
+TEST_F(LoggerTest, WarnStdOut) {
   Logger::SetHandler(new StdoutStreamWrapper());
   testing::internal::CaptureStdout();
   Logger::Warn() << "This is a warning message" << std::endl;
@@ -18,7 +23,7 @@ TEST(Logger, WarnStdOut) {
                    testing::internal::GetCapturedStdout().c_str());
 }
 
-TEST(Logger, ErrorStdOut) {
+TEST_F(LoggerTest, ErrorStdOut) {
   Logger::SetHandler(new StdoutStreamWrapper());
   testing::internal::CaptureStdout();
   Logger::Error() << "This is an error message" << std::endl;
@@ -26,7 +31,7 @@ TEST(Logger, ErrorStdOut) {
                    testing::internal::GetCapturedStdout().c_str());
 }
 
-TEST(Logger, DebugStdOut) {
+TEST_F(LoggerTest, DebugStdOut) {
   Logger::SetHandler(new StdoutStreamWrapper());
   testing::internal::CaptureStdout();
   Logger::Debug() << "This is a debug message" << std::endl;
@@ -34,7 +39,7 @@ TEST(Logger, DebugStdOut) {
                    testing::internal::GetCapturedStdout().c_str());
 }
 
-TEST(Logger, InfoFile) {
+TEST_F(LoggerTest, InfoFile) {
   Logger::SetHandler(new FileStreamWrapper("test.log"));
   Logger::Info() << "This is an info message" << std::endl;
   Logger::SetHandler(new StdoutStreamWrapper());
@@ -46,7 +51,7 @@ TEST(Logger, InfoFile) {
   remove("test.log");
 }
 
-TEST(Logger, WarnFile) {
+TEST_F(LoggerTest, WarnFile) {
   Logger::SetHandler(new FileStreamWrapper("test.log"));
   Logger::Warn() << "This is a warning message" << std::endl;
   Logger::SetHandler(new StdoutStreamWrapper());
@@ -58,7 +63,7 @@ TEST(Logger, WarnFile) {
   remove("test.log");
 }
 
-TEST(Logger, ErrorFile) {
+TEST_F(LoggerTest, ErrorFile) {
   Logger::SetHandler(new FileStreamWrapper("test.log"));
   Logger::Error() << "This is an error message" << std::endl;
   Logger::SetHandler(new StdoutStreamWrapper());
@@ -70,7 +75,7 @@ TEST(Logger, ErrorFile) {
   remove("test.log");
 }
 
-TEST(Logger, DebugFile) {
+TEST_F(LoggerTest, DebugFile) {
   Logger::SetHandler(new FileStreamWrapper("test.log"));
   Logger::Debug() << "This is a debug message" << std::endl;
   Logger::SetHandler(new StdoutStreamWrapper());
@@ -82,7 +87,7 @@ TEST(Logger, DebugFile) {
   remove("test.log");
 }
 
-TEST(Logger, SetLogLevelInfo) {
+TEST_F(LoggerTest, SetLogLevelInfo) {
   Logger::SetHandler(new StdoutStreamWrapper());
   Logger::SetLogLevel(kInfo);
 
@@ -93,7 +98,7 @@ TEST(Logger, SetLogLevelInfo) {
                    testing::internal::GetCapturedStdout().c_str());
 }
 
-TEST(Logger, SetLogLevelWarn) {
+TEST_F(LoggerTest, SetLogLevelWarn) {
   Logger::SetHandler(new StdoutStreamWrapper());
   Logger::SetLogLevel(kWarn);
 
@@ -109,7 +114,7 @@ TEST(Logger, SetLogLevelWarn) {
                    testing::internal::GetCapturedStdout().c_str());
 }
 
-TEST(Logger, SetLogLevelError) {
+TEST_F(LoggerTest, SetLogLevelError) {
   Logger::SetHandler(new StdoutStreamWrapper());
   Logger::SetLogLevel(kError);
 
@@ -130,7 +135,7 @@ TEST(Logger, SetLogLevelError) {
                    testing::internal::GetCapturedStdout().c_str());
 }
 
-TEST(Logger, SetLogLevelDebug) {
+TEST_F(LoggerTest, SetLogLevelDebug) {
   Logger::SetHandler(new StdoutStreamWrapper());
   Logger::SetLogLevel(kDebug);
 
