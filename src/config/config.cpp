@@ -2,6 +2,8 @@
 
 std::vector<ServerContext> Config::server_;
 
+void Config::Clear() { server_.clear(); }
+
 void Config::AddServer(const ServerContext &server) {
   server_.push_back(server);
 }

@@ -11,6 +11,7 @@
 class ConfigParser;
 class Config {
  public:
+  static void Clear();
   static void AddServer(const ServerContext &);
   static const std::vector<ServerContext> &GetServer();
 

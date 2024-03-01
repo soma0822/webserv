@@ -3,6 +3,7 @@
 const std::string ConfigParser::default_file_ = "./conf/default.conf";
 
 void ConfigParser::Parse(const std::string &file) {
+  Config::Clear();
   std::vector<ServerContext> server;
   std::string line;
   std::ifstream inf(file);
