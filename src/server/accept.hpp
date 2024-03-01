@@ -22,8 +22,8 @@ class Accept : public AIOTask {
 
  private:
   Accept();
-  Accept(const Accept &);
-  Accept &operator=(const Accept &);
+  Accept(const Accept &other);
+  Accept &operator=(const Accept &other);
 };
 
 #endif
