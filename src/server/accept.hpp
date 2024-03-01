@@ -1,8 +1,9 @@
 #ifndef WEBSERV_SRC_SERVER_HPP
 #define WEBSERV_SRC_SERVER_HPP
 
-#include <cstring>
 #include <poll.h>
+
+#include <cstring>
 // struct sockaddr_in
 #include <arpa/inet.h>
 // socket
