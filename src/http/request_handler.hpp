@@ -1,11 +1,12 @@
 #ifndef WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_
 #define WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_
 
-namespace http {
+#include "http_request.hpp"
+#include "http_response.hpp"
 
 class RequestHandler {
  public:
-  Handle(const HTTPRequest &request);
+  static HTTPResponse Handle(const HTTPRequest &request);
 
  private:
   RequestHandler();
@@ -13,7 +14,5 @@ class RequestHandler {
   RequestHandler &operator=(const RequestHandler &other);
   ~RequestHandler();
 };
-
-}  // namespace http
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_

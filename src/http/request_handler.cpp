@@ -1,17 +1,17 @@
 #include "request_handler.hpp"
 
-int http::RequestHandler::Handle(const int &request) { return HTTPResponse(); }
-
-http::RequestHandler::RequestHandler() {}
-
-http::RequestHandler::RequestHandler(const RequestHandler &other) {
-  (void)other;
+HTTPResponse RequestHandler::Handle(const HTTPRequest &request) {
+  (void)request;
+  return HTTPResponse();
 }
 
-http::RequestHandler &http::RequestHandler::operator=(
-    const RequestHandler &other) {
+RequestHandler::RequestHandler() {}
+
+RequestHandler::RequestHandler(const RequestHandler &other) { (void)other; }
+
+RequestHandler &RequestHandler::operator=(const RequestHandler &other) {
   (void)other;
   return *this;
 }
 
-http::RequestHandler::~RequestHandler() {}
+RequestHandler::~RequestHandler() {}
