@@ -29,7 +29,7 @@ Result<int, std::string> Accept::Execute() {
   int client_sock = accept(fd_, (struct sockaddr *)&client_addr, &len);
   if (client_sock == -1) {
     Logger::Error() << "accept エラー" << std::endl;
-    return Err("accept エラー");
+    return Err("accept error");
   }
   Logger::Info() << port_ << " : 接続しました" << std::endl;
   // TODO: IOTaskManagerクラスとReadRequestFromClientクラスの実装

@@ -109,84 +109,52 @@ TEST(ConfigTest, DefaultPath) {
 }
 
 TEST(ConfigTest, TooLargePortTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/too_large_port.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "Invalid server value: 20000000000000");
-  }
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/too_large_port.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, NotNumberPortTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/not_num_port.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "Invalid server value: 200a");
-  }
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/not_num_port.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidServerTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/invalid_server.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "Invalid key: servera {");
-  }
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_server.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, NoFileTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/no_file.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "File could not open: test/conf_test/no_file.conf");
-  }
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/no_file.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidLocationKeyTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/invalid_location_key.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "Invalid location key: tokazaki");
-  }
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_location_key.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidLocationValueTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/invalid_location_value.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(
-        e.what(),
-        "Invalid location value: /usr/share/nginx/html /usr/share/nginx/html");
-  }
+  ASSERT_THROW(
+      ConfigParser::Parse("test/conf_test/invalid_location_value.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, LocationSyntaxErrorTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/location_syntax_error.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(),
-                 "Syntax error: semicolon: \t\troot /usr/share/nginx/html");
-  }
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/location_syntax_error.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, ServerSyntaxErrorTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/server_syntax_error.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "Syntax error: 	location / ");
-  }
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/server_syntax_error.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidServerKeyTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/invalid_server_key.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "Invalid server key: tkuramot");
-  }
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_server_key.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidServerValueTest) {
-  try {
-    ConfigParser::Parse("test/conf_test/invalid_server_value.conf");
-  } catch (std::exception &e) {
-    ASSERT_STREQ(e.what(), "Invalid server value: kuramoto okazaki");
-  }
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_server_value.conf"),
+               std::invalid_argument);
 }
