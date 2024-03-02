@@ -1,7 +1,6 @@
 #include "read_request_from_client.hpp"
 
-ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port)
-    : {
+ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port) {
   fd_ = fd;
   event_ = POLLIN;
   port_ = port;
