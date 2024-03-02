@@ -7,12 +7,15 @@
 
 class HTTPRequestParser {
  public:
-  static const HTTPRequest *GetRequestInstance(std::string request_line,
-                                         std::string port);
-
- private:
   HTTPRequestParser();
   ~HTTPRequestParser();
+
+  const HTTPRequest *GetRequestInstance(std::string request_line);
+
+ private:
+  std::string row_line_;
+  HTTPRequest *request_;
+
   HTTPRequestParser(const HTTPRequestParser &other);
   HTTPRequestParser &operator=(const HTTPRequestParser &other);
 };

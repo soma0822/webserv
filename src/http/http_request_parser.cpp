@@ -1,18 +1,20 @@
-#include <iostream>
-
 #include "http_request_parser.hpp"
 
-HTTPRequestParser::HTTPRequestParser() {}
-HTTPRequestParser::~HTTPRequestParser() {}
-HTTPRequestParser::HTTPRequestParser(const HTTPRequestParser &other) {}
-HTTPRequestParser &HTTPRequestParser::operator=(const HTTPRequestParser &other) {}
+#include <iostream>
 
-const HTTPRequest *HTTPRequestParser::GetRequestInstance(std::string request_line, std::string port) {
-	try {
-	HTTPRequest *request = new HTTPRequest();
-	return request;
-	} catch (std::exception &e) {
-		std::cout << "Error: " << e.what() << std::endl;
-		return NULL;
-	}
+HTTPRequestParser::HTTPRequestParser() : request_(NULL), row_line_("") {}
+HTTPRequestParser::~HTTPRequestParser() {}
+HTTPRequestParser::HTTPRequestParser(const HTTPRequestParser &other) {
+  (void)other;
+}
+HTTPRequestParser &HTTPRequestParser::operator=(
+    const HTTPRequestParser &other) {
+  (void)other;
+}
+
+const HTTPRequest *HTTPRequestParser::GetRequestInstance(
+    std::string request_line) {
+  if (request_ == NULL) HTTPRequest *request = new HTTPRequest();
+  // setterと形式があってるかのエラーチェック
+  return request_;
 }
