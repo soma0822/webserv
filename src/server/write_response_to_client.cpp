@@ -1,14 +1,13 @@
 #include "write_response_to_client.hpp"
 
-WriteResponseToClient::WriteResponseToClient(int fd, const HTTPResponse *response) {
+WriteResponseToClient::WriteResponseToClient(int fd,
+                                             const HTTPResponse *response) {
   fd_ = fd;
   event_ = POLLOUT;
   response_ = response;
 }
 
-WriteResponseToClient::~WriteResponseToClient() {
-  delete response_;
-}
+WriteResponseToClient::~WriteResponseToClient() { delete response_; }
 
 Result<int, std::string> WriteResponseToClient::Excecute() {
   std::string response_str = response_->ToString();
