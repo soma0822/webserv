@@ -10,11 +10,12 @@ HTTPRequestParser::HTTPRequestParser(const HTTPRequestParser &other) {
 HTTPRequestParser &HTTPRequestParser::operator=(
     const HTTPRequestParser &other) {
   (void)other;
+  return *this;
 }
 
-const HTTPRequest *HTTPRequestParser::GetRequestInstance(
-    std::string request_line) {
-  if (request_ == NULL) HTTPRequest *request = new HTTPRequest();
+const HTTPRequest *HTTPRequestParser::Execute(std::string request_line) {
+  if (request_ == NULL) request_ = new HTTPRequest();
   // setterと形式があってるかのエラーチェック
   return request_;
+  (void)request_line;
 }

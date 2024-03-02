@@ -10,11 +10,11 @@ class HTTPRequestParser {
   HTTPRequestParser();
   ~HTTPRequestParser();
 
-  const HTTPRequest *GetRequestInstance(std::string request_line);
+  const HTTPRequest *Execute(std::string request_line);
 
  private:
-  std::string row_line_;
   HTTPRequest *request_;
+  std::string row_line_;
 
   HTTPRequestParser(const HTTPRequestParser &other);
   HTTPRequestParser &operator=(const HTTPRequestParser &other);
