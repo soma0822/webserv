@@ -8,7 +8,7 @@ void ConfigParser::Parse(const std::string &file) {
   std::string line;
   std::ifstream inf(file);
   if (!inf.is_open()) {
-    throw std::invalid_argument("File could not open: " + file);
+    throw std::invalid_argument("ファイルが開けませんでした: " + file);
   }
   while (std::getline(inf, line)) {
     std::stringstream ss(line);
@@ -20,7 +20,7 @@ void ConfigParser::Parse(const std::string &file) {
     if (key + value == "server{" && ss.get() == std::char_traits<char>::eof())
       Config::AddServer(ServerParser::ParseServer(inf));
     else {
-      throw std::invalid_argument("Invalid key: " + line);
+      throw std::invalid_argument("無効なキー: " + line);
     }
   }
 }
