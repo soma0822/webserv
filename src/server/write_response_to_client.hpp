@@ -10,14 +10,14 @@
 #include "io_task.hpp"
 #include "result.hpp"
 
-class WriteResponseToClient : public IOTask {
+class WriteResponseToClient : public AIOTask {
  public:
   WriteResponseToClient(int fd, const HTTPResponse *response);
   virtual ~WriteResponseToClient();
   virtual Result<int, std::string> Excecute();
 
  private:
-  HTTPResponse response_;
-}
+  const HTTPResponse *response_;
+};
 
 #endif  // WEBSERV_SRC_WRITE_RESPONSE_TO_CLIENT_HPP
