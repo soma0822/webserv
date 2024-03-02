@@ -2,7 +2,8 @@
 
 HTTPRequest::HTTPRequest() {}
 HTTPRequest::HTTPRequest(const HTTPRequest &other)
-    : method_(other.method_),
+    : port_(other.port_),
+      method_(other.method_),
       uri_(other.uri_),
       protocol_(other.protocol_),
       version_(other.version_),
@@ -11,6 +12,7 @@ HTTPRequest::HTTPRequest(const HTTPRequest &other)
       body_(other.body_) {}
 HTTPRequest &HTTPRequest::operator=(const HTTPRequest &other) {
   if (this != &other) {
+    this->port_ = other.port_;
     this->method_ = other.method_;
     this->uri_ = other.uri_;
     this->protocol_ = other.protocol_;
@@ -22,6 +24,9 @@ HTTPRequest &HTTPRequest::operator=(const HTTPRequest &other) {
   return *this;
 }
 HTTPRequest::~HTTPRequest() {}
+
+// port setter
+void HTTPRequest::SetPort(const std::string &port) { port_ = port; }
 
 // request line setters
 void HTTPRequest::SetMethod(const std::string &method) { method_ = method; }
@@ -41,6 +46,9 @@ void HTTPRequest::AddHeader(const std::string &key, const std::string &value) {
 
 // body setters
 void HTTPRequest::SetBody(const std::string &body) { body_ = body; }
+
+// port getter
+const std::string &HTTPRequest::GetPort() const { return port_; }
 
 // request line getters
 const std::string &HTTPRequest::GetMethod() const { return method_; }

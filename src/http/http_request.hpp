@@ -11,6 +11,7 @@ class HTTPRequest {
   HTTPRequest &operator=(const HTTPRequest &other);
   ~HTTPRequest();
 
+  void SetPort(const std::string &port);
   void SetMethod(const std::string &method);
   void SetUri(const std::string &uri);
   void SetProtocol(const std::string &protocol);
@@ -18,6 +19,8 @@ class HTTPRequest {
   void SetHostHeader(const std::string &host_header);
   void AddHeader(const std::string &key, const std::string &value);
   void SetBody(const std::string &body);
+
+  const std::string &GetPort() const;
   const std::string &GetMethod() const;
   const std::string &GetUri() const;
   const std::string &GetProtocol() const;
@@ -27,6 +30,7 @@ class HTTPRequest {
   const std::string &GetBody() const;
 
  private:
+  std::string port_;
   std::string method_;
   std::string uri_;
   std::string protocol_;
