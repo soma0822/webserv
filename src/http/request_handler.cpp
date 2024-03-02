@@ -1,8 +1,8 @@
 #include "request_handler.hpp"
 
-HTTPResponse RequestHandler::Handle(const HTTPRequest &request) {
+const HTTPResponse *RequestHandler::Handle(const HTTPRequest *request) {
   (void)request;
-  return HTTPResponse();
+  return new HTTPResponse();
 }
 
 RequestHandler::RequestHandler() {}

@@ -6,7 +6,7 @@
 
 class RequestHandler {
  public:
-  static HTTPResponse Handle(const HTTPRequest &request);
+  static const HTTPResponse *Handle(const HTTPRequest *request);
 
  private:
   RequestHandler();
