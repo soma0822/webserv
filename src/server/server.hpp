@@ -23,7 +23,7 @@ class Server {
   static Result<int, int> Listen(const std::string &port);
 
   // TODO : errornoによって定義していく
-  enum error { klistenError, kBindError };
+  enum Error { kListenError, kBindError };
 };
 
 #endif
