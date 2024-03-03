@@ -1,5 +1,11 @@
 #include "location_parser.hpp"
 
+bool LocationParser::parsed_auto_index_;
+bool LocationParser::parsed_limit_client_body_;
+bool LocationParser::parsed_return_;
+bool LocationParser::parsed_alias_;
+bool LocationParser::parsed_root_;
+
 LocationContext LocationParser::ParseLocation(std::ifstream &inf) {
   LocationContext location;
   std::map<std::string, parseFunction> func;
@@ -38,38 +44,58 @@ void LocationParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   func["cgi_ext"] = &LocationParser::ParseCgiExtention;
   func["allow_methods"] = &LocationParser::ParseAllowMethod;
   func["error_page"] = &LocationParser::ParseErrorPage;
+  parsed_auto_index_ = false;
+  parsed_limit_client_body_ = false;
+  parsed_return_ = false;
+  parsed_alias_ = false;
+  parsed_root_ = false;
 }
 
 bool LocationParser::ParseAutoIndex(const std::vector<std::string> &value,
                                     LocationContext &location) {
+  if (parsed_auto_index_ == true)
+    throw std::invalid_argument("auto_indexが複数あります");
   if (value.size() != 1) return false;
-  location.SetCanAutoIndex(value.at(0) == "on" ? true : false);
+  location.SetCanAutoIndex(value.at(0) == "on");
+  parsed_auto_index_ = true;
   return true;
 }
 bool LocationParser::ParseLimitClientBody(const std::vector<std::string> &value,
                                           LocationContext &location) {
+  if (parsed_limit_client_body_== true)
+    throw std::invalid_argument("limit_client_bodyが複数あります");
   if (value.size() != 1) return false;
   Result<int, std::string> result = string_utils::StrToI(value.at(0));
   if (result.IsErr()) return false;
   location.SetLimitClientBody(result.Unwrap());
+  parsed_limit_client_body_ = true;
   return true;
 }
 bool LocationParser::ParseReturn(const std::vector<std::string> &value,
                                  LocationContext &location) {
+  if (parsed_return_ == true)
+    throw std::invalid_argument("returnが複数あります");
   if (value.size() != 1) return false;
   location.SetReturn(value.at(0));
+  parsed_return_ = true;
   return true;
 }
 bool LocationParser::ParseAlias(const std::vector<std::string> &value,
                                 LocationContext &location) {
+  if (parsed_alias_ == true)
+    throw std::invalid_argument("aliasが複数あります");
   if (value.size() != 1) return false;
   location.SetAlias(value.at(0));
+  parsed_alias_ = true;
   return true;
 }
 bool LocationParser::ParseRoot(const std::vector<std::string> &value,
                                LocationContext &location) {
+  if (parsed_root_ == true)
+    throw std::invalid_argument("rootが複数あります");
   if (value.size() != 1) return false;
   location.SetRoot(value.at(0));
+  parsed_root_ = false;
   return true;
 }
 bool LocationParser::ParseIndex(const std::vector<std::string> &value,

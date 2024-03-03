@@ -83,7 +83,7 @@ bool ServerParser::ParseIp(const std::vector<std::string> &value,
 bool ServerParser::ParseRoot(const std::vector<std::string> &value,
                              ServerContext &server) {
   if (parsed_root_ == true)
-    throw std::invalid_argument("hostが複数あります");
+    throw std::invalid_argument("rootが複数あります");
   if (value.size() != 1) return false;
   server.SetRoot(value.at(0));
   parsed_root_ = true;
@@ -98,9 +98,11 @@ bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
-  if (value.size() != 1) return false;
-  if (validation::IsPort(value.at(0)) == false) return false;
-  server.AddPort(value.at(0));
+  if (value.size() == 0) return false;
+  for (unsigned int i = 0; i < value.size(); i++) {
+    if (validation::IsPort(value.at(i)) == false) return false;
+    server.AddPort(value.at(i));
+  }
   return true;
 }
 
