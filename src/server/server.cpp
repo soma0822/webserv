@@ -12,17 +12,16 @@ Server &Server::operator=(const Server &other) {
 void Server::run() {
   std::vector<ServerContext> servers = Config::GetServer();
   std::vector<ServerContext>::iterator server_it = servers.begin();
-  std::vector<std::string> listen_port;
+  std::map<std::string, bool> listen_port;
   for (; server_it != servers.end(); server_it++) {
     std::vector<std::string> ports = server_it->GetPort();
     std::vector<std::string>::iterator port_it = ports.begin();
     for (; port_it != ports.end(); port_it++) {
-      if (listen_port.end() ==
-          std::find(listen_port.begin(), listen_port.end(), *port_it)) {
+      if (listen_port[*port_it] == false) {
         Result<int, int> result = Listen(*port_it);
         if (result.IsOk()) {
           // IOTaskManager::AddTask(new Accept(result.Unwrap(), *port_it));
-          listen_port.push_back(*port_it);
+          listen_port[*port_it] = true;
         } else {
           Logger::Error() << "リッスンに失敗しました" << std::endl;
         }
