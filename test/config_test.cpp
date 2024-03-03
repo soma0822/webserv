@@ -163,3 +163,38 @@ TEST(ConfigTest, NoPortTest) {
   ASSERT_THROW(ConfigParser::Parse("test/conf_test/no_port.conf"),
                std::invalid_argument);
 }
+
+TEST(ConfigTest, DoubleIp) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_ip.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleRoot) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_root.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleIndex) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_index.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoublePort) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_port.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleServerName) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_server_name.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleErrorPage) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_error_page.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleLocation) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location.conf"),
+               std::invalid_argument);
+}
