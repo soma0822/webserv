@@ -62,7 +62,7 @@ bool LocationParser::ParseAutoIndex(const std::vector<std::string> &value,
 }
 bool LocationParser::ParseLimitClientBody(const std::vector<std::string> &value,
                                           LocationContext &location) {
-  if (parsed_limit_client_body_== true)
+  if (parsed_limit_client_body_ == true)
     throw std::invalid_argument("limit_client_bodyが複数あります");
   if (value.size() != 1) return false;
   Result<int, std::string> result = string_utils::StrToI(value.at(0));
@@ -82,8 +82,7 @@ bool LocationParser::ParseReturn(const std::vector<std::string> &value,
 }
 bool LocationParser::ParseAlias(const std::vector<std::string> &value,
                                 LocationContext &location) {
-  if (parsed_alias_ == true)
-    throw std::invalid_argument("aliasが複数あります");
+  if (parsed_alias_ == true) throw std::invalid_argument("aliasが複数あります");
   if (value.size() != 1) return false;
   location.SetAlias(value.at(0));
   parsed_alias_ = true;
@@ -91,8 +90,7 @@ bool LocationParser::ParseAlias(const std::vector<std::string> &value,
 }
 bool LocationParser::ParseRoot(const std::vector<std::string> &value,
                                LocationContext &location) {
-  if (parsed_root_ == true)
-    throw std::invalid_argument("rootが複数あります");
+  if (parsed_root_ == true) throw std::invalid_argument("rootが複数あります");
   if (value.size() != 1) return false;
   location.SetRoot(value.at(0));
   parsed_root_ = true;

@@ -1,8 +1,7 @@
 #include "location_context.hpp"
 
 LocationContext::LocationContext()
-    : can_auto_index_(false),
-      limit_client_body_bytes_(1000) {
+    : can_auto_index_(false), limit_client_body_bytes_(1000) {
   allow_method_["GET"] = false;
   allow_method_["POST"] = false;
   allow_method_["DELETE"] = false;
@@ -66,13 +65,16 @@ void LocationContext::AddIndex(const std::string &index) {
   index_.push_back(index);
 }
 void LocationContext::AddCgiPath(const std::string &cgi_path) {
-  if (cgi_path_.end() != std::find(cgi_path_.begin(), cgi_path_.end(), cgi_path))
+  if (cgi_path_.end() !=
+      std::find(cgi_path_.begin(), cgi_path_.end(), cgi_path))
     throw std::invalid_argument("cgi_pathで同じものが複数指定されています");
   cgi_path_.push_back(cgi_path);
 }
 void LocationContext::AddCgiExtention(const std::string &cgi_extention) {
-  if (cgi_extention_.end() != std::find(cgi_extention_.begin(), cgi_extention_.end(), cgi_extention))
-    throw std::invalid_argument("cgi_extentionで同じものが複数指定されています");
+  if (cgi_extention_.end() !=
+      std::find(cgi_extention_.begin(), cgi_extention_.end(), cgi_extention))
+    throw std::invalid_argument(
+        "cgi_extentionで同じものが複数指定されています");
   cgi_extention_.push_back(cgi_extention);
 }
 void LocationContext::AddAllowMethod(const std::string &key) {
