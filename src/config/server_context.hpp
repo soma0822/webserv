@@ -16,6 +16,8 @@ class ServerContext {
   ServerContext(const ServerContext &other);
   ServerContext &operator=(const ServerContext &other);
 
+  bool IsValidContext() const;
+  // ゲッター
   const std::string &GetIp() const;
   const std::string &GetRoot() const;
   const std::vector<std::string> &GetIndex() const;
@@ -23,7 +25,7 @@ class ServerContext {
   const std::vector<std::string> &GetServerName() const;
   const std::map<std::string, std::string> &GetErrorPage() const;
   const std::map<std::string, LocationContext> &GetLocation() const;
-
+  //セッター
   void SetIp(const std::string &ip);
   void SetRoot(const std::string &root);
   void AddIndex(const std::string &index);

@@ -20,6 +20,16 @@ ServerContext &ServerContext::operator=(const ServerContext &other) {
   return *this;
 }
 
+// ポートを指定しないサーバー設定はエラー。他はなくてもいい。portについてもデフォルト決めるのもあり
+//　複数被ったときは、先に現れた方が優先
+//　locationのautoindexとlimit_client_body_bytesが複数あるかの判定が冗長になため
+bool ServerContext::IsValidContext() const{
+  if (port_.size() == 0)
+    return false;
+  else
+    return true;
+}
+
 // ゲッター
 const std::string &ServerContext::GetIp() const { return ip_; }
 const std::string &ServerContext::GetRoot() const { return root_; }

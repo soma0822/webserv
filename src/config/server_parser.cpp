@@ -34,7 +34,10 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
       }
     }
   }
-  return server;
+  if (server.IsValidContext())
+    return server;
+  else
+     throw std::invalid_argument("serverにポートがありません");
 }
 
 void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
