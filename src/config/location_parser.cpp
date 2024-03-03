@@ -101,47 +101,39 @@ bool LocationParser::ParseRoot(const std::vector<std::string> &value,
 bool LocationParser::ParseIndex(const std::vector<std::string> &value,
                                 LocationContext &location) {
   if (value.size() == 0) return false;
-  for (std::vector<std::string>::const_iterator it = value.begin();
-       it != value.end(); it++) {
-    location.AddIndex(*it);
-  }
+  for (unsigned int i = 0; i < value.size(); i++)
+    location.AddIndex(value.at(i));
   return true;
 }
 bool LocationParser::ParseCgiPath(const std::vector<std::string> &value,
                                   LocationContext &location) {
   if (value.size() == 0) return false;
-  for (std::vector<std::string>::const_iterator it = value.begin();
-       it != value.end(); it++) {
-    if (validation::IsPath(*it) == false) return false;
-    location.AddCgiPath(*it);
+  for (unsigned int i = 0; i < value.size(); i++) {
+    if (validation::IsPath(value.at(i)) == false) return false;
+    location.AddCgiPath(value.at(i));
   }
   return true;
 }
 bool LocationParser::ParseCgiExtention(const std::vector<std::string> &value,
                                        LocationContext &location) {
   if (value.size() == 0) return false;
-  for (std::vector<std::string>::const_iterator it = value.begin();
-       it != value.end(); it++) {
-    location.AddCgiExtention(*it);
-  }
+  for (unsigned int i = 0; i < value.size(); i++)
+    location.AddCgiExtention(value.at(i));
   return true;
 }
 bool LocationParser::ParseAllowMethod(const std::vector<std::string> &value,
                                       LocationContext &location) {
   if (value.size() == 0) return false;
-  for (std::vector<std::string>::const_iterator it = value.begin();
-       it != value.end(); it++) {
-    location.AddAllowMethod(*it);
-  }
+  for (unsigned int i = 0; i < value.size(); i++)
+    location.AddAllowMethod(value.at(i));
   return true;
 }
 bool LocationParser::ParseErrorPage(const std::vector<std::string> &value,
                                     LocationContext &location) {
   if (value.size() < 2) return false;
-  for (std::vector<std::string>::const_iterator it = value.begin();
-       it != value.end() - 1; it++) {
-    if (validation::IsNumber(*it) == false) return false;
-    location.AddErrorPage(*it, *(value.end() - 1));
+  for (unsigned int i = 0; i < value.size() - 1; i++) {
+    if (validation::IsNumber(value.at(i)) == false) return false;
+    location.AddErrorPage(value.at(i), *(value.end() - 1));
   }
   return true;
 }
