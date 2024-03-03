@@ -1,5 +1,8 @@
 #include "server_parser.hpp"
 
+bool ServerParser::parsed_root_;
+bool ServerParser::parsed_ip_;
+
 ServerContext ServerParser::ParseServer(std::ifstream &inf) {
   ServerContext server;
   std::map<std::string, parseFunction> func;

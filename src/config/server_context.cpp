@@ -60,7 +60,7 @@ void ServerContext::AddIndex(const std::string &index) {
 }
 void ServerContext::AddPort(const std::string &port) { port_.push_back(port); }
 void ServerContext::AddServerName(const std::string &server_name) {
-  if (server_name_.end() != std::find(server_name_.begin(), server_name_.end(), server_name_))
+  if (server_name_.end() != std::find(server_name_.begin(), server_name_.end(), server_name))
     throw std::invalid_argument("server_nameで同じものが複数指定されています");
   server_name_.push_back(server_name);
 }
