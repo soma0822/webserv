@@ -6,7 +6,7 @@ void ConfigParser::Parse(const std::string &file) {
   Config::Clear();
   std::vector<ServerContext> server;
   std::string line;
-  std::ifstream inf(file);
+  std::ifstream inf(file.c_str());
   if (!inf.is_open()) {
     throw std::invalid_argument("ファイルが開けませんでした: " + file);
   }
