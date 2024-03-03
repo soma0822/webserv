@@ -127,8 +127,8 @@ void LocationParser::RemoveSemicolon(std::string &line) {
   if (key == "}") {
     return;
   }
-  if (line.back() == ';') {
-    line.pop_back();
+  if (line.at(line.size() - 1) == ';') {
+    line.erase(line.size() - 1, 1);
     return;
   }
   throw std::invalid_argument("Syntaxエラー: semicolon: " + line);

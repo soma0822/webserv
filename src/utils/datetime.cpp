@@ -1,5 +1,7 @@
 #include "datetime.hpp"
 
+#include <ctime>
+
 namespace datetime {
 std::string GetDatetimeString() {
   time_t t = time(NULL);
