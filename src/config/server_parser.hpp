@@ -35,6 +35,8 @@ class ServerParser {
   static bool ParsePort(const std::vector<std::string> &value,
                         ServerContext &server);
   static void RemoveSemicolon(std::string &line);
+  static bool parsed_root_;
+  static bool parsed_ip_;
 };
 
 #endif

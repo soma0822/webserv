@@ -47,6 +47,8 @@ void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   func["root"] = &ServerParser::ParseRoot;
   func["server_name"] = &ServerParser::ParseServer_name;
   func["listen"] = &ServerParser::ParsePort;
+  parsed_root_ = false;
+  parsed_ip_ = false;
 }
 
 // パーサー
@@ -68,14 +70,20 @@ bool ServerParser::ParseIndex(const std::vector<std::string> &value,
 }
 bool ServerParser::ParseIp(const std::vector<std::string> &value,
                            ServerContext &server) {
+  if (parsed_ip_ == true)
+    throw std::invalid_argument("hostが複数あります");
   if (value.size() != 1) return false;
   server.SetIp(value.at(0));
+  parsed_ip_ = true;
   return true;
 }
 bool ServerParser::ParseRoot(const std::vector<std::string> &value,
                              ServerContext &server) {
+  if (parsed_root_ == true)
+    throw std::invalid_argument("hostが複数あります");
   if (value.size() != 1) return false;
   server.SetRoot(value.at(0));
+  parsed_root_ = true;
   return true;
 }
 bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
