@@ -41,7 +41,7 @@ void LocationParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   func["root"] = &LocationParser::ParseRoot;
   func["index"] = &LocationParser::ParseIndex;
   func["cgi_path"] = &LocationParser::ParseCgiPath;
-  func["cgi_ext"] = &LocationParser::ParseCgiExtention;
+  func["cgi_extention"] = &LocationParser::ParseCgiExtention;
   func["allow_methods"] = &LocationParser::ParseAllowMethod;
   func["error_page"] = &LocationParser::ParseErrorPage;
   parsed_auto_index_ = false;
@@ -95,7 +95,7 @@ bool LocationParser::ParseRoot(const std::vector<std::string> &value,
     throw std::invalid_argument("rootが複数あります");
   if (value.size() != 1) return false;
   location.SetRoot(value.at(0));
-  parsed_root_ = false;
+  parsed_root_ = true;
   return true;
 }
 bool LocationParser::ParseIndex(const std::vector<std::string> &value,

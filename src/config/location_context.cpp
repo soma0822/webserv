@@ -84,7 +84,7 @@ void LocationContext::AddErrorPage(const std::string &key,
                                    const std::string &value) {
   std::map<std::string, std::string>::iterator it = error_page_.find(key);
   if (it != error_page_.end())
-    std::invalid_argument("error_pageで同じものが複数指定されています");
+    throw std::invalid_argument("error_pageで同じものが複数指定されています");
   error_page_[key] = value;
 }
 

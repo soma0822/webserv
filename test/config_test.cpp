@@ -198,3 +198,51 @@ TEST(ConfigTest, DoubleLocation) {
   ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location.conf"),
                std::invalid_argument);
 }
+//location double
+TEST(ConfigTest, DoubleLocationCanAutoIndex) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_can_auto_index.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleLocationLimitClientBody) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_limit_client_body.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleLocationReturn) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_return.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleLocationalias) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_alias.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleLocationRoot) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_root.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleLocationIndex) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_index.conf"),
+               std::invalid_argument);
+}
+TEST(ConfigTest, DoubleLocationCgi_Path) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_cgi_path.conf"),
+               std::invalid_argument);
+}
+TEST(ConfigTest, DoubleLocationCgiExtention) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_Cgi_Extention.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleLocationAllowMethod) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_allow_method.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, DoubleLocationErrorPage) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_error_page.conf"),
+               std::invalid_argument);
+}
