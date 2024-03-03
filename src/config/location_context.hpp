@@ -1,6 +1,7 @@
 #ifndef WEBSERV_SRC_CONFIG_LOCATION_CONTEXT_HPP
 #define WEBSERV_SRC_CONFIG_LOCATION_CONTEXT_HPP
 
+#include <algorithm>
 #include <climits>
 #include <iostream>
 #include <map>

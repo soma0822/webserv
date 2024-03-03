@@ -1,6 +1,7 @@
 #ifndef WEBSERV_SRC_CONFIG_SERVER_PARSER_HPP
 #define WEBSERV_SRC_CONFIG_SERVER_PARSER_HPP
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
