@@ -1,8 +1,10 @@
 #ifndef WEBSERV_SRC_CONFIG_SERVER_CONTEXT_HPP
 #define WEBSERV_SRC_CONFIG_SERVER_CONTEXT_HPP
 
+#include <algorithm>
 #include <iostream>
 #include <map>
+#include <stdexcept>
 #include <vector>
 
 #include "location_context.hpp"

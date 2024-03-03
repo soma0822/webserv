@@ -1,8 +1,8 @@
 #include "server_context.hpp"
 
-ServerContext::ServerContext() : ip_("") {}
+ServerContext::ServerContext() {}
 
-ServerContext::ServerContext(const ServerContext &other) : ip_(other.ip_) {
+ServerContext::ServerContext(const ServerContext &other) {
   *this = other;
 }
 
@@ -50,25 +50,33 @@ const std::map<std::string, LocationContext> &ServerContext::GetLocation()
 
 // セッター
 void ServerContext::SetIp(const std::string &ip) {
-  if (ip_ == "") ip_ = ip;
+  ip_ = ip;
 }
 void ServerContext::SetRoot(const std::string &root) { root_ = root; }
 void ServerContext::AddIndex(const std::string &index) {
+  if (index_.end() != std::find(index_.begin(), index_.end(), index))
+    throw std::invalid_argument("indexで同じものが複数指定されています");
   index_.push_back(index);
 }
 void ServerContext::AddPort(const std::string &port) { port_.push_back(port); }
 void ServerContext::AddServerName(const std::string &server_name) {
+  if (server_name_.end() != std::find(server_name_.begin(), server_name_.end(), server_name_))
+    throw std::invalid_argument("server_nameで同じものが複数指定されています");
   server_name_.push_back(server_name);
 }
 void ServerContext::AddErrorPage(const std::string &key,
                                  const std::string &value) {
   std::map<std::string, std::string>::iterator it = error_page_.find(key);
-  if (it == error_page_.end()) error_page_[key] = value;
+  if (it != error_page_.end()) 
+    throw std::invalid_argument("error_pageで同じものが複数指定されています");
+  error_page_[key] = value;
 }
 void ServerContext::AddLocation(const std::string &key,
                                 const LocationContext &value) {
   std::map<std::string, LocationContext>::iterator it = location_.find(key);
-  if (it == location_.end()) location_[key] = value;
+  if (it != location_.end()) 
+    throw std::invalid_argument("locationで同じものが複数指定されています");
+  location_[key] = value;
 }
 
 std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
