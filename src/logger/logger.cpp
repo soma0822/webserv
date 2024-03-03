@@ -87,13 +87,11 @@ std::ostream &StdoutStreamWrapper::GetStream() { return std::cout; }
  * ファイルストリームラッパー
  */
 
-FileStreamWrapper::FileStreamWrapper(const std::string &filename) {
-  ostream_.open(filename);
-}
+FileStreamWrapper::FileStreamWrapper(const std::string &filename)
+    : ostream_(filename.c_str()) {}
 
 FileStreamWrapper::FileStreamWrapper() {
-  ostream_.open(kDefaultLogDir + datetime::GetDatetimeString() +
-                std::string(".log"));
+  ostream_.open(std::string(kDefaultLogDir) + datetime::GetDatetimeString() + ".log");
 }
 
 FileStreamWrapper::~FileStreamWrapper() { ostream_.close(); }
