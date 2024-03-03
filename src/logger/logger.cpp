@@ -91,8 +91,9 @@ FileStreamWrapper::FileStreamWrapper(const std::string &filename)
     : ostream_(filename.c_str()) {}
 
 FileStreamWrapper::FileStreamWrapper() {
-  ostream_.open(std::string(kDefaultLogDir) + datetime::GetDatetimeString() +
-                std::string(".log"));
+  std::string log_file_path =
+      kDefaultLogDir + datetime::GetDatetimeString() + ".log";
+  ostream_.open(log_file_path.c_str());
 }
 
 FileStreamWrapper::~FileStreamWrapper() { ostream_.close(); }
