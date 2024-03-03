@@ -45,7 +45,7 @@ Result<int, int> Server::Listen(const std::string &port) {
   // TODO：errornoを見て処理を変える
   if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1)
     return Err(kBindError);
-  if (listen(sock, SOMAXCONN) == -1) return Err(klistenError);
+  if (listen(sock, SOMAXCONN) == -1) return Err(kListenError);
   Logger::Info() << port << " : リッスン開始" << std::endl;
   return Ok(sock);
 }
