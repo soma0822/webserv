@@ -38,7 +38,6 @@ const std::map<std::string, std::string> &HTTPResponse::GetHeaders() const {
 void HTTPResponse::SetBody(const std::string &body) { body_ = body; }
 
 std::string HTTPResponse::ToString() const {
-  std::map<http::StatusCode, std::string>::const_iterator it =
-      http::kStatusMessage.find(status_code_);
-  return "HTTP/1.1 " + it->second + " OK\n\nHello, World!";
+  return "HTTP/1.1 " + http::GetStatusMessage(status_code_) +
+         " OK\n\nHello, World!";
 }
