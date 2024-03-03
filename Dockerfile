@@ -9,3 +9,4 @@ RUN set -eux \
   build-essential
 
 ENTRYPOINT ["bash"]
+
