@@ -158,3 +158,8 @@ TEST(ConfigTest, InvalidServerValueTest) {
   ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_server_value.conf"),
                std::invalid_argument);
 }
+
+TEST(ConfigTest, NoPortTest) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/no_port.conf"),
+               std::invalid_argument);
+}
