@@ -1,7 +1,7 @@
 #include "write_response_to_client.hpp"
 
 WriteResponseToClient::WriteResponseToClient(int fd,
-                                             const HTTPResponse *response)
+                                             HTTPResponse *response)
     : response_(response) {
   fd_ = fd;
   event_ = POLLOUT;
