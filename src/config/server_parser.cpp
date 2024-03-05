@@ -58,7 +58,7 @@ void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
 bool ServerParser::ParseErrorPage(const std::vector<std::string> &value,
                                   ServerContext &server) {
   if (value.size() < 2) return false;
-  for (unsigned int i = 0; i < value.size() - 1; i++) {
+  for (unsigned int i = 0; i < value.size() - 1; ++i) {
     if (validation::IsNumber(value.at(i)) == false) return false;
     server.AddErrorPage(value.at(i), *(value.end() - 1));
   }
@@ -67,7 +67,7 @@ bool ServerParser::ParseErrorPage(const std::vector<std::string> &value,
 bool ServerParser::ParseIndex(const std::vector<std::string> &value,
                               ServerContext &server) {
   if (value.size() == 0) return false;
-  for (unsigned int i = 0; i < value.size(); i++) server.AddIndex(value.at(i));
+  for (unsigned int i = 0; i < value.size(); ++i) server.AddIndex(value.at(i));
   return true;
 }
 bool ServerParser::ParseIp(const std::vector<std::string> &value,
@@ -89,14 +89,14 @@ bool ServerParser::ParseRoot(const std::vector<std::string> &value,
 bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
                                     ServerContext &server) {
   if (value.size() == 0) return false;
-  for (unsigned int i = 0; i < value.size(); i++)
+  for (unsigned int i = 0; i < value.size(); ++i)
     server.AddServerName(value.at(i));
   return true;
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
   if (value.size() == 0) return false;
-  for (unsigned int i = 0; i < value.size(); i++) {
+  for (unsigned int i = 0; i < value.size(); ++i) {
     if (validation::IsPort(value.at(i)) == false) return false;
     server.AddPort(value.at(i));
   }

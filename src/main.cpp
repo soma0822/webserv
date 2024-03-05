@@ -19,7 +19,7 @@ int main(int ac, char **av) {
     ConfigParser::Parse(config_file);
     std::vector<ServerContext> m = Config::GetServer();
     for (std::vector<ServerContext>::const_iterator it = m.begin();
-         it != m.end(); it++) {
+         it != m.end(); ++it) {
       std::cout << *it << std::endl;
     }
   } catch (std::exception &e) {

@@ -6,15 +6,15 @@ std::vector<struct pollfd> IOTaskManager::fds_;
 IOTaskManager::IOTaskManager() {}
 
 IOTaskManager::~IOTaskManager() {
-  for (unsigned int i = 0; i < tasks_.size(); i++) {
-    for (unsigned int j = 0; j < tasks_.at(i).size(); j++) {
+  for (unsigned int i = 0; i < tasks_.size(); ++i) {
+    for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
       delete tasks_.at(i).at(j);
     }
   }
 }
 
 void IOTaskManager::AddTask(AIOTask *task) {
-  for (unsigned int i = 0; i < fds_.size(); i++) {
+  for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == task->GetFd()) {
       tasks_.at(i).push_back(task);
       std::cout << "AddTask: " << task->GetFd() << task->GetEvent()
@@ -32,9 +32,9 @@ void IOTaskManager::AddTask(AIOTask *task) {
 
 void IOTaskManager::RemoveTask(AIOTask *task) {
   ReadRequestFromClient *tmp = dynamic_cast<ReadRequestFromClient *>(task);
-  for (unsigned int i = 0; i < fds_.size(); i++) {
+  for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == task->GetFd()) {
-      for (unsigned int j = 0; j < tasks_.at(i).size(); j++) {
+      for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
         if (tmp) {  // ReadRequestFromClientを消すときは接続を切るとき。同時にwriteも消すべき。それ以外のときはそのタスクのみを消す
           delete tasks_.at(i).at(j);
         } else if (tasks_.at(i).at(j) == task) {
