@@ -20,12 +20,12 @@ class IOTaskManager {
 
  private:
   IOTaskManager();
-  IOTaskManager(const IOTaskManager &);
-  IOTaskManager &operator=(const IOTaskManager &);
+  IOTaskManager(const IOTaskManager &other);
+  IOTaskManager &operator=(const IOTaskManager &other);
   static std::vector<std::vector<AIOTask *> > tasks_;
   static std::vector<struct pollfd> fds_;
 
-  enum Error { Ok, Delete };
+  enum Error { kOk, kDelete };
 };
 
 #endif
