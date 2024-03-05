@@ -21,7 +21,8 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
     if (key == "location") {  // locationの時
       if (IsValidLocationKey(value) == false)
         throw std::invalid_argument("無効なlocation: " + line);
-      server.AddLocation(value.at(0), LocationParser::ParseLocation(inf, value.size() == 3));
+      server.AddLocation(value.at(0),
+                         LocationParser::ParseLocation(inf, value.size() == 3));
     } else {  // それ以外
       std::map<std::string, parseFunction>::iterator it = func.find(key);
       if (it == func.end()) {  // 対応した関数が見つからない
@@ -39,12 +40,12 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
     throw std::invalid_argument("serverにポートがありません");
 }
 
-bool ServerParser::IsValidLocationKey(const std::vector<std::string> &value){
-  if (value.size() == 2){
-    if (validation::IsPath(value.at(0)) && value.at(1) == "{")
-      return true;
-  } else if (value.size() == 3){
-    if (value.at(0) == "=" && validation::IsPath(value.at(1)) && value.at(2) == "{")
+bool ServerParser::IsValidLocationKey(const std::vector<std::string> &value) {
+  if (value.size() == 2) {
+    if (validation::IsPath(value.at(0)) && value.at(1) == "{") return true;
+  } else if (value.size() == 3) {
+    if (value.at(0) == "=" && validation::IsPath(value.at(1)) &&
+        value.at(2) == "{")
       return true;
   }
   return false;
