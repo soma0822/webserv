@@ -1,5 +1,8 @@
 #include "server_parser.hpp"
 
+bool ServerParser::parsed_root_;
+bool ServerParser::parsed_ip_;
+
 ServerContext ServerParser::ParseServer(std::ifstream &inf) {
   ServerContext server;
   std::map<std::string, parseFunction> func;
@@ -34,7 +37,10 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
       }
     }
   }
-  return server;
+  if (server.IsValidContext())
+    return server;
+  else
+    throw std::invalid_argument("serverにポートがありません");
 }
 
 void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
@@ -44,50 +50,56 @@ void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   func["root"] = &ServerParser::ParseRoot;
   func["server_name"] = &ServerParser::ParseServer_name;
   func["listen"] = &ServerParser::ParsePort;
+  parsed_root_ = false;
+  parsed_ip_ = false;
 }
 
 // パーサー
 bool ServerParser::ParseErrorPage(const std::vector<std::string> &value,
                                   ServerContext &server) {
   if (value.size() < 2) return false;
-  for (std::vector<std::string>::const_iterator it = value.begin();
-       it != value.end() - 1; it++) {
-    if (validation::IsNumber(*it) == false) return false;
-    server.AddErrorPage(*it, *(value.end() - 1));
+  for (unsigned int i = 0; i < value.size() - 1; i++) {
+    if (validation::IsNumber(value.at(i)) == false) return false;
+    server.AddErrorPage(value.at(i), *(value.end() - 1));
   }
   return true;
 }
 bool ServerParser::ParseIndex(const std::vector<std::string> &value,
                               ServerContext &server) {
   if (value.size() == 0) return false;
-  server.AddIndex(value.at(0));
+  for (unsigned int i = 0; i < value.size(); i++) server.AddIndex(value.at(i));
   return true;
 }
 bool ServerParser::ParseIp(const std::vector<std::string> &value,
                            ServerContext &server) {
+  if (parsed_ip_ == true) throw std::invalid_argument("hostが複数あります");
   if (value.size() != 1) return false;
   server.SetIp(value.at(0));
+  parsed_ip_ = true;
   return true;
 }
 bool ServerParser::ParseRoot(const std::vector<std::string> &value,
                              ServerContext &server) {
+  if (parsed_root_ == true) throw std::invalid_argument("rootが複数あります");
   if (value.size() != 1) return false;
   server.SetRoot(value.at(0));
+  parsed_root_ = true;
   return true;
 }
 bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
                                     ServerContext &server) {
   if (value.size() == 0) return false;
-  for (std::vector<std::string>::const_iterator it = value.begin();
-       it != value.end(); it++)
-    server.AddServerName(*it);
+  for (unsigned int i = 0; i < value.size(); i++)
+    server.AddServerName(value.at(i));
   return true;
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
-  if (value.size() != 1) return false;
-  if (validation::IsPort(value.at(0)) == false) return false;
-  server.AddPort(value.at(0));
+  if (value.size() == 0) return false;
+  for (unsigned int i = 0; i < value.size(); i++) {
+    if (validation::IsPort(value.at(i)) == false) return false;
+    server.AddPort(value.at(i));
+  }
   return true;
 }
 
