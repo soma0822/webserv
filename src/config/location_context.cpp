@@ -94,13 +94,13 @@ void LocationContext::AddErrorPage(const std::string &key,
 std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
   os << "index: ";
   for (std::vector<std::string>::const_iterator it = obj.GetIndex().begin();
-       it != obj.GetIndex().end(); it++) {
+       it != obj.GetIndex().end(); ++it) {
     os << *it << " ";
   }
   os << "\nerror page: ";
   for (std::map<std::string, std::string>::const_iterator it =
            obj.GetErrorPage().begin();
-       it != obj.GetErrorPage().end(); it++) {
+       it != obj.GetErrorPage().end(); ++it) {
     os << it->first << "[" << it->second << "]"
        << "    ";
   }
@@ -112,13 +112,13 @@ std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
   }
   os << "\ncgiPath: ";
   for (std::vector<std::string>::const_iterator it = obj.GetCgiPath().begin();
-       it != obj.GetCgiPath().end(); it++) {
+       it != obj.GetCgiPath().end(); ++it) {
     os << *it << " ";
   }
   os << "\ncgiExtention: ";
   for (std::vector<std::string>::const_iterator it =
            obj.GetCgiExtention().begin();
-       it != obj.GetCgiExtention().end(); it++) {
+       it != obj.GetCgiExtention().end(); ++it) {
     os << *it << " ";
   }
   os << "\nautoindex: " << (obj.GetCnaAutoIndex() == true ? "on" : "off");
@@ -134,7 +134,7 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = obj.GetIndex().begin();
-         it != obj.GetIndex().end(); it++)
+         it != obj.GetIndex().end(); ++it)
       os << *it << " ";
   }
   os << "\nerror page: ";
@@ -143,7 +143,7 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
   else {
     for (std::map<std::string, std::string>::const_iterator it =
              obj.GetErrorPage().begin();
-         it != obj.GetErrorPage().end(); it++)
+         it != obj.GetErrorPage().end(); ++it)
       os << it->first << "[" << it->second << "]"
          << "    ";
   }
@@ -159,7 +159,7 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = obj.GetCgiPath().begin();
-         it != obj.GetCgiPath().end(); it++)
+         it != obj.GetCgiPath().end(); ++it)
       os << *it << " ";
   }
   os << "\ncgiExtention: ";
@@ -168,7 +168,7 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
   else {
     for (std::vector<std::string>::const_iterator it =
              obj.GetCgiExtention().begin();
-         it != obj.GetCgiExtention().end(); it++)
+         it != obj.GetCgiExtention().end(); ++it)
       os << *it << " ";
   }
   os << "\nautoindex: " << (obj.GetCnaAutoIndex() == true ? "on" : "off");

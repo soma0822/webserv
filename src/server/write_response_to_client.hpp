@@ -12,12 +12,12 @@
 
 class WriteResponseToClient : public AIOTask {
  public:
-  WriteResponseToClient(int fd, const HTTPResponse *response);
+  WriteResponseToClient(int fd, HTTPResponse *response);
   virtual ~WriteResponseToClient();
   virtual Result<int, std::string> Excecute();
 
  private:
-  const HTTPResponse *response_;
+  HTTPResponse *response_;
 };
 
 #endif  // WEBSERV_SRC_WRITE_RESPONSE_TO_CLIENT_HPP
