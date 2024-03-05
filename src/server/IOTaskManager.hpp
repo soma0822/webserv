@@ -25,7 +25,7 @@ class IOTaskManager {
   static std::vector<std::vector<AIOTask *> > tasks_;
   static std::vector<struct pollfd> fds_;
 
-  enum Error { Ok, Delete };
+  enum Error { kOk, kDelete };
 };
 
 #endif

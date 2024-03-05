@@ -60,16 +60,16 @@ void IOTaskManager::ExecuteTasks() {
       std::cerr << "poll error" << std::endl;
       return;
     }
-    for (unsigned int i = 0; i < fds_.size(); i++) {
-      for (unsigned int j = 0; j < tasks_.at(i).size(); j++) {
+    for (unsigned int i = 0; i < fds_.size(); ++i) {
+      for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
         if (fds_.at(i).revents & tasks_.at(i).at(j)->GetEvent()) {
           Result<int, std::string> result = tasks_.at(i).at(j)->Execute();
           if (result
                   .IsErr())  // errを返すのは致命的なエラーのみの予定。他はOkの数値を見て判断
             throw std::invalid_argument("taskエラー");
-          else if (result.Unwrap() == Delete) {
+          else if (result.Unwrap() == kDelete) {
             RemoveTask(tasks_.at(i).at(j));
-            j--;
+            --j;
           }
         }
       }
