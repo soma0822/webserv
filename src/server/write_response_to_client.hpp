@@ -14,9 +14,11 @@ class WriteResponseToClient : public AIOTask {
  public:
   WriteResponseToClient(int fd, HTTPResponse *response);
   virtual ~WriteResponseToClient();
-  virtual Result<int, std::string> Excecute();
+  virtual Result<int, std::string> Execute();
 
  private:
+  WriteResponseToClient();
+  WriteResponseToClient(const WriteResponseToClient &other);
   HTTPResponse *response_;
 };
 

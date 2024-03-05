@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 
 #include "io_task.hpp"
+#include "io_task_manager.hpp"
 #include "logger.hpp"
 #include "result.hpp"
 #include "string_utils.hpp"

@@ -1,4 +1,4 @@
-#include "IOTaskManager.hpp"
+#include "io_task_manager.hpp"
 
 std::vector<std::vector<AIOTask *> > IOTaskManager::tasks_;
 std::vector<struct pollfd> IOTaskManager::fds_;
@@ -18,7 +18,7 @@ void IOTaskManager::AddTask(AIOTask *task) {
     if (fds_.at(i).fd == task->GetFd()) {
       tasks_.at(i).push_back(task);
       Logger::Info() << "AddTask: " << task->GetFd() << task->GetEvent()
-                << std::endl;
+                     << std::endl;
       return;
     }
   }
@@ -27,7 +27,8 @@ void IOTaskManager::AddTask(AIOTask *task) {
   tmp.push_back(task);
   tasks_.push_back(tmp);
   fds_.push_back(fd);
-  Logger::Info() << "AddTask: " << task->GetFd() << task->GetEvent() << std::endl;
+  Logger::Info() << "AddTask: " << task->GetFd() << task->GetEvent()
+                 << std::endl;
 }
 
 void IOTaskManager::RemoveTask(AIOTask *task) {

@@ -3,6 +3,7 @@
 #include "config.hpp"
 #include "config_parser.hpp"
 #include "logger.hpp"
+#include "server.hpp"
 
 int main(int ac, char **av) {
   std::string config_file;
@@ -22,6 +23,7 @@ int main(int ac, char **av) {
          it != m.end(); ++it) {
       std::cout << *it << std::endl;
     }
+    Server::run();
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
   }

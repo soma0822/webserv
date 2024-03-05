@@ -8,7 +8,7 @@ WriteResponseToClient::WriteResponseToClient(int fd, HTTPResponse *response)
 
 WriteResponseToClient::~WriteResponseToClient() { delete response_; }
 
-Result<int, std::string> WriteResponseToClient::Excecute() {
+Result<int, std::string> WriteResponseToClient::Execute() {
   std::string response_str = response_->ToString();
   int bytes_written = write(fd_, response_str.c_str(), response_str.size());
   if (bytes_written < 0) {
