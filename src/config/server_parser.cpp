@@ -53,7 +53,6 @@ void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   func["listen"] = &ServerParser::ParsePort;
   parsed_root_ = false;
   parsed_ip_ = false;
-  parsed_pair_.clear();
 }
 
 // パーサー
@@ -132,4 +131,8 @@ void ServerParser::RemoveSemicolon(std::string &line) {
     return;
   }
   throw std::invalid_argument("Syntaxエラー: semicolon: " + line);
+}
+
+void ServerParser::ClearParsedPair(){
+  parsed_pair_.clear();
 }

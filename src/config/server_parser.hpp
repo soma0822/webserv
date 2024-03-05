@@ -20,6 +20,7 @@ class ServerParser {
   typedef bool (*parseFunction)(const std::vector<std::string> &value,
                                 ServerContext &server);
   static ServerContext ParseServer(std::ifstream &inf);
+  static void ClearParsedPair();
 
  private:
   static void ParseFuncInit(std::map<std::string, parseFunction> &func);
@@ -38,7 +39,7 @@ class ServerParser {
   static void RemoveSemicolon(std::string &line);
   static bool parsed_root_;
   static bool parsed_ip_;
-  static std::map<std::string, std::vector<std::string>> parsed_pair_;
+  static std::map<std::string, std::vector<std::string> > parsed_pair_;
 };
 
 #endif

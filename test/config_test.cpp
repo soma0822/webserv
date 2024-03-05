@@ -190,6 +190,11 @@ TEST(ConfigTest, DoubleServerName) {
                std::invalid_argument);
 }
 
+TEST(ConfigTest, DoublePair) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_server_pair.conf"),
+               std::invalid_argument);
+}
+
 TEST(ConfigTest, DoubleErrorPage) {
   ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_error_page.conf"),
                std::invalid_argument);
