@@ -62,9 +62,9 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   //   }
   // }
   // // setterと形式があってるかのエラーチェック
-std::cout << "PrintAll  : " << std::endl;
+  std::cout << "PrintAll  : " << std::endl;
   PrintAll(request_);
-std::cout << "row_line_ : " << row_line_ << std::endl;
+  std::cout << "row_line_ : " << row_line_ << std::endl;
   return Ok(request_);
   (void)request_line;
 }
@@ -133,4 +133,3 @@ int HTTPRequestParser::SetRequestLine() {
   request_->SetVersion(str_toupper(version));
   return kOk;
 }
-
