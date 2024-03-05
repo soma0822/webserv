@@ -20,6 +20,18 @@ ServerContext &ServerContext::operator=(const ServerContext &other) {
   return *this;
 }
 
+bool ServerContext::HavePort(const std::string &port){
+  if (port_.end() == std::find(port_.begin(), port_.end(), port))
+    return false;
+  return true;
+}
+
+bool ServerContext::HaveServerName(const std::string &server_name){
+  if (server_name_.end() == std::find(server_name_.begin(), server_name_.end(), server_name))
+    return false;
+  return true;
+}
+
 // ゲッター
 const std::string &ServerContext::GetIp() const { return ip_; }
 const std::string &ServerContext::GetRoot() const { return root_; }

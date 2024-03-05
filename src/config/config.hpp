@@ -14,6 +14,7 @@ class Config {
   static void Clear();
   static void AddServer(const ServerContext &server);
   static const std::vector<ServerContext> &GetServer();
+  static const ServerContext &SerchServer(const std::string &port, const std::string &server_name);
 
  private:
   Config();

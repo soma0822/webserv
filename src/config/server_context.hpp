@@ -1,6 +1,7 @@
 #ifndef WEBSERV_SRC_CONFIG_SERVER_CONTEXT_HPP
 #define WEBSERV_SRC_CONFIG_SERVER_CONTEXT_HPP
 
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -15,6 +16,9 @@ class ServerContext {
   ServerContext();
   ServerContext(const ServerContext &other);
   ServerContext &operator=(const ServerContext &other);
+
+  bool HavePort(const std::string &port);
+  bool HaveServerName(const std::string &server_name);
 
   const std::string &GetIp() const;
   const std::string &GetRoot() const;
