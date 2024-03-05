@@ -81,7 +81,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   tmp = obj.GetServerName();
@@ -90,7 +90,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   tmp = obj.GetIndex();
@@ -99,7 +99,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   os << "\nerror page: ";
@@ -108,7 +108,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
   else {
     for (std::map<std::string, std::string>::const_iterator it =
              obj.GetErrorPage().begin();
-         it != obj.GetErrorPage().end(); it++)
+         it != obj.GetErrorPage().end(); ++it)
       os << it->first << "[" << it->second << "]"
          << "    ";
   }
@@ -117,7 +117,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
   os << "\nip: " << (obj.GetIp().empty() ? "no set" : obj.GetIp());
   for (std::map<std::string, LocationContext>::const_iterator it =
            obj.GetLocation().begin();
-       it != obj.GetLocation().end(); it++) {
+       it != obj.GetLocation().end(); ++it) {
     os << LOCATION << "\nLocation: ";
     os << it->first << "\n";
     os << it->second << "\n";
@@ -134,7 +134,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   tmp = obj.GetServerName();
@@ -143,7 +143,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   tmp = obj.GetIndex();
@@ -152,7 +152,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   os << "\nerror page: ";
@@ -161,7 +161,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
   else {
     for (std::map<std::string, std::string>::const_iterator it =
              obj.GetErrorPage().begin();
-         it != obj.GetErrorPage().end(); it++)
+         it != obj.GetErrorPage().end(); ++it)
       os << it->first << "[" << it->second << "]"
          << "    ";
   }
@@ -170,7 +170,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
   os << "\nip: " << (obj.GetIp().empty() ? "no set" : obj.GetIp());
   for (std::map<std::string, LocationContext>::const_iterator it =
            obj.GetLocation().begin();
-       it != obj.GetLocation().end(); it++) {
+       it != obj.GetLocation().end(); ++it) {
     os << LOCATION << "\nLocation: ";
     os << it->first << "\n";
     os << it->second << "\n";
