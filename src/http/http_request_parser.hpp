@@ -27,6 +27,7 @@ class HTTPRequestParser {
   bool IsFillRequestLine();
   bool IsFillHeaders();
   bool IsFillBody();
+  bool IsNeedBody();
 
   int SetRequestLine();
   int SetRequestHeaders();
