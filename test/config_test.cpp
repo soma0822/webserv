@@ -21,7 +21,7 @@ TEST(ConfigTest, DefaultPath) {
   it++;
   ASSERT_EQ(it->first, "405");
   ASSERT_EQ(it->second, "error_pages/404.html");
-  ASSERT_EQ(Config::GetServer()[0].GetLocation().size(), 4);
+  ASSERT_EQ(Config::GetServer()[0].GetLocation().size(), 5);
   std::map<std::string, LocationContext>::const_iterator it2 =
       Config::GetServer()[0].GetLocation().begin();
   ASSERT_EQ(it2->first, "/");
@@ -106,6 +106,8 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it7->second, true);
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   it2++;
+  ASSERT_EQ(it2->first, "= /red");
+  ++it2;
   ASSERT_EQ(it2, Config::GetServer()[0].GetLocation().end());
 }
 

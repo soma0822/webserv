@@ -14,7 +14,6 @@ class LocationContext {
   LocationContext& operator=(const LocationContext& other);
   // ゲッター
   bool GetCnaAutoIndex() const;
-  bool GetHaveEqual() const;
   int GetLimitClientBody() const;
   const std::string& GetReturn() const;
   const std::string& GetAlias() const;
@@ -26,7 +25,6 @@ class LocationContext {
   const std::map<std::string, std::string>& GetErrorPage() const;
   // セッター
   void SetCanAutoIndex(bool can_auto_inde);
-  void SetHaveEqual(bool have_equal);
   void SetLimitClientBody(int limit_client_body_bytes);
   void SetReturn(const std::string& ret);
   void SetAlias(const std::string& alias);
@@ -39,7 +37,6 @@ class LocationContext {
 
  private:
   bool can_auto_index_;
-  bool have_equal_;
   int limit_client_body_bytes_;
   std::string return_;
   std::string alias_;

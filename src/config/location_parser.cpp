@@ -6,13 +6,11 @@ bool LocationParser::parsed_return_;
 bool LocationParser::parsed_alias_;
 bool LocationParser::parsed_root_;
 
-LocationContext LocationParser::ParseLocation(std::ifstream &inf,
-                                              bool have_equal) {
+LocationContext LocationParser::ParseLocation(std::ifstream &inf) {
   LocationContext location;
   std::map<std::string, parseFunction> func;
   std::string line;
 
-  location.SetHaveEqual(have_equal);
   ParseFuncInit(func);
   while (std::getline(inf, line)) {
     if (line.empty()) continue;
