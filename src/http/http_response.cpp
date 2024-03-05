@@ -48,7 +48,7 @@ std::string HTTPResponse::ToString() {
 
   // ヘッダ
   for (std::map<std::string, std::string>::iterator it = headers_.begin();
-       it != headers_.end(); it++) {
+       it != headers_.end(); ++it) {
     ss << it->first << ": " << it->second << "\r\n";
   }
 
@@ -56,7 +56,7 @@ std::string HTTPResponse::ToString() {
   ss << "\r\n";
 
   // ボディ
-  ss << body_ << "\r\n";
+  ss << body_;
 
   return ss.str();
 }
