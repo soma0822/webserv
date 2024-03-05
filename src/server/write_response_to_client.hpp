@@ -17,7 +17,7 @@ class WriteResponseToClient : public AIOTask {
   virtual Result<int, std::string> Excecute();
 
  private:
-  const HTTPResponse *response_;
+  HTTPResponse *response_;
 };
 
 #endif  // WEBSERV_SRC_WRITE_RESPONSE_TO_CLIENT_HPP
