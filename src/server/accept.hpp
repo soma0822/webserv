@@ -16,7 +16,7 @@
 
 class Accept : public AIOTask {
  public:
-  Accept(const std::string &);
+  Accept(int fd, const std::string &);
   virtual ~Accept();
   virtual Result<int, std::string> Execute();
   const std::string &GetPort() const;
