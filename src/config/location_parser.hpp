@@ -19,7 +19,7 @@ class LocationParser {
  public:
   typedef bool (*parseFunction)(const std::vector<std::string> &value,
                                 LocationContext &location);
-  static LocationContext ParseLocation(std::ifstream &inf);
+  static LocationContext ParseLocation(std::ifstream &inf, bool have_equal);
 
  private:
   static void ParseFuncInit(std::map<std::string, parseFunction> &func);

@@ -27,6 +27,7 @@ LocationContext &LocationContext::operator=(const LocationContext &other) {
 }
 // ゲッター
 bool LocationContext::GetCnaAutoIndex() const { return can_auto_index_; }
+bool LocationContext::GetHaveEqual() const { return have_equal_; }
 int LocationContext::GetLimitClientBody() const {
   return limit_client_body_bytes_;
 }
@@ -52,6 +53,9 @@ const std::map<std::string, std::string> &LocationContext::GetErrorPage()
 // セッター
 void LocationContext::SetCanAutoIndex(bool can_auto_index) {
   can_auto_index_ = can_auto_index;
+}
+void LocationContext::SetHaveEqual(bool have_equal) {
+  have_equal_ = have_equal;
 }
 void LocationContext::SetLimitClientBody(int limit_client_body_bytes) {
   limit_client_body_bytes_ = limit_client_body_bytes;
