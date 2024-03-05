@@ -3,7 +3,7 @@
 namespace validation {
 
 bool IsNumber(const std::string &str) {
-  for (size_t i = 0; i < str.size(); i++) {
+  for (size_t i = 0; i < str.size(); ++i) {
     if (!std::isdigit(str[i])) {
       return false;
     }
@@ -29,7 +29,7 @@ bool IsIp(const std::string &str) {
   if (parts.size() != 4) {
     return false;
   }
-  for (size_t i = 0; i < parts.size(); i++) {
+  for (size_t i = 0; i < parts.size(); ++i) {
     if (parts[i].size() > 3) {
       return false;
     }
