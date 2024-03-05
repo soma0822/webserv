@@ -18,7 +18,7 @@ TEST(ConfigTest, DefaultPath) {
       Config::GetServer()[0].GetErrorPage().begin();
   ASSERT_EQ(it->first, "404");
   ASSERT_EQ(it->second, "error_pages/404.html");
-  it++;
+  ++it;
   ASSERT_EQ(it->first, "405");
   ASSERT_EQ(it->second, "error_pages/404.html");
   ASSERT_EQ(Config::GetServer()[0].GetLocation().size(), 4);
@@ -36,16 +36,16 @@ TEST(ConfigTest, DefaultPath) {
   std::map<std::string, bool>::const_iterator it3 =
       it2->second.GetAllowMethod().begin();
   ASSERT_EQ(it3->second, true);
-  it3++;
+  ++it3;
   ASSERT_EQ(it3->second, true);
-  it3++;
+  ++it3;
   ASSERT_EQ(it3->second, true);
   ASSERT_EQ(it2->second.GetErrorPage().size(), 1);
   std::map<std::string, std::string>::const_iterator it4 =
       it2->second.GetErrorPage().begin();
   ASSERT_EQ(it4->first, "404");
   ASSERT_EQ(it4->second, "error_pages/404.html");
-  it2++;
+  ++it2;
   ASSERT_EQ(it2->first, "/cgi-bin");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
@@ -63,12 +63,12 @@ TEST(ConfigTest, DefaultPath) {
   std::map<std::string, bool>::const_iterator it5 =
       it2->second.GetAllowMethod().begin();
   ASSERT_EQ(it5->second, true);
-  it5++;
+  ++it5;
   ASSERT_EQ(it5->second, true);
-  it5++;
+  ++it5;
   ASSERT_EQ(it5->second, true);
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
-  it2++;
+  ++it2;
   ASSERT_EQ(it2->first, "/red");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), true);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
@@ -81,12 +81,12 @@ TEST(ConfigTest, DefaultPath) {
   std::map<std::string, bool>::const_iterator it6 =
       it2->second.GetAllowMethod().begin();
   ASSERT_EQ(it6->second, false);
-  it6++;
+  ++it6;
   ASSERT_EQ(it6->second, false);
-  it6++;
+  ++it6;
   ASSERT_EQ(it6->second, false);
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
-  it2++;
+  ++it2;
   ASSERT_EQ(it2->first, "/tours");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
@@ -100,12 +100,12 @@ TEST(ConfigTest, DefaultPath) {
   std::map<std::string, bool>::const_iterator it7 =
       it2->second.GetAllowMethod().begin();
   ASSERT_EQ(it7->second, false);
-  it7++;
+  ++it7;
   ASSERT_EQ(it7->second, true);
-  it7++;
+  ++it7;
   ASSERT_EQ(it7->second, true);
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
-  it2++;
+  ++it2;
   ASSERT_EQ(it2, Config::GetServer()[0].GetLocation().end());
 }
 
