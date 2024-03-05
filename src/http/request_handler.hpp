@@ -8,6 +8,8 @@ class RequestHandler {
  public:
   static const HTTPResponse *Handle(const HTTPRequest *request,
                                     const std::string &port);
+  static const HTTPResponse *Get(const HTTPRequest *request,
+                                 const std::string &port);
 
  private:
   RequestHandler();
