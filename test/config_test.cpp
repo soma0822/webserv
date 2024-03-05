@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "config_parser.hpp"
+#include "server_context.hpp"
 
 TEST(ConfigTest, DefaultPath) {
   ConfigParser::Parse("test/conf_test/default.conf");
@@ -157,4 +158,17 @@ TEST(ConfigTest, InvalidServerKeyTest) {
 TEST(ConfigTest, InvalidServerValueTest) {
   ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_server_value.conf"),
                std::invalid_argument);
+}
+
+// SerchServer
+TEST(SerchServer, DefaultTest) {
+  ConfigParser::Parse("test/conf_test/search_server.conf");
+  const ServerContext &tmp = Config::SearchServer("8002", "");
+  ASSERT_EQ(&Config::GetServer().at(0), &tmp);
+  const ServerContext &tmp1 = Config::SearchServer("8000", "");
+  ASSERT_EQ(&Config::GetServer().at(1), &tmp1);
+  const ServerContext &tmp2 = Config::SearchServer("8000", "tokazaki");
+  ASSERT_EQ(&Config::GetServer().at(1), &tmp2);
+  const ServerContext &tmp3 = Config::SearchServer("8002", "tkuramot");
+  ASSERT_EQ(&Config::GetServer().at(2), &tmp3);
 }
