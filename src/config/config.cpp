@@ -18,7 +18,5 @@ const ServerContext &Config::SearchServer(const std::string &port,
         (server_.at(i).HaveServerName(server_name) || ret == -1))
       ret = i;
   }
-  // portが一致しているものが一つもないはずはない。あったら投げるほうが間違っている。
-  if (ret == -1) throw std::exception();
   return server_.at(ret);
 }
