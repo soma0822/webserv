@@ -39,7 +39,7 @@ const std::map<std::string, std::string> &HTTPResponse::GetHeaders() const {
 
 void HTTPResponse::SetBody(const std::string &body) { body_ = body; }
 
-std::string HTTPResponse::ToString() const {
+std::string HTTPResponse::ToString() {
   std::ostringstream ss;
 
   // ステータスライン

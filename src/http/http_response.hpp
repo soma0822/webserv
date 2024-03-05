@@ -23,7 +23,7 @@ class HTTPResponse {
   void SetBody(const std::string &body);
   const std::string &GetBody() const;
 
-  std::string ToString() const;
+  std::string ToString();
 
  private:
   std::string http_version_;
