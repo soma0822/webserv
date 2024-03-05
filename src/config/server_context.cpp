@@ -18,6 +18,18 @@ ServerContext &ServerContext::operator=(const ServerContext &other) {
   return *this;
 }
 
+bool ServerContext::HavePort(const std::string &port) {
+  if (port_.end() == std::find(port_.begin(), port_.end(), port)) return false;
+  return true;
+}
+
+bool ServerContext::HaveServerName(const std::string &server_name) {
+  if (server_name_.end() ==
+      std::find(server_name_.begin(), server_name_.end(), server_name))
+    return false;
+  return true;
+}
+
 // ポートを指定しないサーバー設定はエラー。他はなくてもいい。portについてもデフォルト決めるのもあり
 bool ServerContext::IsValidContext() const {
   if (port_.size() == 0)
@@ -86,7 +98,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   tmp = obj.GetServerName();
@@ -95,7 +107,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   tmp = obj.GetIndex();
@@ -104,7 +116,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   os << "\nerror page: ";
@@ -113,7 +125,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
   else {
     for (std::map<std::string, std::string>::const_iterator it =
              obj.GetErrorPage().begin();
-         it != obj.GetErrorPage().end(); it++)
+         it != obj.GetErrorPage().end(); ++it)
       os << it->first << "[" << it->second << "]"
          << "    ";
   }
@@ -122,7 +134,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
   os << "\nip: " << (obj.GetIp().empty() ? "no set" : obj.GetIp());
   for (std::map<std::string, LocationContext>::const_iterator it =
            obj.GetLocation().begin();
-       it != obj.GetLocation().end(); it++) {
+       it != obj.GetLocation().end(); ++it) {
     os << LOCATION << "\nLocation: ";
     os << it->first << "\n";
     os << it->second << "\n";
@@ -139,7 +151,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   tmp = obj.GetServerName();
@@ -148,7 +160,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   tmp = obj.GetIndex();
@@ -157,7 +169,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); it++)
+         it != tmp.end(); ++it)
       os << *it << " ";
   }
   os << "\nerror page: ";
@@ -166,7 +178,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
   else {
     for (std::map<std::string, std::string>::const_iterator it =
              obj.GetErrorPage().begin();
-         it != obj.GetErrorPage().end(); it++)
+         it != obj.GetErrorPage().end(); ++it)
       os << it->first << "[" << it->second << "]"
          << "    ";
   }
@@ -175,7 +187,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
   os << "\nip: " << (obj.GetIp().empty() ? "no set" : obj.GetIp());
   for (std::map<std::string, LocationContext>::const_iterator it =
            obj.GetLocation().begin();
-       it != obj.GetLocation().end(); it++) {
+       it != obj.GetLocation().end(); ++it) {
     os << LOCATION << "\nLocation: ";
     os << it->first << "\n";
     os << it->second << "\n";
