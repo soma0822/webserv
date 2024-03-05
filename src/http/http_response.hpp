@@ -14,6 +14,8 @@ class HTTPResponse {
   ~HTTPResponse();
 
   // アクセサー
+  void SetHttpVersion(const std::string &http_version);
+  const std::string &GetHttpVersion() const;
   void SetStatusCode(http::StatusCode status_code);
   http::StatusCode GetStatusCode() const;
   void AddHeader(const std::string &key, const std::string &value);
@@ -24,6 +26,7 @@ class HTTPResponse {
   std::string ToString() const;
 
  private:
+  std::string http_version_;
   http::StatusCode status_code_;
   std::map<std::string, std::string> headers_;
   std::string body_;
