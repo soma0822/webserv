@@ -1,6 +1,7 @@
 #ifndef WEBSERV_SRC_CONFIG_SERVER_PARSER_HPP
 #define WEBSERV_SRC_CONFIG_SERVER_PARSER_HPP
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -35,6 +36,8 @@ class ServerParser {
   static bool ParsePort(const std::vector<std::string> &value,
                         ServerContext &server);
   static void RemoveSemicolon(std::string &line);
+  static bool parsed_root_;
+  static bool parsed_ip_;
 };
 
 #endif

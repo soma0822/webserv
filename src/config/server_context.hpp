@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <stdexcept>
 #include <vector>
 
 #include "location_context.hpp"
@@ -19,7 +20,8 @@ class ServerContext {
 
   bool HavePort(const std::string &port);
   bool HaveServerName(const std::string &server_name);
-
+  bool IsValidContext() const;
+  // ゲッター
   const std::string &GetIp() const;
   const std::string &GetRoot() const;
   const std::vector<std::string> &GetIndex() const;
@@ -27,7 +29,7 @@ class ServerContext {
   const std::vector<std::string> &GetServerName() const;
   const std::map<std::string, std::string> &GetErrorPage() const;
   const std::map<std::string, LocationContext> &GetLocation() const;
-
+  // セッター
   void SetIp(const std::string &ip);
   void SetRoot(const std::string &root);
   void AddIndex(const std::string &index);

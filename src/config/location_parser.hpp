@@ -1,6 +1,7 @@
 #ifndef WEBSERV_SRC_CONFIG_LOCATION_PARSER_HPP
 #define WEBSERV_SRC_CONFIG_LOCATION_PARSER_HPP
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -43,6 +44,11 @@ class LocationParser {
   static bool ParseErrorPage(const std::vector<std::string> &value,
                              LocationContext &location);
   static void RemoveSemicolon(std::string &line);
+  static bool parsed_auto_index_;
+  static bool parsed_limit_client_body_;
+  static bool parsed_return_;
+  static bool parsed_alias_;
+  static bool parsed_root_;
 };
 
 #endif

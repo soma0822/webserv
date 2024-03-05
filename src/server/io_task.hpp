@@ -8,6 +8,7 @@
 class AIOTask {
  public:
   AIOTask();
+  AIOTask(int fd, int event);
   virtual ~AIOTask();
   virtual Result<int, std::string> Execute() = 0;
   int GetFd() const;
