@@ -1,6 +1,14 @@
 #include "config.hpp"
 
-std::vector<ServerContext> Config::server_;
+Config::Config(){}
+
+Config::~Config() {}
+
+Config &Config::operator=(const Config &other) {
+  (void)other;
+  return *this;
+}
+
 
 void Config::Clear() { server_.clear(); }
 
