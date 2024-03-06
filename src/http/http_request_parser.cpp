@@ -113,16 +113,13 @@ int HTTPRequestParser::SetRequestHeaders() {
     row_line_ = request_line;
     return kNotEnough;
   }
-  // Hostがあるか確認
-  if (request_->GetHeaders().count("Host") == 0) {
-    row_line_ = request_line;
-    return kBadRequest;
-  }
-  request_->SetHostHeader(request_->GetHeaders().find("Host")->second);
-  if (request_->GetHostHeader() == "") {
+  // Hostがあるか右辺が空白じゃないか確認
+  if (request_->GetHeaders().count("Host") == 0 ||
+      request_->GetHeaders().find("Host")->second == "") {
     row_line_ = request_line.substr(2);
     return kBadRequest;
   }
+  request_->SetHostHeader(request_->GetHeaders().find("Host")->second);
   row_line_ = request_line.substr(2);
   return kOk;
 }
