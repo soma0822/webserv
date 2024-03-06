@@ -9,9 +9,11 @@
 #include "result.hpp"
 #include "string_utils.hpp"
 
-#define kBadRequest 0
-#define kNotEnough 1
-#define kOk 2
+enum ReturnStatus {
+  kBadRequest = 0,
+  kNotEnough = 1,
+  kOk = 2,
+};
 
 class HTTPRequestParser {
  public:
