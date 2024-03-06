@@ -45,20 +45,6 @@ class HTTPRequestParser {
 
   std::string StrToUpper(std::string s);
   std::string SkipSpace(std::string s);
-
-  // データのセットを関数ポインタとテンプレートでやりたいけど、よく分からん。
-  //   template <typename F>
-  //   int SetData(std::string search_str,  F *foo, std::string &request_line) {
-  //     try {
-  //       size_t pos = request_line.find(search_str);
-  //       const std::string set_str = request_line.substr(0, pos);
-  //       foo(set_str);
-  //       request_line = request_line.substr(pos + 1);
-  //       return kOk;
-  //     } catch (std::exception &e) {
-  //       return kBadRequest;
-  //     }
-  //   }
 };
 
 #endif  // WEBSERVE_SRC_HTTP_HTTP_REQUEST_PARSER_HPP
