@@ -20,7 +20,8 @@ Result<int, std::string> Accept::Execute() {
   }
   Logger::Info() << port_ << " : 接続しました" << std::endl;
   // TODO: IOTaskManagerクラスとReadRequestFromClientクラスの実装
-  //  IOTaskManager::AddTask(new ReadRequestFromClient(client_sock, port_, ip_));
+  //  IOTaskManager::AddTask(new ReadRequestFromClient(client_sock, port_,
+  //  ip_));
   return Ok(0);
 }
 
