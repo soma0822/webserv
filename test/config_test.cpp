@@ -265,12 +265,14 @@ TEST(ConfigTest, DoubleLocationErrorPage) {
 // SerchServer
 TEST(SerchServer, DefaultTest) {
   Config config = ConfigParser::Parse("test/conf_test/search_server.conf");
-  const ServerContext &tmp = config.SearchServer("8002", "");
-  ASSERT_EQ(&config.GetServer().at(0), &tmp);
-  const ServerContext &tmp1 = config.SearchServer("8000", "");
+  const ServerContext &tmp = config.SearchServer("8002", "127.0.0.2", "");
+  ASSERT_EQ(&config.GetServer().at(2), &tmp);
+  const ServerContext &tmp1 = config.SearchServer("8000", "127.0.0.1", "");
   ASSERT_EQ(&config.GetServer().at(1), &tmp1);
-  const ServerContext &tmp2 = config.SearchServer("8000", "tokazaki");
+  const ServerContext &tmp2 =
+      config.SearchServer("8000", "127.0.0.1", "tokazaki");
   ASSERT_EQ(&config.GetServer().at(1), &tmp2);
-  const ServerContext &tmp3 = config.SearchServer("8002", "tkuramot");
+  const ServerContext &tmp3 =
+      config.SearchServer("8002", "127.0.0.2", "tkuramot");
   ASSERT_EQ(&config.GetServer().at(2), &tmp3);
 }

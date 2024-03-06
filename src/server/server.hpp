@@ -20,7 +20,8 @@ class Server {
   ~Server();
   Server(const Server &other);
   Server &operator=(const Server &other);
-  static Result<int, int> Listen(const std::string &port);
+  static Result<int, int> Listen(const std::string &port,
+                                 const std::string &ip);
 
   // TODO : errornoによって定義していく
   enum Error { kListenError, kBindError };
