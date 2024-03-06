@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -25,6 +26,7 @@ class ServerParser {
  private:
   static bool IsValidLocationKey(const std::vector<std::string> &value);
   static std::string MakeLocationKey(const std::vector<std::string> &value);
+  static bool UniqueListen(const ServerContext &server);
   static void ParseFuncInit(std::map<std::string, parseFunction> &func);
   static bool ParseErrorPage(const std::vector<std::string> &value,
                              ServerContext &server);
@@ -41,7 +43,7 @@ class ServerParser {
   static void RemoveSemicolon(std::string &line);
   static bool parsed_root_;
   static bool parsed_ip_;
-  static std::map<std::string, std::vector<std::string> > parsed_pair_;
+  static std::map<std::string, std::map<std::string, std::set<std::string> > > parsed_pair_;
 };
 
 #endif

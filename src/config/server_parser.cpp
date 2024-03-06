@@ -2,7 +2,7 @@
 
 bool ServerParser::parsed_root_;
 bool ServerParser::parsed_ip_;
-std::map<std::string, std::vector<std::string> > ServerParser::parsed_pair_;
+std::map<std::string, std::map<std::string, std::set<std::string> > >  ServerParser::parsed_pair_;
 
 ServerContext ServerParser::ParseServer(std::ifstream &inf) {
   ServerContext server;
@@ -35,10 +35,11 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
       }
     }
   }
-  if (server.IsValidContext())
+  if (server.IsValidContext() && UniqueListen(server))
     return server;
   else
-    throw std::invalid_argument("serverにポートがありません");
+    throw std::invalid_argument("不正なserver設定です");
+  return server;
 }
 
 bool ServerParser::IsValidLocationKey(const std::vector<std::string> &value) {
@@ -58,6 +59,33 @@ std::string ServerParser::MakeLocationKey(
     return value.at(0);
   else
     return (value.at(0) + " " + value.at(1));
+}
+
+bool ServerParser::UniqueListen(const ServerContext &server){
+  const std::string &ip = server.GetIp();
+  const std::vector<std::string> &ports = server.GetPort();
+  const std::vector<std::string> &server_names = server.GetServerName();
+  for (std::vector<std::string>::const_iterator port_it = ports.begin(); port_it != ports.end(); ++port_it){
+    for (std::vector<std::string>::const_iterator server_name_it = server_names.begin(); server_name_it != server_names.end(); ++server_name_it){
+      std::map<std::string, std::map<std::string, std::set<std::string> > >::iterator find_port = parsed_pair_.find(*port_it);
+      if (parsed_pair_.end() != find_port){
+        if (ip == ""){
+          if (find_port->second.size() == 0 || (find_port->second.size() == 1 && find_port->second.end() != find_port->second.find(""))){;}
+          else 
+            return false;
+        } else {
+          if (find_port->second.end() == find_port->second.find("")) {;}
+          else 
+            return false;
+        }
+      }
+      if (parsed_pair_[*port_it][ip].insert(*server_name_it).second)
+        ;
+      else 
+        return false;
+    }
+  }
+  return true;
 }
 
 void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
@@ -107,16 +135,6 @@ bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
                                     ServerContext &server) {
   if (value.size() == 0) return false;
   for (unsigned int i = 0; i < value.size(); ++i) {
-    const std::vector<std::string> &ports = server.GetPort();
-    for (unsigned int j = 0; j < ports.size(); ++j) {
-      if (parsed_pair_[server.GetPort().at(j)].size() == 0 ||
-          parsed_pair_[server.GetPort().at(j)].end() ==
-              std::find(parsed_pair_[ports.at(j)].begin(),
-                        parsed_pair_[ports.at(j)].end(), value.at(i)))
-        parsed_pair_[ports.at(j)].push_back(value.at(i));
-      else
-        return false;
-    }
     server.AddServerName(value.at(i));
   }
   return true;
@@ -126,16 +144,6 @@ bool ServerParser::ParsePort(const std::vector<std::string> &value,
   if (value.size() == 0) return false;
   for (unsigned int i = 0; i < value.size(); ++i) {
     if (validation::IsPort(value.at(i)) == false) return false;
-    const std::vector<std::string> &server_names = server.GetServerName();
-    for (unsigned int j = 0; j < server_names.size(); ++j) {
-      if (parsed_pair_[value.at(i)].size() == 0 ||
-          parsed_pair_[value.at(i)].end() ==
-              std::find(parsed_pair_[value.at(i)].begin(),
-                        parsed_pair_[value.at(i)].end(), server_names.at(j)))
-        parsed_pair_[value.at(i)].push_back(server_names.at(j));
-      else
-        return false;
-    }
     server.AddPort(value.at(i));
   }
   return true;
