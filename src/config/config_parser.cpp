@@ -2,8 +2,9 @@
 
 const std::string ConfigParser::default_file_ = "./conf/default.conf";
 
-void ConfigParser::Parse(Config &config, const std::string &file) {
+Config ConfigParser::Parse(const std::string &file) {
   ServerParser::ClearParsedPair();
+  Config config;
   std::vector<ServerContext> server;
   std::string line;
   std::ifstream inf(file.c_str());
@@ -23,4 +24,5 @@ void ConfigParser::Parse(Config &config, const std::string &file) {
       throw std::invalid_argument("無効なキー: " + line);
     }
   }
+  return config;
 }

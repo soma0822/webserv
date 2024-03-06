@@ -2,6 +2,8 @@
 
 Config::Config() {}
 
+Config::Config(const Config &other) : server_(other.server_) {}
+
 Config::~Config() {}
 
 Config &Config::operator=(const Config &other) {

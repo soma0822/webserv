@@ -16,7 +16,7 @@ class Config;
 
 class ConfigParser {
  public:
-  static void Parse(Config &config, const std::string &file);
+  static Config Parse(const std::string &file);
   static const std::string default_file_;
 };
 
