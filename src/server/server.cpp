@@ -9,7 +9,7 @@ Server &Server::operator=(const Server &other) {
   return *this;
 }
 
-void Server::run(const Config &config) {
+void Server::Run(const Config &config) {
   const std::vector<ServerContext> servers = config.GetServer();
   std::vector<ServerContext>::const_iterator server_it = servers.begin();
   std::map<std::string, bool> listen_port;
