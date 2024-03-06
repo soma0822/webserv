@@ -13,14 +13,15 @@
 
 class Server {
  public:
-  static void run();
+  static void Run(const Config &config);
 
  private:
   Server();
   ~Server();
   Server(const Server &other);
   Server &operator=(const Server &other);
-  static Result<int, int> Listen(const std::string &port);
+  static Result<int, int> Listen(const std::string &port,
+                                 const std::string &ip);
 
   // TODO : errornoによって定義していく
   enum Error { kListenError, kBindError };

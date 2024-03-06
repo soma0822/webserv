@@ -11,17 +11,18 @@
 class ConfigParser;
 class Config {
  public:
-  static void Clear();
-  static void AddServer(const ServerContext &server);
-  static const std::vector<ServerContext> &GetServer();
-  static const ServerContext &SearchServer(const std::string &port,
-                                           const std::string &server_name);
+  Config();
+  ~Config();
+  Config(const Config &other);
+  void AddServer(const ServerContext &server);
+  const std::vector<ServerContext> &GetServer() const;
+  const ServerContext &SearchServer(const std::string &port,
+                                    const std::string &ip,
+                                    const std::string &server_name) const;
 
  private:
-  Config();
-  Config(const Config &other);
-  ~Config();
-  static std::vector<ServerContext> server_;
+  Config &operator=(const Config &other);
+  std::vector<ServerContext> server_;
 };
 
 #endif

@@ -2,6 +2,7 @@
 
 bool ServerParser::parsed_root_;
 bool ServerParser::parsed_ip_;
+std::map<std::string, std::vector<std::string> > ServerParser::parsed_pair_;
 
 ServerContext ServerParser::ParseServer(std::ifstream &inf) {
   ServerContext server;
@@ -105,8 +106,19 @@ bool ServerParser::ParseRoot(const std::vector<std::string> &value,
 bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
                                     ServerContext &server) {
   if (value.size() == 0) return false;
-  for (unsigned int i = 0; i < value.size(); ++i)
+  for (unsigned int i = 0; i < value.size(); ++i) {
+    const std::vector<std::string> &ports = server.GetPort();
+    for (unsigned int j = 0; j < ports.size(); ++j) {
+      if (parsed_pair_[server.GetPort().at(j)].size() == 0 ||
+          parsed_pair_[server.GetPort().at(j)].end() ==
+              std::find(parsed_pair_[ports.at(j)].begin(),
+                        parsed_pair_[ports.at(j)].end(), value.at(i)))
+        parsed_pair_[ports.at(j)].push_back(value.at(i));
+      else
+        return false;
+    }
     server.AddServerName(value.at(i));
+  }
   return true;
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
@@ -114,6 +126,16 @@ bool ServerParser::ParsePort(const std::vector<std::string> &value,
   if (value.size() == 0) return false;
   for (unsigned int i = 0; i < value.size(); ++i) {
     if (validation::IsPort(value.at(i)) == false) return false;
+    const std::vector<std::string> &server_names = server.GetServerName();
+    for (unsigned int j = 0; j < server_names.size(); ++j) {
+      if (parsed_pair_[value.at(i)].size() == 0 ||
+          parsed_pair_[value.at(i)].end() ==
+              std::find(parsed_pair_[value.at(i)].begin(),
+                        parsed_pair_[value.at(i)].end(), server_names.at(j)))
+        parsed_pair_[value.at(i)].push_back(server_names.at(j));
+      else
+        return false;
+    }
     server.AddPort(value.at(i));
   }
   return true;
@@ -132,3 +154,5 @@ void ServerParser::RemoveSemicolon(std::string &line) {
   }
   throw std::invalid_argument("Syntaxエラー: semicolon: " + line);
 }
+
+void ServerParser::ClearParsedPair() { parsed_pair_.clear(); }

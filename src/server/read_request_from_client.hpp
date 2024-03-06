@@ -17,16 +17,18 @@
 
 class ReadRequestFromClient : public AIOTask {
  public:
-  ReadRequestFromClient(int fd, const std::string &port);
+  ReadRequestFromClient(int fd, const std::string &port, const std::string &ip);
   virtual ~ReadRequestFromClient();
   virtual Result<int, std::string> Execute();
   const std::string &GetPort() const;
+  const std::string &GetIp() const;
 
  private:
   ReadRequestFromClient();
   ReadRequestFromClient(const ReadRequestFromClient &other);
   ReadRequestFromClient &operator=(const ReadRequestFromClient &other);
   std::string port_;
+  std::string ip_;
   // RequestParser parser_;
   enum Responce { kOk, kContinue, kBadRequest };
 };
