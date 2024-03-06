@@ -1,0 +1,114 @@
+#include <gtest/gtest.h>
+
+#include <cmath>
+#include <iostream>
+#include <string>
+
+#include "http_request.hpp"
+#include "http_request_parser.hpp"
+
+// GETリクエストのパース
+TEST(HTTPRequestParser, ParseRequestGET) {
+  std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+  HTTPRequestParser parser;
+  const Result<HTTPRequest *, int> req = parser.Parser(request);
+  EXPECT_EQ(req.Unwrap()->GetMethod(), "GET");
+  EXPECT_EQ(req.Unwrap()->GetUri(), "/");
+  EXPECT_EQ(req.Unwrap()->GetProtocol(), "HTTP");
+  EXPECT_EQ(req.Unwrap()->GetVersion(), "1.1");
+  EXPECT_EQ(req.Unwrap()->GetHostHeader(), "localhost:8080");
+  EXPECT_EQ(req.Unwrap()->GetBody(), "");
+}
+
+// GETリクエストのパース(ヘッダがバラバラに送られてくる場合）
+TEST(HTTPRequestParser, ParseRequestGET_Header_kNotEnough) {
+  HTTPRequestParser parser;
+  std::string request = "GET / HTTP/1.1\r\n";
+  Result<HTTPRequest *, int> req = parser.Parser(request);
+  EXPECT_EQ(req.UnwrapErr(), kNotEnough);
+  request = "Host: localhost:8080\r\n";
+  Result<HTTPRequest *, int> req2 = parser.Parser(request);
+  EXPECT_EQ(req2.UnwrapErr(), kNotEnough);
+  request = "\r\n";
+  Result<HTTPRequest *, int> req1 = parser.Parser(request);
+  EXPECT_EQ(req1.Unwrap()->GetMethod(), "GET");
+  EXPECT_EQ(req1.Unwrap()->GetUri(), "/");
+  EXPECT_EQ(req1.Unwrap()->GetProtocol(), "HTTP");
+  EXPECT_EQ(req1.Unwrap()->GetVersion(), "1.1");
+  EXPECT_EQ(req1.Unwrap()->GetHostHeader(), "localhost:8080");
+  EXPECT_EQ(req1.Unwrap()->GetBody(), "");
+}
+
+// requestlineエラーケース
+TEST(HTTPRequestParser, ParseRequestGET_Requestline_BadRequest) {
+  HTTPRequestParser parser;
+
+  // methodがない
+  std::string request = " / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req = parser.Parser(request);
+  EXPECT_EQ(req.UnwrapErr(), kBadRequest);
+  // pathがない
+  request = "GET HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req3 = parser.Parser(request);
+  EXPECT_EQ(req3.UnwrapErr(), kBadRequest);
+  // protocolがない
+  request = "GET / /1.1\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req7 = parser.Parser(request);
+  EXPECT_EQ(req7.UnwrapErr(), kBadRequest);
+  // protocolとversionの間の/がない
+  request = "GET / HTTP1.1\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req4 = parser.Parser(request);
+  EXPECT_EQ(req4.UnwrapErr(), kBadRequest);
+  // versionがない
+  request = "GET / HTTP/\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req5 = parser.Parser(request);
+  EXPECT_EQ(req5.UnwrapErr(), kBadRequest);
+  //\r\nがない
+  request = "GET / HTTP/1.1Host: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req6 = parser.Parser(request);
+  EXPECT_EQ(req6.UnwrapErr(), kBadRequest);
+}
+
+// headerエラーケース
+TEST(HTTPRequestParser, ParseRequestGET_Header_BadRequest) {
+  HTTPRequestParser parser;
+  std::string request;
+  // Hostヘッダがない
+  request = "GET / HTTP/1.1\r\n\r\n";
+  Result<HTTPRequest *, int> req7 = parser.Parser(request);
+  EXPECT_EQ(req7.UnwrapErr(), kBadRequest);
+  // Hostヘッダがない
+  request = "GET / HTTP/1.1\r\n: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req8 = parser.Parser(request);
+  EXPECT_EQ(req8.UnwrapErr(), kBadRequest);
+  // Hostの中身がない
+  request = "GET / HTTP/1.1\r\nHost:\r\n\r\n";
+  Result<HTTPRequest *, int> req9 = parser.Parser(request);
+  EXPECT_EQ(req9.UnwrapErr(), kBadRequest);
+  // Hostがない
+  request =
+      "GET / HTTP/1.1\r\nIf-Modified-Since: Thu, "
+      "14 Jun 2018 10:00:00 GMT\r\n\r\n";
+  Result<HTTPRequest *, int> req6 = parser.Parser(request);
+  EXPECT_EQ(req6.UnwrapErr(), kBadRequest);
+}
+
+// POSTリクエストのパース
+TEST(HTTPRequestParser, ParseRequestPOST) {
+  HTTPRequestParser parser;
+  std::string request =
+      "POST / HTTP/1.1\r\nHost: localhost:8080\r\nContent-Length: 5\r\n\r\n";
+  Result<HTTPRequest *, int> req = parser.Parser(request);
+  EXPECT_EQ(req.UnwrapErr(), kNotEnough);
+  request = "he";
+  Result<HTTPRequest *, int> req1 = parser.Parser(request);
+  EXPECT_EQ(req1.UnwrapErr(), kNotEnough);
+  request = "llo\r\n";
+  Result<HTTPRequest *, int> req2 = parser.Parser(request);
+  EXPECT_EQ(req2.Unwrap()->GetMethod(), "POST");
+  EXPECT_EQ(req2.Unwrap()->GetUri(), "/");
+  EXPECT_EQ(req2.Unwrap()->GetProtocol(), "HTTP");
+  EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
+  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "localhost:8080");
+  EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
+}
