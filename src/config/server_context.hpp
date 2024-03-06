@@ -18,8 +18,8 @@ class ServerContext {
   ServerContext(const ServerContext &other);
   ServerContext &operator=(const ServerContext &other);
 
-  bool HavePort(const std::string &port);
-  bool HaveServerName(const std::string &server_name);
+  bool HavePort(const std::string &port) const;
+  bool HaveServerName(const std::string &server_name) const;
   bool IsValidContext() const;
   // ゲッター
   const std::string &GetIp() const;
