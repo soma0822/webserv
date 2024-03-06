@@ -13,7 +13,6 @@ class Config {
  public:
   Config();
   ~Config();
-  void Clear();
   void AddServer(const ServerContext &server);
   const std::vector<ServerContext> &GetServer() const;
   const ServerContext &SearchServer(const std::string &port,

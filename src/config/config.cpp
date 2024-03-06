@@ -9,8 +9,6 @@ Config &Config::operator=(const Config &other) {
   return *this;
 }
 
-void Config::Clear() { server_.clear(); }
-
 void Config::AddServer(const ServerContext &server) {
   server_.push_back(server);
 }
