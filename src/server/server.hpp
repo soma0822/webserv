@@ -13,7 +13,7 @@
 
 class Server {
  public:
-  static void run();
+  static void run(const Config &config);
 
  private:
   Server();
