@@ -263,11 +263,14 @@ TEST(ConfigTest, DoubleLocationErrorPage) {
 }
 
 TEST(ConfigTest, HostListen) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/host_listen.conf"), std::invalid_argument);
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/host_listen.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, HostListenServername) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/host_listen_server_name.conf"), std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/conf_test/host_listen_server_name.conf"),
+      std::invalid_argument);
 }
 
 // SerchServer
@@ -284,4 +287,3 @@ TEST(SerchServer, DefaultTest) {
       config.SearchServer("8002", "127.0.0.1", "tkuramot");
   ASSERT_EQ(&config.GetServer().at(2), &tmp3);
 }
-

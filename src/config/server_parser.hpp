@@ -43,7 +43,8 @@ class ServerParser {
   static void RemoveSemicolon(std::string &line);
   static bool parsed_root_;
   static bool parsed_ip_;
-  static std::map<std::string, std::map<std::string, std::set<std::string> > > parsed_pair_;
+  static std::map<std::string, std::map<std::string, std::set<std::string> > >
+      parsed_pair_;
 };
 
 #endif

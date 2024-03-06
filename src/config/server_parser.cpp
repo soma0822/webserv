@@ -2,7 +2,8 @@
 
 bool ServerParser::parsed_root_;
 bool ServerParser::parsed_ip_;
-std::map<std::string, std::map<std::string, std::set<std::string> > >  ServerParser::parsed_pair_;
+std::map<std::string, std::map<std::string, std::set<std::string> > >
+    ServerParser::parsed_pair_;
 
 ServerContext ServerParser::ParseServer(std::ifstream &inf) {
   ServerContext server;
@@ -61,27 +62,36 @@ std::string ServerParser::MakeLocationKey(
     return (value.at(0) + " " + value.at(1));
 }
 
-bool ServerParser::UniqueListen(const ServerContext &server){
+bool ServerParser::UniqueListen(const ServerContext &server) {
   const std::string &ip = server.GetIp();
   const std::vector<std::string> &ports = server.GetPort();
   const std::vector<std::string> &server_names = server.GetServerName();
-  for (std::vector<std::string>::const_iterator port_it = ports.begin(); port_it != ports.end(); ++port_it){
-    for (std::vector<std::string>::const_iterator server_name_it = server_names.begin(); server_name_it != server_names.end(); ++server_name_it){
-      std::map<std::string, std::map<std::string, std::set<std::string> > >::iterator find_port = parsed_pair_.find(*port_it);
-      if (parsed_pair_.end() != find_port){
-        if (ip == ""){
-          if (find_port->second.size() == 0 || (find_port->second.size() == 1 && find_port->second.end() != find_port->second.find(""))){;}
-          else 
+  for (std::vector<std::string>::const_iterator port_it = ports.begin();
+       port_it != ports.end(); ++port_it) {
+    for (std::vector<std::string>::const_iterator server_name_it =
+             server_names.begin();
+         server_name_it != server_names.end(); ++server_name_it) {
+      std::map<std::string,
+               std::map<std::string, std::set<std::string> > >::iterator
+          find_port = parsed_pair_.find(*port_it);
+      if (parsed_pair_.end() != find_port) {
+        if (ip == "") {
+          if (find_port->second.size() == 0 ||
+              (find_port->second.size() == 1 &&
+               find_port->second.end() != find_port->second.find(""))) {
+            ;
+          } else
             return false;
         } else {
-          if (find_port->second.end() == find_port->second.find("")) {;}
-          else 
+          if (find_port->second.end() == find_port->second.find("")) {
+            ;
+          } else
             return false;
         }
       }
       if (parsed_pair_[*port_it][ip].insert(*server_name_it).second)
         ;
-      else 
+      else
         return false;
     }
   }
