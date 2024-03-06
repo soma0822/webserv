@@ -18,9 +18,9 @@ void Server::run() {
     std::vector<std::string>::iterator port_it = ports.begin();
     for (; port_it != ports.end(); ++port_it) {
       if (listen_port[*port_it] == false) {
-        Result<int, int> result = Listen(*port_it);
+        Result<int, int> result = Listen(*port_it, server_it->GetIp());
         if (result.IsOk()) {
-          // IOTaskManager::AddTask(new Accept(result.Unwrap(), *port_it));
+          // IOTaskManager::AddTask(new Accept(result.Unwrap(), *port_it, server_it->GetIp()));
           listen_port[*port_it] = true;
         } else {
           Logger::Error() << "リッスンに失敗しました" << std::endl;
@@ -32,7 +32,7 @@ void Server::run() {
 }
 
 // bind, listenのエラーハンドリングするためにAcceptのコンストラクタから移行する
-Result<int, int> Server::Listen(const std::string &port) {
+Result<int, int> Server::Listen(const std::string &port, const std::string &ip) {
   int sock = socket(AF_INET, SOCK_STREAM, 0);
   struct sockaddr_in addr;
   Result<int, std::string> result = string_utils::StrToI(port);
@@ -40,7 +40,8 @@ Result<int, int> Server::Listen(const std::string &port) {
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
   addr.sin_port = htons(result.Unwrap());
-  addr.sin_addr.s_addr = INADDR_ANY;
+  //TODO: inet_addrは使用可能ではないため、自作の必要あり　空文字列の場合INADDR_ANYを返してくる
+  addr.sin_addr.s_addr = inet_addr(ip.c_str());
 
   // TODO：errornoを見て処理を変える
   if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1)

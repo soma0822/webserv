@@ -1,7 +1,7 @@
 #include "accept.hpp"
 
-Accept::Accept(int fd, const std::string &port)
-    : AIOTask(fd, POLLIN), port_(port) {}
+Accept::Accept(int fd, const std::string &port, const std::string &ip)
+    : AIOTask(fd, POLLIN), port_(port), ip_(ip) {}
 
 Accept::~Accept() {}
 
@@ -20,8 +20,9 @@ Result<int, std::string> Accept::Execute() {
   }
   Logger::Info() << port_ << " : 接続しました" << std::endl;
   // TODO: IOTaskManagerクラスとReadRequestFromClientクラスの実装
-  //  IOTaskManager::AddTask(new ReadRequestFromClient(client_sock, port_));
+  //  IOTaskManager::AddTask(new ReadRequestFromClient(client_sock, port_, ip_));
   return Ok(0);
 }
 
 const std::string &Accept::GetPort() const { return port_; }
+const std::string &Accept::GetIp() const { return ip_; }

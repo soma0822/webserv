@@ -1,9 +1,10 @@
 #include "read_request_from_client.hpp"
 
-ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port) {
+ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port, const std::string &ip) {
   fd_ = fd;
   event_ = POLLIN;
   port_ = port;
+  ip_ = ip;
   // parser_ = RequestParser();
 }
 
@@ -26,7 +27,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
   //    IOTaskManager::AddTask(new WriteResponseToClient write_response(fd_,
   //    badrequest_response));
   //  } else {
-  //    HTTPResponse *response = RequestHandler::Handle(result.Unwrap());
+  //    HTTPResponse *response = RequestHandler::Handle(result.Unwrap(), port_, ip_);
   //    IOTaskManager::AddTask(new WriteResponseToClient(fd_, response));
   //  }
   Logger::Info() << port_ << " : "
@@ -35,3 +36,4 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
 }
 
 const std::string &ReadRequestFromClient::GetPort() const { return port_; }
+const std::string &ReadRequestFromClient::GetIp() const { return ip_; }
