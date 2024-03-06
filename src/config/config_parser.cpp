@@ -2,8 +2,7 @@
 
 const std::string ConfigParser::default_file_ = "./conf/default.conf";
 
-void ConfigParser::Parse(const std::string &file) {
-  Config::Clear();
+void ConfigParser::Parse(Config &config, const std::string &file) {
   ServerParser::ClearParsedPair();
   std::vector<ServerContext> server;
   std::string line;
@@ -19,7 +18,7 @@ void ConfigParser::Parse(const std::string &file) {
     if (key.empty()) continue;
     ss >> value;
     if (key + value == "server{" && ss.get() == std::char_traits<char>::eof())
-      Config::AddServer(ServerParser::ParseServer(inf));
+      config.AddServer(ServerParser::ParseServer(inf));
     else {
       throw std::invalid_argument("無効なキー: " + line);
     }
