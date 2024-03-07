@@ -22,8 +22,10 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
     if (key == "location") {  // locationの時
       if (IsValidLocationKey(value) == false)
         throw std::invalid_argument("無効なlocation: " + line);
-      server.AddLocation(MakeLocationKey(value),
-                         LocationParser::ParseLocation(inf));
+      LocationContext loc = LocationParser::ParseLocation(inf);
+      std::string loc_key = MakeLocationKey(value);
+      loc.SetPath(loc_key);
+      server.AddLocation(loc_key, loc);
     } else {  // それ以外
       std::map<std::string, parseFunction>::iterator it = func.find(key);
       if (it == func.end()) {  // 対応した関数が見つからない
