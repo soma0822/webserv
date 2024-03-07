@@ -9,24 +9,25 @@ Server &Server::operator=(const Server &other) {
   return *this;
 }
 
-void Server::Run(const IConfig &config) {
+bool Server::Run(const IConfig &config) {
   const std::vector<ServerContext> &servers = config.GetServer();
   std::vector<ServerContext>::const_iterator server_it = servers.begin();
-  std::map<std::string, bool> listen_port;
+  std::map<std::string, std::set<std::string> > listen_port;
   for (; server_it != servers.end(); ++server_it) {
-    if (listen_port[server_it->GetPort()] == false) {
+    if (listen_port[server_it->GetPort()].insert(server_it->GetIp()).second) {
       Result<int, int> result =
           Listen(server_it->GetPort(), server_it->GetIp());
       if (result.IsOk()) {
         // IOTaskManager::AddTask(new Accept(result.Unwrap(), *port_it,
         // server_it->GetIp()));
-        listen_port[server_it->GetPort()] = true;
       } else {
         Logger::Error() << "リッスンに失敗しました" << std::endl;
+        return false;
       }
     }
   }
   // IOTaskManager::ExecuteTasks();
+  return true;
 }
 
 // bind, listenのエラーハンドリングするためにAcceptのコンストラクタから移行する
