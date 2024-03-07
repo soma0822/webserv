@@ -9,23 +9,20 @@ Server &Server::operator=(const Server &other) {
   return *this;
 }
 
-void Server::Run(const Config &config) {
-  const std::vector<ServerContext> servers = config.GetServer();
+void Server::Run(const IConfig &config) {
+  const std::vector<ServerContext> &servers = config.GetServer();
   std::vector<ServerContext>::const_iterator server_it = servers.begin();
   std::map<std::string, bool> listen_port;
   for (; server_it != servers.end(); ++server_it) {
-    std::vector<std::string> ports = server_it->GetPort();
-    std::vector<std::string>::iterator port_it = ports.begin();
-    for (; port_it != ports.end(); ++port_it) {
-      if (listen_port[*port_it] == false) {
-        Result<int, int> result = Listen(*port_it, server_it->GetIp());
-        if (result.IsOk()) {
-          // IOTaskManager::AddTask(new Accept(result.Unwrap(), *port_it,
-          // server_it->GetIp()));
-          listen_port[*port_it] = true;
-        } else {
-          Logger::Error() << "リッスンに失敗しました" << std::endl;
-        }
+    if (listen_port[server_it->GetPort()] == false) {
+      Result<int, int> result =
+          Listen(server_it->GetPort(), server_it->GetIp());
+      if (result.IsOk()) {
+        // IOTaskManager::AddTask(new Accept(result.Unwrap(), *port_it,
+        // server_it->GetIp()));
+        listen_port[server_it->GetPort()] = true;
+      } else {
+        Logger::Error() << "リッスンに失敗しました" << std::endl;
       }
     }
   }

@@ -35,3 +35,6 @@ foreach (DIR ${INCLUDE_DIRS})
     get_filename_component(DIR_PATH ${DIR} PATH)
     target_include_directories(${PROGRAM} PRIVATE ${DIR_PATH})
 endforeach ()
+
+# FakeItをインクルード
+target_include_directories(${PROGRAM} PRIVATE "${PROJECT_SOURCE_DIR}/lib/fakeit")

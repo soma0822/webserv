@@ -5,6 +5,7 @@ bool LocationParser::parsed_limit_client_body_;
 bool LocationParser::parsed_return_;
 bool LocationParser::parsed_alias_;
 bool LocationParser::parsed_root_;
+bool LocationParser::parsed_index_;
 
 LocationContext LocationParser::ParseLocation(std::ifstream &inf) {
   LocationContext location;
@@ -49,6 +50,7 @@ void LocationParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   parsed_return_ = false;
   parsed_alias_ = false;
   parsed_root_ = false;
+  parsed_index_ = false;
 }
 
 bool LocationParser::ParseAutoIndex(const std::vector<std::string> &value,
@@ -98,9 +100,10 @@ bool LocationParser::ParseRoot(const std::vector<std::string> &value,
 }
 bool LocationParser::ParseIndex(const std::vector<std::string> &value,
                                 LocationContext &location) {
-  if (value.size() == 0) return false;
-  for (unsigned int i = 0; i < value.size(); ++i)
-    location.AddIndex(value.at(i));
+  if (parsed_index_ == true) throw std::invalid_argument("indexが複数あります");
+  if (value.size() != 1) return false;
+  location.SetIndex(value.at(0));
+  parsed_index_ = true;
   return true;
 }
 bool LocationParser::ParseCgiPath(const std::vector<std::string> &value,
