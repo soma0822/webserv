@@ -38,6 +38,24 @@ bool ServerContext::IsValidContext() const {
     return true;
 }
 
+const LocationContext &ServerContext::SearchLocation(const std::string &path) const {
+  std::map<std::string, LocationContext>::const_iterator it = location_.begin();
+  std::map<std::string, LocationContext>::const_iterator ret = location_.end();
+  int ret_len = 0;
+  for (; it != location_.end(); it++){
+    std::string loc_path = it->first;
+    if (loc_path[0] == '=' && loc_path.substr(2) == path){
+      return it->second;
+    } else {
+      if (loc_path.find(it->first) == 0 && ret_len < it->first.length()){
+        ret_len = it->first.length();
+        ret = it;
+      }
+    }
+  }
+  return ret->second;
+}
+
 // ゲッター
 const std::string &ServerContext::GetIp() const { return ip_; }
 const std::string &ServerContext::GetRoot() const { return root_; }
