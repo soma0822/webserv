@@ -2,6 +2,9 @@
 
 bool ServerParser::parsed_root_;
 bool ServerParser::parsed_ip_;
+bool ServerParser::parsed_port_;
+bool ServerParser::parsed_server_name_;
+bool ServerParser::parsed_index_;
 std::map<std::string, std::vector<std::string> > ServerParser::parsed_pair_;
 
 ServerContext ServerParser::ParseServer(std::ifstream &inf) {
@@ -69,6 +72,9 @@ void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   func["listen"] = &ServerParser::ParsePort;
   parsed_root_ = false;
   parsed_ip_ = false;
+  parsed_port_ = false;
+  parsed_server_name_ = false;
+  parsed_index_ = false;
 }
 
 // パーサー
@@ -83,8 +89,10 @@ bool ServerParser::ParseErrorPage(const std::vector<std::string> &value,
 }
 bool ServerParser::ParseIndex(const std::vector<std::string> &value,
                               ServerContext &server) {
-  if (value.size() == 0) return false;
-  for (unsigned int i = 0; i < value.size(); ++i) server.AddIndex(value.at(i));
+  if (parsed_index_ == true) throw std::invalid_argument("indexが複数あります");
+  if (value.size() != 1) return false;
+  server.SetIndex(value.at(0));
+  parsed_index_ = true;
   return true;
 }
 bool ServerParser::ParseIp(const std::vector<std::string> &value,
@@ -105,39 +113,18 @@ bool ServerParser::ParseRoot(const std::vector<std::string> &value,
 }
 bool ServerParser::ParseServer_name(const std::vector<std::string> &value,
                                     ServerContext &server) {
-  if (value.size() == 0) return false;
-  for (unsigned int i = 0; i < value.size(); ++i) {
-    const std::vector<std::string> &ports = server.GetPort();
-    for (unsigned int j = 0; j < ports.size(); ++j) {
-      if (parsed_pair_[server.GetPort().at(j)].size() == 0 ||
-          parsed_pair_[server.GetPort().at(j)].end() ==
-              std::find(parsed_pair_[ports.at(j)].begin(),
-                        parsed_pair_[ports.at(j)].end(), value.at(i)))
-        parsed_pair_[ports.at(j)].push_back(value.at(i));
-      else
-        return false;
-    }
-    server.AddServerName(value.at(i));
-  }
+  if (parsed_server_name_ == true) throw std::invalid_argument("server_nameが複数あります");
+  if (value.size() != 1) return false;
+  server.SetServerName(value.at(0));
+  parsed_server_name_ = true;
   return true;
 }
 bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
-  if (value.size() == 0) return false;
-  for (unsigned int i = 0; i < value.size(); ++i) {
-    if (validation::IsPort(value.at(i)) == false) return false;
-    const std::vector<std::string> &server_names = server.GetServerName();
-    for (unsigned int j = 0; j < server_names.size(); ++j) {
-      if (parsed_pair_[value.at(i)].size() == 0 ||
-          parsed_pair_[value.at(i)].end() ==
-              std::find(parsed_pair_[value.at(i)].begin(),
-                        parsed_pair_[value.at(i)].end(), server_names.at(j)))
-        parsed_pair_[value.at(i)].push_back(server_names.at(j));
-      else
-        return false;
-    }
-    server.AddPort(value.at(i));
-  }
+  if (parsed_port_ == true) throw std::invalid_argument("portが複数あります");
+  if (value.size() != 1) return false;
+  server.SetPort(value.at(0));
+  parsed_port_ = true;
   return true;
 }
 
