@@ -15,6 +15,7 @@ LocationContext &LocationContext::operator=(const LocationContext &other) {
   }
   can_auto_index_ = other.can_auto_index_;
   limit_client_body_bytes_ = other.limit_client_body_bytes_;
+  path_ = other.path_;
   return_ = other.return_;
   alias_ = other.alias_;
   root_ = other.root_;
@@ -96,7 +97,8 @@ void LocationContext::AddErrorPage(const std::string &key,
 
 // 出力
 std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
-  os << "index: ";
+  os << "path: " << obj.GetPath();
+  os << "\nindex: ";
   for (std::vector<std::string>::const_iterator it = obj.GetIndex().begin();
        it != obj.GetIndex().end(); ++it) {
     os << *it << " ";
@@ -133,7 +135,8 @@ std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
 }
 
 std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
-  os << "index: ";
+  os << "path: " << obj.GetPath();
+  os << "\nindex: ";
   if (obj.GetIndex().size() == 0)
     os << "no set";
   else {
