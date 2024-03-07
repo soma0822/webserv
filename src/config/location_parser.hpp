@@ -49,6 +49,7 @@ class LocationParser {
   static bool parsed_return_;
   static bool parsed_alias_;
   static bool parsed_root_;
+  static bool parsed_index_;
 };
 
 #endif

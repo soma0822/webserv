@@ -10,9 +10,9 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(config.GetServer().size(), 1);
   ASSERT_EQ(config.GetServer()[0].GetIp(), "127.0.0.1");
   ASSERT_EQ(config.GetServer()[0].GetRoot(), "docs/fusion_web/");
-  ASSERT_EQ(config.GetServer()[0].GetIndex()[0], "index.html");
-  ASSERT_EQ(config.GetServer()[0].GetPort()[0], "8002");
-  ASSERT_EQ(config.GetServer()[0].GetServerName()[0], "localhost");
+  ASSERT_EQ(config.GetServer()[0].GetIndex(), "index.html");
+  ASSERT_EQ(config.GetServer()[0].GetPort(), "8002");
+  ASSERT_EQ(config.GetServer()[0].GetServerName(), "localhost");
   ASSERT_EQ(config.GetServer()[0].GetErrorPage().size(), 2);
   std::map<std::string, std::string>::const_iterator it =
       config.GetServer()[0].GetErrorPage().begin();
@@ -30,7 +30,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
-  ASSERT_EQ(it2->second.GetIndex().size(), 0);
+  ASSERT_EQ(it2->second.GetIndex(), "");
   ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 0);
   std::map<std::string, bool>::const_iterator it3 =
@@ -52,8 +52,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "./");
-  ASSERT_EQ(it2->second.GetIndex().size(), 1);
-  ASSERT_EQ(it2->second.GetIndex()[0], "time.py");
+  ASSERT_EQ(it2->second.GetIndex(), "time.py");
   ASSERT_EQ(it2->second.GetCgiPath().size(), 2);
   ASSERT_EQ(it2->second.GetCgiPath()[0], "/usr/bin/python3");
   ASSERT_EQ(it2->second.GetCgiPath()[1], "/bin/bash");
@@ -75,7 +74,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetReturn(), "/tours");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
-  ASSERT_EQ(it2->second.GetIndex().size(), 0);
+  ASSERT_EQ(it2->second.GetIndex(), "");
   ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 0);
   std::map<std::string, bool>::const_iterator it6 =
@@ -93,8 +92,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
-  ASSERT_EQ(it2->second.GetIndex().size(), 1);
-  ASSERT_EQ(it2->second.GetIndex()[0], "tours1.html");
+  ASSERT_EQ(it2->second.GetIndex(), "tours1.html");
   ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 0);
   std::map<std::string, bool>::const_iterator it7 =

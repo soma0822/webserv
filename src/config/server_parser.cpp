@@ -123,6 +123,8 @@ bool ServerParser::ParsePort(const std::vector<std::string> &value,
                              ServerContext &server) {
   if (parsed_port_ == true) throw std::invalid_argument("portが複数あります");
   if (value.size() != 1) return false;
+  if (validation::IsPort(value[0]) == false)
+    return false;
   server.SetPort(value.at(0));
   parsed_port_ = true;
   return true;
