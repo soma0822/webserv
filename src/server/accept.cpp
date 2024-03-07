@@ -1,7 +1,7 @@
 #include "accept.hpp"
 
-Accept::Accept(int fd, const std::string &port, const std::string &ip)
-    : AIOTask(fd, POLLIN), port_(port), ip_(ip) {}
+Accept::Accept(int fd, const std::string &port, const std::string &ip, const IConfig &config)
+    : AIOTask(fd, POLLIN), port_(port), ip_(ip), config_(config){}
 
 Accept::~Accept() {}
 
