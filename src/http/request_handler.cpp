@@ -3,7 +3,7 @@
 #include "config.hpp"
 #include "file_utils.hpp"
 
-const HTTPResponse *RequestHandler::Handle(const IConfig &config,
+HTTPResponse *RequestHandler::Handle(const IConfig &config,
                                            const HTTPRequest *request,
                                            const std::string &port,
                                            const std::string &ip) {
@@ -16,7 +16,7 @@ const HTTPResponse *RequestHandler::Handle(const IConfig &config,
   return new HTTPResponse();
 }
 
-const HTTPResponse *RequestHandler::Get(
+HTTPResponse *RequestHandler::Get(
     const HTTPRequest *request, const std::string &requested_file_path) {
   if (!request) {
     // 505を返す

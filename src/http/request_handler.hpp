@@ -7,11 +7,11 @@
 
 class RequestHandler {
  public:
-  static const HTTPResponse *Handle(const IConfig &config,
+  static HTTPResponse *Handle(const IConfig &config,
                                     const HTTPRequest *request,
                                     const std::string &port,
                                     const std::string &ip);
-  static const HTTPResponse *Get(const HTTPRequest *request,
+  static HTTPResponse *Get(const HTTPRequest *request,
                                  const std::string &requested_file_path);
 
  private:
