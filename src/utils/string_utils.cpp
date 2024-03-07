@@ -15,4 +15,10 @@ Result<int, std::string> StrToI(const std::string &str) {
   }
   return Ok(ret);
 }
+
+std::string SkipSpace(std::string s) {
+  size_t pos = s.find_first_not_of(" ");
+  s = s.substr(pos);
+  return s;
+}
 }  // namespace string_utils

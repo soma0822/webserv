@@ -43,7 +43,6 @@ class HTTPRequestParser {
   const Result<HTTPRequest *, int> OkRequest();
 
   std::string StrToUpper(std::string s);
-  std::string SkipSpace(std::string s);
 };
 
 #endif  // WEBSERVE_SRC_HTTP_HTTP_REQUEST_PARSER_HPP
