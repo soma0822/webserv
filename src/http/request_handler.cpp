@@ -3,27 +3,34 @@
 #include "config.hpp"
 #include "file_utils.hpp"
 
-const HTTPResponse *RequestHandler::Handle(const HTTPRequest *request,
-                                           const std::string &port) {
-  (void)request;
+const HTTPResponse *RequestHandler::Handle(const IConfig &config,
+                                           const HTTPRequest *request,
+                                           const std::string &port,
+                                           const std::string &ip) {
+  if (!request) {
+    // 505を返す
+  }
+  (void)config;
   (void)port;
+  (void)ip;
   return new HTTPResponse();
 }
 
-const HTTPResponse *RequestHandler::Get(const HTTPRequest *request,
-                                        const std::string &port) {
-  ServerContext server = Config::SearchServer(port, request->GetHostHeader());
-  // TODO Locationからパスを取得する
-  const std::string requested_file_path = server.GetRoot() + request->GetUri();
+const HTTPResponse *RequestHandler::Get(
+    const HTTPRequest *request, const std::string &requested_file_path) {
+  if (!request) {
+    // 505を返す
+  }
+  // TODO リクエストのヘッダを処理する
 
   HTTPResponse *response = new HTTPResponse();
-  // TODO あとでHTTP1.1を定数化する
   response->SetHttpVersion("HTTP/1.1");
   response->SetStatusCode(http::kOk);
   Result<std::string, file_utils::Error> file_content =
       file_utils::ReadFile(requested_file_path);
-  if (file_content.IsOk()) {
-    response->SetBody(file_content.Unwrap());
+  response->SetBody(file_content.Unwrap());
+  if (file_content.IsErr()) {
+    // TODO 404を返す
   }
 
   return response;
