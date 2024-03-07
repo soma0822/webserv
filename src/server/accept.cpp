@@ -1,27 +1,14 @@
 #include "accept.hpp"
 
-Accept::Accept(const std::string &port) {
-  int sock = socket(AF_INET, SOCK_STREAM, 0);
-  struct sockaddr_in addr;
-  Result<int, std::string> result = string_utils::StrToI(port);
-
-  memset(&addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(result.Unwrap());
-  addr.sin_addr.s_addr = INADDR_ANY;
-
-  // バインドできない、リッスンできないはコンフィグで指定されたportに問題があると思われるのでthrowで抜ける。
-  if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1)
-    throw std::invalid_argument(port + " : bindエラー");
-  if (listen(sock, SOMAXCONN) == -1)
-    throw std::invalid_argument(port + " : listenエラー");
-  Logger::Info() << port << " : リッスン開始" << std::endl;
-  event_ = POLLIN;
-  port_ = port;
-  fd_ = sock;
-}
+Accept::Accept(int fd, const std::string &port, const std::string &ip)
+    : AIOTask(fd, POLLIN), port_(port), ip_(ip) {}
 
 Accept::~Accept() {}
+
+Accept &Accept::operator=(const Accept &other) {
+  (void)other;
+  return *this;
+}
 
 Result<int, std::string> Accept::Execute() {
   struct sockaddr_in client_addr;
@@ -33,8 +20,10 @@ Result<int, std::string> Accept::Execute() {
   }
   Logger::Info() << port_ << " : 接続しました" << std::endl;
   // TODO: IOTaskManagerクラスとReadRequestFromClientクラスの実装
-  //  IOTaskManager::AddTask(new ReadRequestFromClient(client_sock, port_));
+  //  IOTaskManager::AddTask(new ReadRequestFromClient(client_sock, port_,
+  //  ip_));
   return Ok(0);
 }
 
 const std::string &Accept::GetPort() const { return port_; }
+const std::string &Accept::GetIp() const { return ip_; }

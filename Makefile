@@ -82,6 +82,13 @@ test:
 	@# Execute the test
 	@$(TEST_EXE_PATH) || exit 1
 
+# CI -+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+.PHONY: build
+
+ci/build:
+	docker build -t webserv .
+	docker run --rm -it -v $(CURDIR):/app webserv -c "make re && make fclean"
+
 # Clean log file -+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: logclean
 

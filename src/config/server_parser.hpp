@@ -1,6 +1,7 @@
 #ifndef WEBSERV_SRC_CONFIG_SERVER_PARSER_HPP
 #define WEBSERV_SRC_CONFIG_SERVER_PARSER_HPP
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -19,8 +20,11 @@ class ServerParser {
   typedef bool (*parseFunction)(const std::vector<std::string> &value,
                                 ServerContext &server);
   static ServerContext ParseServer(std::ifstream &inf);
+  static void ClearParsedPair();
 
  private:
+  static bool IsValidLocationKey(const std::vector<std::string> &value);
+  static std::string MakeLocationKey(const std::vector<std::string> &value);
   static void ParseFuncInit(std::map<std::string, parseFunction> &func);
   static bool ParseErrorPage(const std::vector<std::string> &value,
                              ServerContext &server);
@@ -35,6 +39,9 @@ class ServerParser {
   static bool ParsePort(const std::vector<std::string> &value,
                         ServerContext &server);
   static void RemoveSemicolon(std::string &line);
+  static bool parsed_root_;
+  static bool parsed_ip_;
+  static std::map<std::string, std::vector<std::string> > parsed_pair_;
 };
 
 #endif

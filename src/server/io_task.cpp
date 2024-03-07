@@ -2,6 +2,8 @@
 
 AIOTask::AIOTask() {}
 
+AIOTask::AIOTask(int fd, int event) : fd_(fd), event_(event) {}
+
 AIOTask::~AIOTask() {}
 
 int AIOTask::GetFd() const { return fd_; }

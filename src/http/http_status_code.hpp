@@ -1,6 +1,9 @@
 #ifndef WEBSERV_SRC_HTTP_STATUS_CODE_HPP
 #define WEBSERV_SRC_HTTP_STATUS_CODE_HPP
 
+#include <map>
+#include <string>
+
 namespace http {
 enum StatusCode {
   kContinue = 100,
@@ -48,6 +51,9 @@ enum StatusCode {
   kGatewayTimeout = 504,
   kHttpVersionNotSupported = 505,
 };
-}
+
+std::string GetStatusMessage(StatusCode status_code);
+
+}  // namespace http
 
 #endif  // WEBSERV_SRC_HTTP_STATUS_CODE_HPP

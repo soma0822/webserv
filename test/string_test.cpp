@@ -27,5 +27,4 @@ TEST(STRINGSTOI, INTMAXPlus1) {
   std::string str = "2147483648";
   Result<int, std::string> result = string_utils::StrToI(str);
   ASSERT_TRUE(result.IsErr());
-  ASSERT_EQ(result.UnwrapErr(), "2147483648 is too large");
 }

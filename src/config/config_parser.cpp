@@ -2,13 +2,14 @@
 
 const std::string ConfigParser::default_file_ = "./conf/default.conf";
 
-void ConfigParser::Parse(const std::string &file) {
-  Config::Clear();
+Config ConfigParser::Parse(const std::string &file) {
+  ServerParser::ClearParsedPair();
+  Config config;
   std::vector<ServerContext> server;
   std::string line;
-  std::ifstream inf(file);
+  std::ifstream inf(file.c_str());
   if (!inf.is_open()) {
-    throw std::invalid_argument("File could not open: " + file);
+    throw std::invalid_argument("ファイルが開けませんでした: " + file);
   }
   while (std::getline(inf, line)) {
     std::stringstream ss(line);
@@ -18,9 +19,10 @@ void ConfigParser::Parse(const std::string &file) {
     if (key.empty()) continue;
     ss >> value;
     if (key + value == "server{" && ss.get() == std::char_traits<char>::eof())
-      Config::AddServer(ServerParser::ParseServer(inf));
+      config.AddServer(ServerParser::ParseServer(inf));
     else {
-      throw std::invalid_argument("Invalid key: " + line);
+      throw std::invalid_argument("無効なキー: " + line);
     }
   }
+  return config;
 }
