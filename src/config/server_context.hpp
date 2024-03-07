@@ -32,8 +32,10 @@ class IServerContext {
   virtual void AddIndex(const std::string &index) = 0;
   virtual void AddPort(const std::string &port) = 0;
   virtual void AddServerName(const std::string &server_name) = 0;
-  virtual void AddErrorPage(const std::string &key, const std::string &value) = 0;
-  virtual void AddLocation(const std::string &key, const LocationContext &value) = 0;
+  virtual void AddErrorPage(const std::string &key,
+                            const std::string &value) = 0;
+  virtual void AddLocation(const std::string &key,
+                           const LocationContext &value) = 0;
 };
 
 class ServerContext : public IServerContext {
