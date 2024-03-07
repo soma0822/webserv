@@ -261,15 +261,13 @@ TEST(ConfigTest, DoubleLocationErrorPage) {
 }
 
 TEST(ConfigTest, PortIp) {
-  ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/port_ip.conf"),
-      std::invalid_argument);
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/port_ip.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, PortIpServerName) {
-  ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/port_ip_server_name.conf"),
-      std::invalid_argument);
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/port_ip_server_name.conf"),
+               std::invalid_argument);
 }
 
 // SerchServer

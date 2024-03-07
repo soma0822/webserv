@@ -37,13 +37,9 @@ bool ServerContext::IsValidContext() const {
 // ゲッター
 const std::string &ServerContext::GetIp() const { return ip_; }
 const std::string &ServerContext::GetRoot() const { return root_; }
-const std::string &ServerContext::GetIndex() const {
-  return index_;
-}
+const std::string &ServerContext::GetIndex() const { return index_; }
 const std::string &ServerContext::GetPort() const { return port_; }
-const std::string &ServerContext::GetServerName() const {
-  return server_name_;
-}
+const std::string &ServerContext::GetServerName() const { return server_name_; }
 const std::map<std::string, std::string> &ServerContext::GetErrorPage() const {
   return error_page_;
 }
@@ -55,12 +51,8 @@ const std::map<std::string, LocationContext> &ServerContext::GetLocation()
 // セッター
 void ServerContext::SetIp(const std::string &ip) { ip_ = ip; }
 void ServerContext::SetRoot(const std::string &root) { root_ = root; }
-void ServerContext::SetIndex(const std::string &index) {
-  index_= index;
-}
-void ServerContext::SetPort(const std::string &port) {
-  port_ = port;
-}
+void ServerContext::SetIndex(const std::string &index) { index_ = index; }
+void ServerContext::SetPort(const std::string &port) { port_ = port; }
 void ServerContext::SetServerName(const std::string &server_name) {
   server_name_ = server_name;
 }
@@ -111,7 +103,6 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
   return os;
 }
 
-
 std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
   os << SERVER;
   std::vector<std::string> tmp;
@@ -143,5 +134,3 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
   }
   return os;
 }
-
-

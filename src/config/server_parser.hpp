@@ -47,7 +47,8 @@ class ServerParser {
   static bool parsed_port_;
   static bool parsed_server_name_;
   static bool parsed_index_;
-  static std::map<std::string, std::map<std::string, std::set<std::string> > > parsed_pair_;
+  static std::map<std::string, std::map<std::string, std::set<std::string> > >
+      parsed_pair_;
 };
 
 #endif

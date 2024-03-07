@@ -14,17 +14,18 @@ void Server::Run(const IConfig &config) {
   std::vector<ServerContext>::const_iterator server_it = servers.begin();
   std::map<std::string, bool> listen_port;
   for (; server_it != servers.end(); ++server_it) {
-      if (listen_port[server_it->GetPort()] == false) {
-        Result<int, int> result = Listen(server_it->GetPort(), server_it->GetIp());
-        if (result.IsOk()) {
-          // IOTaskManager::AddTask(new Accept(result.Unwrap(), *port_it,
-          // server_it->GetIp()));
-          listen_port[server_it->GetPort()] = true;
-        } else {
-          Logger::Error() << "リッスンに失敗しました" << std::endl;
-        }
+    if (listen_port[server_it->GetPort()] == false) {
+      Result<int, int> result =
+          Listen(server_it->GetPort(), server_it->GetIp());
+      if (result.IsOk()) {
+        // IOTaskManager::AddTask(new Accept(result.Unwrap(), *port_it,
+        // server_it->GetIp()));
+        listen_port[server_it->GetPort()] = true;
+      } else {
+        Logger::Error() << "リッスンに失敗しました" << std::endl;
       }
     }
+  }
   // IOTaskManager::ExecuteTasks();
 }
 
