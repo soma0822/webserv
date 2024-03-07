@@ -21,17 +21,17 @@ class IServerContext {
   // ゲッター
   virtual const std::string &GetIp() const = 0;
   virtual const std::string &GetRoot() const = 0;
-  virtual const std::vector<std::string> &GetIndex() const = 0;
-  virtual const std::vector<std::string> &GetPort() const = 0;
-  virtual const std::vector<std::string> &GetServerName() const = 0;
+  virtual const std::string &GetIndex() const = 0;
+  virtual const std::string &GetPort() const = 0;
+  virtual const std::string &GetServerName() const = 0;
   virtual const std::map<std::string, std::string> &GetErrorPage() const = 0;
   virtual const std::map<std::string, LocationContext> &GetLocation() const = 0;
   // セッター
   virtual void SetIp(const std::string &ip) = 0;
   virtual void SetRoot(const std::string &root) = 0;
-  virtual void AddIndex(const std::string &index) = 0;
-  virtual void AddPort(const std::string &port) = 0;
-  virtual void AddServerName(const std::string &server_name) = 0;
+  virtual void SetIndex(const std::string &index) = 0;
+  virtual void SetPort(const std::string &port) = 0;
+  virtual void SetServerName(const std::string &server_name) = 0;
   virtual void AddErrorPage(const std::string &key,
                             const std::string &value) = 0;
   virtual void AddLocation(const std::string &key,
@@ -51,26 +51,26 @@ class ServerContext : public IServerContext {
   // ゲッター
   const std::string &GetIp() const;
   const std::string &GetRoot() const;
-  const std::vector<std::string> &GetIndex() const;
-  const std::vector<std::string> &GetPort() const;
-  const std::vector<std::string> &GetServerName() const;
+  const std::string &GetIndex() const;
+  const std::string &GetPort() const;
+  const std::string &GetServerName() const;
   const std::map<std::string, std::string> &GetErrorPage() const;
   const std::map<std::string, LocationContext> &GetLocation() const;
   // セッター
   void SetIp(const std::string &ip);
   void SetRoot(const std::string &root);
-  void AddIndex(const std::string &index);
-  void AddPort(const std::string &port);
-  void AddServerName(const std::string &server_name);
+  void SetIndex(const std::string &index);
+  void SetPort(const std::string &port);
+  void SetServerName(const std::string &server_name);
   void AddErrorPage(const std::string &key, const std::string &value);
   void AddLocation(const std::string &key, const LocationContext &value);
 
  private:
   std::string ip_;
   std::string root_;
-  std::vector<std::string> index_;
-  std::vector<std::string> port_;
-  std::vector<std::string> server_name_;
+  std::string index_;
+  std::string port_;
+  std::string server_name_;
   std::map<std::string, std::string> error_page_;
   std::map<std::string, LocationContext> location_;
 };
