@@ -103,7 +103,8 @@ int HTTPRequestParser::SetRequestHeaders() {
     // どちらかの辺が空白、もしくは右辺だけない。
     if (value_pos == 0 || key_pos == 0) return kBadRequest;
     key = request_line.substr(0, key_pos);
-    value = string_utils::SkipSpace(request_line.substr(key_pos + 1, value_pos));
+    value =
+        string_utils::SkipSpace(request_line.substr(key_pos + 1, value_pos));
     request_line = request_line.substr(key_pos + value_pos + 3);
     request_->AddHeader(key, value);
   }
@@ -180,4 +181,3 @@ bool HTTPRequestParser::IsNeedBody() {
     return true;
   return false;
 }
-
