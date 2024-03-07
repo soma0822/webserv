@@ -4,9 +4,9 @@
 #include "file_utils.hpp"
 
 HTTPResponse *RequestHandler::Handle(const IConfig &config,
-                                           const HTTPRequest *request,
-                                           const std::string &port,
-                                           const std::string &ip) {
+                                     const HTTPRequest *request,
+                                     const std::string &port,
+                                     const std::string &ip) {
   if (!request) {
     // 505を返す
   }
@@ -16,8 +16,8 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config,
   return new HTTPResponse();
 }
 
-HTTPResponse *RequestHandler::Get(
-    const HTTPRequest *request, const std::string &requested_file_path) {
+HTTPResponse *RequestHandler::Get(const HTTPRequest *request,
+                                  const std::string &requested_file_path) {
   if (!request) {
     // 505を返す
   }
