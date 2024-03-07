@@ -1,7 +1,8 @@
 #include "accept.hpp"
 
-Accept::Accept(int fd, const std::string &port, const std::string &ip, const IConfig &config)
-    : AIOTask(fd, POLLIN), port_(port), ip_(ip), config_(config){}
+Accept::Accept(int fd, const std::string &port, const std::string &ip,
+               const IConfig &config)
+    : AIOTask(fd, POLLIN), port_(port), ip_(ip), config_(config) {}
 
 Accept::~Accept() {}
 
@@ -19,8 +20,8 @@ Result<int, std::string> Accept::Execute() {
     return Err("accept error");
   }
   Logger::Info() << port_ << " : 接続しました" << std::endl;
-   IOTaskManager::AddTask(new ReadRequestFromClient(client_sock, port_,
-   ip_, config_));
+  IOTaskManager::AddTask(
+      new ReadRequestFromClient(client_sock, port_, ip_, config_));
   return Ok(0);
 }
 

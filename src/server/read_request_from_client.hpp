@@ -16,7 +16,8 @@
 
 class ReadRequestFromClient : public AIOTask {
  public:
-  ReadRequestFromClient(int fd, const std::string &port, const std::string &ip, const IConfig &config);
+  ReadRequestFromClient(int fd, const std::string &port, const std::string &ip,
+                        const IConfig &config);
   virtual ~ReadRequestFromClient();
   virtual Result<int, std::string> Execute();
   const std::string &GetPort() const;

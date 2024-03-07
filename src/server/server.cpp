@@ -19,7 +19,7 @@ bool Server::Run(const IConfig &config) {
           Listen(server_it->GetPort(), server_it->GetIp());
       if (result.IsOk()) {
         IOTaskManager::AddTask(new Accept(result.Unwrap(), server_it->GetPort(),
-        server_it->GetIp(), config));
+                                          server_it->GetIp(), config));
       } else {
         Logger::Error() << "リッスンに失敗しました" << std::endl;
         return false;
