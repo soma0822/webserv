@@ -9,5 +9,6 @@
 
 namespace string_utils {
 Result<int, std::string> StrToI(const std::string &str);
+std::string SkipSpace(std::string s);
 }  // namespace string_utils
 #endif
