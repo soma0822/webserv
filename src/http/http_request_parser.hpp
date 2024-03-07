@@ -9,14 +9,13 @@
 #include "result.hpp"
 #include "string_utils.hpp"
 
-enum ReturnStatus {
-  kBadRequest = 0,
-  kNotEnough = 1,
-  kOk = 2,
-};
-
 class HTTPRequestParser {
  public:
+  enum ReturnStatus {
+    kBadRequest = 0,
+    kNotEnough = 1,
+    kOk = 2,
+  };
   HTTPRequestParser();
   ~HTTPRequestParser();
 
