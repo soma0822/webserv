@@ -18,8 +18,8 @@ bool Server::Run(const IConfig &config) {
       Result<int, int> result =
           Listen(server_it->GetPort(), server_it->GetIp());
       if (result.IsOk()) {
-        // IOTaskManager::AddTask(new Accept(result.Unwrap(), *port_it,
-        // server_it->GetIp()));
+        IOTaskManager::AddTask(new Accept(result.Unwrap(), server_it->GetPort(),
+        server_it->GetIp()));
       } else {
         Logger::Error() << "リッスンに失敗しました" << std::endl;
         return false;

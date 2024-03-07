@@ -9,7 +9,7 @@
 #include "config.hpp"
 #include "logger.hpp"
 #include "result.hpp"
-// #include "io_task_manager.hpp"
+#include "io_task_manager.hpp"
 
 class Server {
  public:
