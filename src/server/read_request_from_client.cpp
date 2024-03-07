@@ -1,11 +1,7 @@
 #include "read_request_from_client.hpp"
 
 ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
-                                             const std::string &ip) {
-  fd_ = fd;
-  event_ = POLLIN;
-  port_ = port;
-  ip_ = ip;
+                                             const std::string &ip, const IConfig &config) : AIOTask(fd, POLLIN), port_(port), ip_(ip), config_(config){
   // parser_ = RequestParser();
 }
 

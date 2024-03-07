@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 
+#include "config.hpp"
 #include "http_response.hpp"
 // #include "http_request.hpp"
 #include "io_task.hpp"
@@ -15,7 +16,7 @@
 
 class ReadRequestFromClient : public AIOTask {
  public:
-  ReadRequestFromClient(int fd, const std::string &port, const std::string &ip);
+  ReadRequestFromClient(int fd, const std::string &port, const std::string &ip, const IConfig &config);
   virtual ~ReadRequestFromClient();
   virtual Result<int, std::string> Execute();
   const std::string &GetPort() const;
@@ -27,6 +28,7 @@ class ReadRequestFromClient : public AIOTask {
   ReadRequestFromClient &operator=(const ReadRequestFromClient &other);
   std::string port_;
   std::string ip_;
+  const IConfig &config_;
   // RequestParser parser_;
 };
 
