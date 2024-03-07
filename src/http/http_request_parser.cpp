@@ -175,7 +175,7 @@ int HTTPRequestParser::SetChunkedBody() {
         return kBadRequest;
       }
       pos = request_line.find("\r\n");
-	  if (pos == std::string::npos) return kNotEnough;
+      if (pos == std::string::npos) return kNotEnough;
       request_line = request_line.substr(pos + 2);
       chunked_state = kNeedChunkedBody;
     }

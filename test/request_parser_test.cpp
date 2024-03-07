@@ -16,7 +16,7 @@ TEST(HTTPRequestParser, ParseRequestGET) {
   EXPECT_EQ(req.Unwrap()->GetUri(), "/");
   EXPECT_EQ(req.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req.Unwrap()->GetVersion(), "1.1");
-EXPECT_EQ(req.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req.Unwrap()->GetBody(), "");
 }
 
