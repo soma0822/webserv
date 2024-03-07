@@ -27,7 +27,7 @@ class LocationContext {
   // セッター
   void SetCanAutoIndex(bool can_auto_inde);
   void SetLimitClientBody(int limit_client_body_bytes);
-  void SetPath(const std::string &path);
+  void SetPath(const std::string& path);
   void SetReturn(const std::string& ret);
   void SetAlias(const std::string& alias);
   void SetRoot(const std::string& root);
