@@ -24,7 +24,7 @@ const HTTPResponse *RequestHandler::Get(
   // TODO リクエストのヘッダを処理する
 
   HTTPResponse *response = new HTTPResponse();
-  response->SetHttpVersion("HTTP/1.1");
+  response->SetHTTPVersion("HTTP/1.1");
   response->SetStatusCode(http::kOk);
   Result<std::string, file_utils::Error> file_content =
       file_utils::ReadFile(requested_file_path);

@@ -21,6 +21,14 @@ HTTPResponse &HTTPResponse::operator=(const HTTPResponse &other) {
 
 HTTPResponse::~HTTPResponse() {}
 
+void HTTPResponse::SetHTTPVersion(const std::string &http_version) {
+  http_version_ = http_version;
+}
+
+const std::string &HTTPResponse::GetHTTPVersion() const {
+  return http_version_;
+}
+
 void HTTPResponse::SetStatusCode(http::StatusCode status_code) {
   status_code_ = status_code;
 }
