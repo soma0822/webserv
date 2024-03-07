@@ -12,14 +12,40 @@
 #define LOCATION "\033[1;32m"
 #define SERVER "\033[1;33m"
 
-class ServerContext {
+class IServerContext {
+ public:
+  virtual ~IServerContext() {}
+  virtual bool HavePort(const std::string &port) const = 0;
+  virtual bool HaveServerName(const std::string &server_name) const = 0;
+  virtual bool IsValidContext() const = 0;
+  // ゲッター
+  virtual const std::string &GetIp() const = 0;
+  virtual const std::string &GetRoot() const = 0;
+  virtual const std::vector<std::string> &GetIndex() const = 0;
+  virtual const std::vector<std::string> &GetPort() const = 0;
+  virtual const std::vector<std::string> &GetServerName() const = 0;
+  virtual const std::map<std::string, std::string> &GetErrorPage() const = 0;
+  virtual const std::map<std::string, LocationContext> &GetLocation() const = 0;
+  // セッター
+  virtual void SetIp(const std::string &ip) = 0;
+  virtual void SetRoot(const std::string &root) = 0;
+  virtual void AddIndex(const std::string &index) = 0;
+  virtual void AddPort(const std::string &port) = 0;
+  virtual void AddServerName(const std::string &server_name) = 0;
+  virtual void AddErrorPage(const std::string &key,
+                            const std::string &value) = 0;
+  virtual void AddLocation(const std::string &key,
+                           const LocationContext &value) = 0;
+};
+
+class ServerContext : public IServerContext {
  public:
   ServerContext();
   ServerContext(const ServerContext &other);
   ServerContext &operator=(const ServerContext &other);
 
-  bool HavePort(const std::string &port);
-  bool HaveServerName(const std::string &server_name);
+  bool HavePort(const std::string &port) const;
+  bool HaveServerName(const std::string &server_name) const;
   bool IsValidContext() const;
   // ゲッター
   const std::string &GetIp() const;
