@@ -270,6 +270,17 @@ TEST(ConfigTest, PortIpServerName) {
                std::invalid_argument);
 }
 
+TEST(ConfigTest, HostListen) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/host_listen.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, HostListenServername) {
+  ASSERT_THROW(
+      ConfigParser::Parse("test/conf_test/host_listen_server_name.conf"),
+      std::invalid_argument);
+}
+
 // SerchServer
 TEST(SerchServer, DefaultTest) {
   Config config = ConfigParser::Parse("test/conf_test/search_server.conf");
