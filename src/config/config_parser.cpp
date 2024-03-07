@@ -24,5 +24,7 @@ Config ConfigParser::Parse(const std::string &file) {
       throw std::invalid_argument("無効なキー: " + line);
     }
   }
+  if (ServerParser::UniqueListen() == false)
+    throw std::invalid_argument("同じポート、同じipで複数設定されています");
   return config;
 }

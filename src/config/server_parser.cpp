@@ -5,7 +5,7 @@ bool ServerParser::parsed_ip_;
 bool ServerParser::parsed_port_;
 bool ServerParser::parsed_server_name_;
 bool ServerParser::parsed_index_;
-std::map<std::string, std::vector<std::string> > ServerParser::parsed_pair_;
+std::map<std::string, std::map<std::string, std::set<std::string> > > ServerParser::parsed_pair_;
 
 ServerContext ServerParser::ParseServer(std::ifstream &inf) {
   ServerContext server;
@@ -38,10 +38,9 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
       }
     }
   }
-  if (server.IsValidContext())
-    return server;
-  else
+  if (server.IsValidContext() == false || UniqueServerName(server) == false)
     throw std::invalid_argument("serverにポートがありません");
+  return server;
 }
 
 bool ServerParser::IsValidLocationKey(const std::vector<std::string> &value) {
@@ -75,6 +74,24 @@ void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   parsed_port_ = false;
   parsed_server_name_ = false;
   parsed_index_ = false;
+}
+
+bool ServerParser::UniqueServerName(const ServerContext &server){
+  const std::string &port = server.GetPort();
+  const std::string &ip = server.GetIp();
+  const std::string &server_name = server.GetServerName();
+  if (parsed_pair_[port][ip].insert(server_name).second == false)
+    return false;
+  return true;
+}
+
+bool ServerParser::UniqueListen(){
+  std::map<std::string, std::map<std::string, std::set<std::string> > >::iterator it = parsed_pair_.begin();
+  for (; it != parsed_pair_.end(); it++){
+    if (it->second.size() > 1 && it->second.count("") > 0)
+      return false;
+  }
+  return true;
 }
 
 // パーサー
