@@ -1,5 +1,7 @@
 #include "http_request_parser.hpp"
 
+#include <cstddef>
+
 // canonical
 HTTPRequestParser::HTTPRequestParser()
     : request_(NULL), row_line_(""), parser_state_(kBeforeProcess) {}
@@ -106,7 +108,7 @@ int HTTPRequestParser::SetRequestHeaders() {
     value =
         string_utils::SkipSpace(request_line.substr(key_pos + 1, value_pos));
     request_line = request_line.substr(key_pos + value_pos + 3);
-    request_->AddHeader(key, value);
+    request_->AddHeader(StrToUpper(key), StrToUpper(value));
   }
   // headerの終わりの確認
   // まだheaderが続いている場合
@@ -115,12 +117,12 @@ int HTTPRequestParser::SetRequestHeaders() {
     return kNotEnough;
   }
   // Hostがあるか右辺が空白じゃないか確認
-  if (request_->GetHeaders().count("Host") == 0 ||
-      request_->GetHeaders().find("Host")->second == "") {
+  if (request_->GetHeaders().count("HOST") == 0 ||
+      request_->GetHeaders().find("HOST")->second == "") {
     row_line_ = request_line.substr(2);
     return kBadRequest;
   }
-  request_->SetHostHeader(request_->GetHeaders().find("Host")->second);
+  request_->SetHostHeader(request_->GetHeaders().find("HOST")->second);
   row_line_ = request_line.substr(2);
   return kOk;
 }
@@ -129,10 +131,11 @@ int HTTPRequestParser::SetRequestHeaders() {
 int HTTPRequestParser::SetRequestBody() {
   std::string request_line = row_line_;
   size_t pos = 0;
-  if (request_->GetHeaders().count("Content-Length") > 0) {
+
+  if (request_->GetHeaders().count("CONTENT-LENGTH") > 0) {
     pos = request_line.find("\r\n");
     if (pos == std::string::npos) pos = request_line.length();
-    std::string length = request_->GetHeaders().find("Content-Length")->second;
+    std::string length = request_->GetHeaders().find("CONTENT-LENGTH")->second;
     Result<int, std::string> result = string_utils::StrToI(length);
     if (result.IsErr()) return kBadRequest;
     if (static_cast<int>(request_line.length()) < result.Unwrap())
@@ -143,13 +146,65 @@ int HTTPRequestParser::SetRequestBody() {
     }
   }
   // trasfer-encodingは未実装
-  //  else if (request_->GetHeaders().count("Transfer-Encoding") > 0) {
-  //    pos = request_line.find("\r\n");
-  //    if (pos == std::string::npos) return kNotEnough;
-  //    request_->SetBody(request_line.substr(0, pos));
-  //    row_line_ = request_line.substr(pos + 2);
-  //  }
+  // 数字以外きたらbadrequest
+  // 数字の値と違ったらbadrequest
+  else {
+    return SetChunkedBody();
+  }
   return kOk;
+}
+
+enum chunked_state {
+  kNeedChunkedSize = 0,
+  kNeedChunkedBody,
+  kNeedChunkedEnd,
+};
+
+int HTTPRequestParser::SetChunkedBody() {
+  static int chunked_state = kNeedChunkedSize;
+  static size_t chunked_size = 0;
+  std::string request_line = row_line_;
+  size_t pos = 0;
+
+  while (1) {
+    if (chunked_state == kNeedChunkedSize) {
+      Result<int, std::string> result = string_utils::StrToI(request_line);
+      if (result.IsErr()) {
+        chunked_state = kNeedChunkedSize;
+        chunked_size = 0;
+        return kBadRequest;
+      }
+      pos = request_line.find("\r\n");
+	  if (pos == std::string::npos) return kNotEnough;
+      request_line = request_line.substr(pos + 2);
+      chunked_state = kNeedChunkedBody;
+    }
+    if (chunked_state == kNeedChunkedBody) {
+      pos = request_line.find("\r\n");
+      if (pos == 0 && chunked_size == 0) {
+        request_line = request_line.substr(chunked_size + 2);
+        chunked_state = kNeedChunkedSize;
+        return kOk;
+      } else if (pos > chunked_size || pos == 0) {
+        request_line = request_line.substr(chunked_size + 2);
+        chunked_state = kNeedChunkedSize;
+        return kBadRequest;
+      } else if (pos == std::string::npos || pos < chunked_size)
+        return kNotEnough;
+      else if (pos == chunked_size) {
+        request_->SetBody(request_line.substr(0, chunked_size));
+        request_line = request_line.substr(chunked_size + 2);
+        chunked_state = kNeedChunkedEnd;
+      }
+    }
+    if (chunked_state == kNeedChunkedEnd) {
+      if (request_line.find("\r\n") == 0) {
+        chunked_state = kNeedChunkedSize;
+      } else {
+        return kBadRequest;
+      }
+    }
+  }
 }
 
 // utils
@@ -176,8 +231,8 @@ const Result<HTTPRequest *, int> HTTPRequestParser::OkRequest() {
 }
 
 bool HTTPRequestParser::IsNeedBody() {
-  if ((request_->GetHeaders().count("Content-Length") > 0) ||
-      (request_->GetHeaders().count("Transfer-Encoding") > 0))
+  if ((request_->GetHeaders().count("CONTENT-LENGTH") > 0) ||
+      (request_->GetHeaders().find("TRANSFER-ENCODING")->second == "CHUNKED"))
     return true;
   return false;
 }

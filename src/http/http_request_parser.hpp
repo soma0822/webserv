@@ -38,6 +38,7 @@ class HTTPRequestParser {
   int SetRequestLine();
   int SetRequestHeaders();
   int SetRequestBody();
+  int SetChunkedBody();
 
   const Result<HTTPRequest *, int> BadRequest();
   const Result<HTTPRequest *, int> OkRequest();
