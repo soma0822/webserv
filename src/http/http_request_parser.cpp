@@ -20,6 +20,7 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
     std::string request_line) {
   int return_state;
   row_line_ = row_line_ + request_line;
+  if (row_line_ == "") return Err(kEndParse);
   if (request_ == NULL) request_ = new HTTPRequest();
   // requestlineの内容を確認
   if (parser_state_ == kBeforeProcess) {

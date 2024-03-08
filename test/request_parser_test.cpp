@@ -7,6 +7,14 @@
 #include "http_request.hpp"
 #include "http_request_parser.hpp"
 
+// kEndHeaderのテスト
+TEST(HTTPRequestParser, kEndHandler) {
+  std::string request = "";
+  HTTPRequestParser parser;
+  const Result<HTTPRequest *, int> req = parser.Parser(request);
+  EXPECT_EQ(req.UnwrapErr(), HTTPRequestParser::kEndParse);
+}
+
 // GETリクエストのパース
 TEST(HTTPRequestParser, ParseRequestGET) {
   std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";

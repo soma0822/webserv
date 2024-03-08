@@ -15,7 +15,7 @@ class HTTPRequestParser {
     kBadRequest = 0,
     kNotEnough = 1,
     kOk = 2,
-    kEndHandler = 3,
+    kEndParse = 3,
   };
   HTTPRequestParser();
   ~HTTPRequestParser();
