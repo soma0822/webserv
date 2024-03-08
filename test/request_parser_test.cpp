@@ -7,7 +7,7 @@
 #include "http_request.hpp"
 #include "http_request_parser.hpp"
 
-// kEndHeaderのテスト
+// kEndHandlerのテスト
 TEST(HTTPRequestParser, kEndHandler) {
   std::string request = "";
   HTTPRequestParser parser;
