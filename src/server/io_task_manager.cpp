@@ -31,29 +31,36 @@ void IOTaskManager::AddTask(AIOTask *task) {
                  << std::endl;
 }
 
-void IOTaskManager::RemoveTask(AIOTask *task) {
+void IOTaskManager::RemoveReadTask(AIOTask *task) {
   ReadRequestFromClient *tmp = dynamic_cast<ReadRequestFromClient *>(task);
+  if (!tmp) return;
   for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == task->GetFd()) {
       for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
-        if (tmp) {  // ReadRequestFromClientを消すときは接続を切るとき。同時にwriteも消すべき。それ以外のときはそのタスクのみを消す
-          delete tasks_.at(i).at(j);
-        } else if (tasks_.at(i).at(j) == task) {
-          delete tasks_.at(i).at(j);
-          tasks_.at(i).erase(tasks_.at(i).begin() + j);
-        }
+        delete tasks_.at(i).at(j);
       }
-      if (tmp) {  // 接続を切る
-        close(fds_.at(i).fd);
-        tasks_.erase(tasks_.begin() + i);
-      }
+      close(fds_.at(i).fd);
+      tasks_.at(i).clear();
+      fds_.at(i).fd = -1;
+      Logger::Info() << "接続を削除しました" << std::endl;
       return;
     }
   }
 }
 
-// TODO:
-// pollのエラーハンドリング。Executeの返り値について。Taskを消した時に接続を切る場合のiもどす必要ある。
+void IOTaskManager::RemoveWriteTask(AIOTask *task) {
+  WriteResponseToClient *tmp = dynamic_cast<WriteResponseToClient *>(task);
+  if (!tmp) return;
+  for (unsigned int i = 0; i < fds_.size(); ++i) {
+    if (fds_.at(i).fd == task->GetFd()) {
+      *(std::find(tasks_.at(i).begin(), tasks_.at(i).end(), task)) = NULL;
+      delete task;
+      Logger::Info() << "ライトタスクを削除しました" << std::endl;
+      return;
+    }
+  }
+}
+
 void IOTaskManager::ExecuteTasks() {
   while (true) {
     int ret = poll(&fds_[0], fds_.size(), 5000);
@@ -62,15 +69,19 @@ void IOTaskManager::ExecuteTasks() {
       return;
     }
     for (unsigned int i = 0; i < fds_.size(); ++i) {
+      if (fds_.at(i).fd == -1) continue;
       for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
+        if (tasks_.at(i).at(j) == NULL) continue;
         if (fds_.at(i).revents & tasks_.at(i).at(j)->GetEvent()) {
           Result<int, std::string> result = tasks_.at(i).at(j)->Execute();
-          if (result
-                  .IsErr())  // errを返すのは致命的なエラーのみの予定。他はOkの数値を見て判断
+          if (result.IsErr())
             throw std::invalid_argument("taskエラー");
-          else if (result.Unwrap() == kDelete) {
-            RemoveTask(tasks_.at(i).at(j));
+          else if (result.Unwrap() == AIOTask::kWriteDelete) {
+            RemoveWriteTask(tasks_.at(i).at(j));
             --j;
+          } else if (result.Unwrap() == AIOTask::kReadDelete) {
+            RemoveReadTask(tasks_.at(i).at(j));
+            --i;
           }
         }
       }

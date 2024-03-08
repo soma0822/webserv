@@ -7,6 +7,7 @@
 
 class AIOTask {
  public:
+  enum IOTaskStatus { kOk, kWriteDelete, kReadDelete };
   AIOTask();
   AIOTask(int fd, int event);
   virtual ~AIOTask();
