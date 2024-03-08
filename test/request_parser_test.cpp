@@ -127,9 +127,6 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked) {
   request = "hello\r\n";
   Result<HTTPRequest *, int> req3 = parser.Parser(request);
   EXPECT_EQ(req3.UnwrapErr(), HTTPRequestParser::kNotEnough);
-  request = "\r\n";
-  Result<HTTPRequest *, int> req5 = parser.Parser(request);
-  EXPECT_EQ(req5.UnwrapErr(), HTTPRequestParser::kNotEnough);
   request = "0\r\n";
   Result<HTTPRequest *, int> req4 = parser.Parser(request);
   EXPECT_EQ(req4.UnwrapErr(), HTTPRequestParser::kNotEnough);
@@ -147,7 +144,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked2) {
   HTTPRequestParser parser;
   std::string request =
       "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
-      "chunked\r\n\r\n5\r\nhello\r\n\r\n0\r\n\r\n";
+      "chunked\r\n\r\n5\r\nhello\r\n0\r\n\r\n";
   Result<HTTPRequest *, int> req2 = parser.Parser(request);
   EXPECT_EQ(req2.Unwrap()->GetMethod(), "POST");
   EXPECT_EQ(req2.Unwrap()->GetUri(), "/");
@@ -157,7 +154,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked2) {
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
   request =
       "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
-      "chunked\r\n\r\n5\r\nhello\r\n\r\n0\r\n\r\n";
+      "chunked\r\n\r\n5\r\nhello\r\n0\r\n\r\n";
   Result<HTTPRequest *, int> req3 = parser.Parser(request);
   EXPECT_EQ(req3.Unwrap()->GetMethod(), "POST");
   EXPECT_EQ(req3.Unwrap()->GetUri(), "/");

@@ -135,6 +135,7 @@ int HTTPRequestParser::SetRequestBody() {
   std::string request_line = row_line_;
   size_t pos = 0;
 
+// content-length
   if (request_->GetHeaders().count("CONTENT-LENGTH") > 0) {
     pos = request_line.find("\r\n");
     if (pos == std::string::npos) pos = request_line.length();
@@ -148,18 +149,11 @@ int HTTPRequestParser::SetRequestBody() {
       request_->AddBody(request_line.substr(0, pos));
     }
   }
-  // trasfer-encodingは未実装
+  // trasfer-encoding
   else {
     return SetChunkedBody();
   }
   return kOk;
-}
-
-int HTTPRequestParser::BadChunkedBody(int &chunked_state,
-                                      size_t &chunked_size) {
-  chunked_size = 0;
-  chunked_state = kNeedChunkedSize;
-  return kBadRequest;
 }
 
 int HTTPRequestParser::SetChunkedBody() {
@@ -168,6 +162,7 @@ int HTTPRequestParser::SetChunkedBody() {
   size_t pos = 0;
 
   while (1) {
+	  //sizeが書かれているか確認
     if (chunked_state == kNeedChunkedSize) {
       pos = row_line_.find("\r\n");
       if (pos == 0) return kBadRequest;
@@ -179,9 +174,11 @@ int HTTPRequestParser::SetChunkedBody() {
       row_line_ = row_line_.substr(pos + 2);
       chunked_state = kNeedChunkedBody;
     }
+	//sizeの分だけbodyがあるか確認
     if (chunked_state == kNeedChunkedBody) {
       pos = row_line_.find("\r\n");
       if (pos == std::string::npos) return kNotEnough;
+	  //size == 0の時はすぐに\r\nが来て終わる
       if (pos == 0 && chunked_size == 0) {
         row_line_ = row_line_.substr(chunked_size + 2);
         chunked_state = kNeedChunkedSize;
@@ -189,17 +186,8 @@ int HTTPRequestParser::SetChunkedBody() {
       } else if (pos == chunked_size) {
         request_->AddBody(row_line_.substr(0, chunked_size));
         row_line_ = row_line_.substr(chunked_size + 2);
-        chunked_state = kNeedChunkedEnd;
-      } else
-        return BadChunkedBody(chunked_state, chunked_size);
-    }
-    if (chunked_state == kNeedChunkedEnd) {
-      pos = row_line_.find("\r\n");
-      if (pos == std::string::npos) return kNotEnough;
-      row_line_ = row_line_.substr(2);
-      if (pos == 0)
         chunked_state = kNeedChunkedSize;
-      else
+      } else
         return BadChunkedBody(chunked_state, chunked_size);
     }
   }
@@ -226,6 +214,13 @@ const Result<HTTPRequest *, int> HTTPRequestParser::OkRequest() {
   HTTPRequest *request = request_;
   request_ = NULL;
   return Ok(request);
+}
+
+int HTTPRequestParser::BadChunkedBody(int &chunked_state,
+                                      size_t &chunked_size) {
+  chunked_size = 0;
+  chunked_state = kNeedChunkedSize;
+  return kBadRequest;
 }
 
 bool HTTPRequestParser::IsNeedBody() {

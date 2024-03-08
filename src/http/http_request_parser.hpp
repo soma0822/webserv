@@ -15,6 +15,7 @@ class HTTPRequestParser {
     kBadRequest = 0,
     kNotEnough = 1,
     kOk = 2,
+    kEndHandler = 3,
   };
   HTTPRequestParser();
   ~HTTPRequestParser();
@@ -26,7 +27,6 @@ class HTTPRequestParser {
   enum chunked_state {
     kNeedChunkedSize,
     kNeedChunkedBody,
-    kNeedChunkedEnd,
   };
   HTTPRequest *request_;
   std::string row_line_;
