@@ -4,7 +4,7 @@
 HTTPRequestParser::HTTPRequestParser()
     : request_(NULL), row_line_(""), parser_state_(kBeforeProcess) {}
 HTTPRequestParser::~HTTPRequestParser() {}
-HTTPRequestParser::HTTPRequestParser(const HTTPRequestParser &other) {
+HTTPRequestParser::HTTPRequestParser(const HTTPRequestParser &other) : request_(NULL), row_line_(""), parser_state_(kBeforeProcess) {
   (void)other;
 }
 HTTPRequestParser &HTTPRequestParser::operator=(
@@ -28,8 +28,9 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   // Headerの内容を確認
   if (parser_state_ == kNeedHeader) {
     int return_state = SetRequestHeaders();
-    if (return_state == kBadRequest)
+    if (return_state == kBadRequest){
       return BadRequest();
+    }
     else if (return_state == kNotEnough)
       return Err(kNotEnough);
     else {

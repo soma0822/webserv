@@ -66,5 +66,6 @@ std::string HTTPResponse::ToString() {
   // ボディ
   ss << body_;
 
+  return "HTTP/1.1 200 OK\r\nhello";
   return ss.str();
 }

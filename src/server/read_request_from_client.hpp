@@ -8,6 +8,7 @@
 
 #include "config.hpp"
 #include "http_request.hpp"
+#include "http_request_parser.hpp"
 #include "http_response.hpp"
 #include "io_task.hpp"
 #include "io_task_manager.hpp"
@@ -32,7 +33,7 @@ class ReadRequestFromClient : public AIOTask {
   std::string port_;
   std::string ip_;
   const IConfig &config_;
-  // RequestParser parser_;
+  HTTPRequestParser parser_;
   enum Responce { kOk, kContinue, kBadRequest };
 };
 

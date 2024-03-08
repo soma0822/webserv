@@ -10,9 +10,11 @@ WriteResponseToClient::~WriteResponseToClient() { delete response_; }
 
 Result<int, std::string> WriteResponseToClient::Execute() {
   std::string response_str = response_->ToString();
-  int bytes_written = write(fd_, response_str.c_str(), response_str.size());
+  unsigned int bytes_written = write(fd_, response_str.c_str(), response_str.size());
   if (bytes_written < 0) {
     return Err("ライトに失敗しました");
   }
-  return Ok(1);
+  if ((writed_ += bytes_written) == response_str.size())
+    return Ok(1);
+  return Ok(0);
 }

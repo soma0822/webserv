@@ -20,7 +20,7 @@ class IConfig {
       const std::string &server_name) const = 0;
 };
 
-class Config {
+class Config : public IConfig{
  public:
   Config();
   ~Config();
