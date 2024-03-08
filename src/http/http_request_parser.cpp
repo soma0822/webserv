@@ -185,8 +185,6 @@ int HTTPRequestParser::SetChunkedBody() {
         chunked_state = kNeedChunkedSize;
         return kOk;
       } else if (pos == chunked_size) {
-        std::cout << ":" << row_line_.substr(0, chunked_size) << std::endl;
-
         request_->AddBody(row_line_.substr(0, chunked_size));
         row_line_ = row_line_.substr(chunked_size + 2);
         chunked_state = kNeedChunkedEnd;
