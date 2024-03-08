@@ -49,6 +49,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->first, "/cgi-bin");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
+  // ASSERT_EQ(it2->second.GetPath(), "/cgi-bin");
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "./");
@@ -105,6 +106,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   ++it2;
   ASSERT_EQ(it2->first, "= /red");
+  ASSERT_EQ(it2->second.GetPath(), "= /red");
   ++it2;
   ASSERT_EQ(it2, config.GetServer()[0].GetLocation().end());
 }

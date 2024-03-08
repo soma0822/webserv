@@ -15,6 +15,7 @@ class LocationContext {
   // ゲッター
   bool GetCnaAutoIndex() const;
   int GetLimitClientBody() const;
+  const std::string &GetPath() const;
   const std::string &GetReturn() const;
   const std::string &GetAlias() const;
   const std::string &GetRoot() const;
@@ -26,6 +27,7 @@ class LocationContext {
   // セッター
   void SetCanAutoIndex(bool can_auto_inde);
   void SetLimitClientBody(int limit_client_body_bytes);
+  void SetPath(const std::string &path);
   void SetReturn(const std::string &ret);
   void SetAlias(const std::string &alias);
   void SetRoot(const std::string &root);
@@ -38,6 +40,7 @@ class LocationContext {
  private:
   bool can_auto_index_;
   int limit_client_body_bytes_;
+  std::string path_;
   std::string return_;
   std::string alias_;
   std::string root_;
