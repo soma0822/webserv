@@ -40,7 +40,7 @@ void HTTPRequest::AddHeader(const std::string &key, const std::string &value) {
 }
 
 // body setters
-void HTTPRequest::SetBody(const std::string &body) { body_ = body; }
+void HTTPRequest::AddBody(const std::string &body) { body_ = body_ + body; }
 
 // request line getters
 const std::string &HTTPRequest::GetMethod() const { return method_; }
