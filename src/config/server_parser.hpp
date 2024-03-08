@@ -27,6 +27,7 @@ class ServerParser {
  private:
   static bool IsValidLocationKey(const std::vector<std::string> &value);
   static std::string MakeLocationKey(const std::vector<std::string> &value);
+  static bool UniqueListen(const ServerContext &server);
   static void ParseFuncInit(std::map<std::string, parseFunction> &func);
   static bool ParseErrorPage(const std::vector<std::string> &value,
                              ServerContext &server);
