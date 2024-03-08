@@ -13,7 +13,7 @@
 
 class Server {
  public:
-  static void Run(const Config &config);
+  static bool Run(const IConfig &config);
 
  private:
   Server();

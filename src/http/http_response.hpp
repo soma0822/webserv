@@ -14,8 +14,8 @@ class HTTPResponse {
   ~HTTPResponse();
 
   // アクセサー
-  void SetHttpVersion(const std::string &http_version);
-  const std::string &GetHttpVersion() const;
+  void SetHTTPVersion(const std::string &http_version);
+  const std::string &GetHTTPVersion() const;
   void SetStatusCode(http::StatusCode status_code);
   http::StatusCode GetStatusCode() const;
   void AddHeader(const std::string &key, const std::string &value);

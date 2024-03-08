@@ -15,6 +15,7 @@ LocationContext &LocationContext::operator=(const LocationContext &other) {
   }
   can_auto_index_ = other.can_auto_index_;
   limit_client_body_bytes_ = other.limit_client_body_bytes_;
+  path_ = other.path_;
   return_ = other.return_;
   alias_ = other.alias_;
   root_ = other.root_;
@@ -30,12 +31,11 @@ bool LocationContext::GetCnaAutoIndex() const { return can_auto_index_; }
 int LocationContext::GetLimitClientBody() const {
   return limit_client_body_bytes_;
 }
+const std::string &LocationContext::GetPath() const { return path_; }
 const std::string &LocationContext::GetReturn() const { return return_; }
 const std::string &LocationContext::GetAlias() const { return alias_; }
 const std::string &LocationContext::GetRoot() const { return root_; }
-const std::vector<std::string> &LocationContext::GetIndex() const {
-  return index_;
-}
+const std::string &LocationContext::GetIndex() const { return index_; }
 const std::vector<std::string> &LocationContext::GetCgiPath() const {
   return cgi_path_;
 }
@@ -56,14 +56,11 @@ void LocationContext::SetCanAutoIndex(bool can_auto_index) {
 void LocationContext::SetLimitClientBody(int limit_client_body_bytes) {
   limit_client_body_bytes_ = limit_client_body_bytes;
 }
+void LocationContext::SetPath(const std::string &path) { path_ = path; }
 void LocationContext::SetReturn(const std::string &ret) { return_ = ret; }
 void LocationContext::SetAlias(const std::string &alias) { alias_ = alias; }
 void LocationContext::SetRoot(const std::string &root) { root_ = root; }
-void LocationContext::AddIndex(const std::string &index) {
-  if (index_.end() != std::find(index_.begin(), index_.end(), index))
-    throw std::invalid_argument("indexで同じものが複数指定されています");
-  index_.push_back(index);
-}
+void LocationContext::SetIndex(const std::string &index) { index_ = index; }
 void LocationContext::AddCgiPath(const std::string &cgi_path) {
   if (cgi_path_.end() !=
       std::find(cgi_path_.begin(), cgi_path_.end(), cgi_path))
@@ -92,11 +89,9 @@ void LocationContext::AddErrorPage(const std::string &key,
 
 // 出力
 std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
-  os << "index: ";
-  for (std::vector<std::string>::const_iterator it = obj.GetIndex().begin();
-       it != obj.GetIndex().end(); ++it) {
-    os << *it << " ";
-  }
+  os << "path: " << obj.GetPath();
+  os << "\nindex: ";
+  os << obj.GetIndex();
   os << "\nerror page: ";
   for (std::map<std::string, std::string>::const_iterator it =
            obj.GetErrorPage().begin();
@@ -129,14 +124,9 @@ std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
 }
 
 std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
-  os << "index: ";
-  if (obj.GetIndex().size() == 0)
-    os << "no set";
-  else {
-    for (std::vector<std::string>::const_iterator it = obj.GetIndex().begin();
-         it != obj.GetIndex().end(); ++it)
-      os << *it << " ";
-  }
+  os << "path: " << obj.GetPath();
+  os << "\nindex: ";
+  os << obj.GetIndex();
   os << "\nerror page: ";
   if (obj.GetErrorPage().size() == 0)
     os << "no set";
