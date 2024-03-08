@@ -20,10 +20,12 @@ void CheckRequest(std::string request, HTTPRequestParser &parser) {
 }
 
 int main() {
+  std::cout << "Hello, World!" << std::endl;
+  return 0;
   HTTPRequestParser parser;
   std::string request =
       "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
-      "chunked\r\n\r\n\r\n";
+      "chunked\r\n\r\n";
   CheckRequest(request, parser);
   // CheckRequest("5\r\n", parser);
   // CheckRequest("hello\r\n", parser);

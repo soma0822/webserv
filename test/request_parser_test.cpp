@@ -26,6 +26,7 @@ TEST(HTTPRequestParser, ParseRequestGET) {
   EXPECT_EQ(req.Unwrap()->GetVersion(), "1.1");
   EXPECT_EQ(req.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req.Unwrap()->GetBody(), "");
+  delete req.Unwrap();
 }
 
 // GETリクエストのパース(ヘッダがバラバラに送られてくる場合）
@@ -45,6 +46,7 @@ TEST(HTTPRequestParser, ParseRequestGET_Header_kNotEnough) {
   EXPECT_EQ(req1.Unwrap()->GetVersion(), "1.1");
   EXPECT_EQ(req1.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req1.Unwrap()->GetBody(), "");
+  delete req1.Unwrap();
 }
 
 // requestlineエラーケース
@@ -119,6 +121,7 @@ TEST(HTTPRequestParser, ParseRequestPOST) {
   EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
   EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
+  delete req2.Unwrap();
 }
 
 // Transfer-Encodingのパース
@@ -146,6 +149,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked) {
   EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
   EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
+  delete req2.Unwrap();
 }
 //// Transfer-Encodingのパース 2度の処理がくる場合
 TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked2) {
@@ -160,6 +164,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked2) {
   EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
   EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
+  delete req2.Unwrap();
   request =
       "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
       "chunked\r\n\r\n5\r\nhello\r\n0\r\n\r\n";
@@ -170,6 +175,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked2) {
   EXPECT_EQ(req3.Unwrap()->GetVersion(), "1.1");
   EXPECT_EQ(req3.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req3.Unwrap()->GetBody(), "hello");
+  delete req3.Unwrap();
 }
 
 // Transfer-Encodingのエラーケース数字来ないで終わる
