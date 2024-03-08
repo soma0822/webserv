@@ -135,7 +135,7 @@ int HTTPRequestParser::SetRequestBody() {
   std::string request_line = row_line_;
   size_t pos = 0;
 
-// content-length
+  // content-length
   if (request_->GetHeaders().count("CONTENT-LENGTH") > 0) {
     pos = request_line.find("\r\n");
     if (pos == std::string::npos) pos = request_line.length();
@@ -162,7 +162,7 @@ int HTTPRequestParser::SetChunkedBody() {
   size_t pos = 0;
 
   while (1) {
-	  //sizeが書かれているか確認
+    // sizeが書かれているか確認
     if (chunked_state == kNeedChunkedSize) {
       pos = row_line_.find("\r\n");
       if (pos == 0) return kBadRequest;
@@ -174,11 +174,11 @@ int HTTPRequestParser::SetChunkedBody() {
       row_line_ = row_line_.substr(pos + 2);
       chunked_state = kNeedChunkedBody;
     }
-	//sizeの分だけbodyがあるか確認
+    // sizeの分だけbodyがあるか確認
     if (chunked_state == kNeedChunkedBody) {
       pos = row_line_.find("\r\n");
       if (pos == std::string::npos) return kNotEnough;
-	  //size == 0の時はすぐに\r\nが来て終わる
+      // size == 0の時はすぐに\r\nが来て終わる
       if (pos == 0 && chunked_size == 0) {
         row_line_ = row_line_.substr(chunked_size + 2);
         chunked_state = kNeedChunkedSize;
