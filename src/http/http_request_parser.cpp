@@ -142,7 +142,7 @@ int HTTPRequestParser::SetRequestBody() {
       return kNotEnough;
     else {
       row_line_ = request_line.substr(pos);
-      request_->SetBody(request_line.substr(0, pos));
+      request_->AddBody(request_line.substr(0, pos));
     }
   }
   // trasfer-encodingは未実装
@@ -154,55 +154,53 @@ int HTTPRequestParser::SetRequestBody() {
   return kOk;
 }
 
-enum chunked_state {
-  kNeedChunkedSize = 0,
-  kNeedChunkedBody,
-  kNeedChunkedEnd,
-};
+int HTTPRequestParser::BadChunkedBody(int &chunked_state,
+                                      size_t &chunked_size) {
+  chunked_size = 0;
+  chunked_state = kNeedChunkedSize;
+  return kBadRequest;
+}
 
 int HTTPRequestParser::SetChunkedBody() {
   static int chunked_state = kNeedChunkedSize;
   static size_t chunked_size = 0;
-  std::string request_line = row_line_;
   size_t pos = 0;
 
   while (1) {
     if (chunked_state == kNeedChunkedSize) {
-      Result<int, std::string> result = string_utils::StrToI(request_line);
-      if (result.IsErr()) {
-        chunked_state = kNeedChunkedSize;
-        chunked_size = 0;
-        return kBadRequest;
-      }
-      pos = request_line.find("\r\n");
+      pos = row_line_.find("\r\n");
       if (pos == std::string::npos) return kNotEnough;
-      request_line = request_line.substr(pos + 2);
+      Result<int, std::string> result =
+          string_utils::StrToI(row_line_.substr(0, pos));
+      if (result.IsErr()) return BadChunkedBody(chunked_state, chunked_size);
+      chunked_size = static_cast<size_t>(result.Unwrap());
+      row_line_ = row_line_.substr(pos + 2);
       chunked_state = kNeedChunkedBody;
     }
     if (chunked_state == kNeedChunkedBody) {
-      pos = request_line.find("\r\n");
+      pos = row_line_.find("\r\n");
+      if (pos == std::string::npos) return kNotEnough;
       if (pos == 0 && chunked_size == 0) {
-        request_line = request_line.substr(chunked_size + 2);
+        row_line_ = row_line_.substr(chunked_size + 2);
         chunked_state = kNeedChunkedSize;
         return kOk;
-      } else if (pos > chunked_size || pos == 0) {
-        request_line = request_line.substr(chunked_size + 2);
-        chunked_state = kNeedChunkedSize;
-        return kBadRequest;
-      } else if (pos == std::string::npos || pos < chunked_size)
-        return kNotEnough;
-      else if (pos == chunked_size) {
-        request_->SetBody(request_line.substr(0, chunked_size));
-        request_line = request_line.substr(chunked_size + 2);
+      } else if (pos == chunked_size) {
+        std::cout << ":" << row_line_.substr(0, chunked_size) << std::endl;
+
+        request_->AddBody(row_line_.substr(0, chunked_size));
+        row_line_ = row_line_.substr(chunked_size + 2);
         chunked_state = kNeedChunkedEnd;
-      }
+      } else
+        return BadChunkedBody(chunked_state, chunked_size);
     }
     if (chunked_state == kNeedChunkedEnd) {
-      if (request_line.find("\r\n") == 0) {
+      pos = row_line_.find("\r\n");
+      if (pos == std::string::npos) return kNotEnough;
+      row_line_ = row_line_.substr(2);
+      if (pos == 0)
         chunked_state = kNeedChunkedSize;
-      } else {
-        return kBadRequest;
-      }
+      else
+        return BadChunkedBody(chunked_state, chunked_size);
     }
   }
 }

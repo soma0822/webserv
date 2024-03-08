@@ -23,6 +23,11 @@ class HTTPRequestParser {
 
  private:
   enum StatusFlag { kBeforeProcess, kNeedHeader, kEndHeader, kNeedBody };
+  enum chunked_state {
+    kNeedChunkedSize,
+    kNeedChunkedBody,
+    kNeedChunkedEnd,
+  };
   HTTPRequest *request_;
   std::string row_line_;
   int parser_state_;
@@ -39,6 +44,7 @@ class HTTPRequestParser {
   int SetRequestHeaders();
   int SetRequestBody();
   int SetChunkedBody();
+  int BadChunkedBody(int &chunked_state, size_t &chunked_size);
 
   const Result<HTTPRequest *, int> BadRequest();
   const Result<HTTPRequest *, int> OkRequest();
