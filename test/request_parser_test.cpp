@@ -126,10 +126,13 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked) {
   EXPECT_EQ(req1.UnwrapErr(), HTTPRequestParser::kNotEnough);
   request = "hello\r\n";
   Result<HTTPRequest *, int> req3 = parser.Parser(request);
-  //  EXPECT_EQ(req3.UnwrapErr(), HTTPRequestParser::kNotEnough);
+  EXPECT_EQ(req3.UnwrapErr(), HTTPRequestParser::kNotEnough);
+  request = "\r\n";
+  Result<HTTPRequest *, int> req5 = parser.Parser(request);
+  EXPECT_EQ(req5.UnwrapErr(), HTTPRequestParser::kNotEnough);
   request = "0\r\n";
   Result<HTTPRequest *, int> req4 = parser.Parser(request);
-  //  EXPECT_EQ(req4.UnwrapErr(), HTTPRequestParser::kNotEnough);
+  EXPECT_EQ(req4.UnwrapErr(), HTTPRequestParser::kNotEnough);
   request = "\r\n";
   Result<HTTPRequest *, int> req2 = parser.Parser(request);
   EXPECT_EQ(req2.Unwrap()->GetMethod(), "POST");
