@@ -18,6 +18,7 @@ HTTPRequestParser &HTTPRequestParser::operator=(
 // リクエストのパース
 const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
     std::string request_line) {
+  int return_state;
   row_line_ = row_line_ + request_line;
   if (request_ == NULL) request_ = new HTTPRequest();
   // requestlineの内容を確認
@@ -29,7 +30,7 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   }
   // Headerの内容を確認
   if (parser_state_ == kNeedHeader) {
-    int return_state = SetRequestHeaders();
+    return_state = SetRequestHeaders();
     if (return_state == kBadRequest)
       return BadRequest();
     else if (return_state == kNotEnough)
@@ -44,9 +45,11 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   }
   // bodyの内容を確認
   if (parser_state_ == kNeedBody) {
-    if (SetRequestBody() == kNotEnough) {
+    return_state = SetRequestBody();
+    if (return_state == kNotEnough)
       return Err(kNotEnough);
-    }
+    else if (return_state == kBadRequest)
+      return BadRequest();
   }
   return OkRequest();
 }
@@ -146,8 +149,6 @@ int HTTPRequestParser::SetRequestBody() {
     }
   }
   // trasfer-encodingは未実装
-  // 数字以外きたらbadrequest
-  // 数字の値と違ったらbadrequest
   else {
     return SetChunkedBody();
   }
@@ -169,6 +170,7 @@ int HTTPRequestParser::SetChunkedBody() {
   while (1) {
     if (chunked_state == kNeedChunkedSize) {
       pos = row_line_.find("\r\n");
+      if (pos == 0) return kBadRequest;
       if (pos == std::string::npos) return kNotEnough;
       Result<int, std::string> result =
           string_utils::StrToI(row_line_.substr(0, pos));
