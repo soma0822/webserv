@@ -5,7 +5,7 @@
 // canonical
 HTTPRequestParser::HTTPRequestParser()
     : request_(NULL), row_line_(""), parser_state_(kBeforeProcess) {}
-HTTPRequestParser::~HTTPRequestParser() {}
+HTTPRequestParser::~HTTPRequestParser() { delete request_; }
 HTTPRequestParser::HTTPRequestParser(const HTTPRequestParser &other) {
   (void)other;
 }
