@@ -54,6 +54,9 @@ Result<LocationContext, std::string> ServerContext::SearchLocation(
       }
     }
   }
+  if (ret == location_.end()) {
+    return Err("locationが見つかりません");
+  }
   return Ok(ret->second);
 }
 
