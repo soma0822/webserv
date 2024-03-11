@@ -13,22 +13,35 @@ IOTaskManager::~IOTaskManager() {
   }
 }
 
+const std::vector<std::vector<AIOTask *> > &IOTaskManager::GetTasks() {
+  return tasks_;
+}
+const std::vector<struct pollfd> &IOTaskManager::GetFds() { return fds_; }
+
 void IOTaskManager::AddTask(AIOTask *task) {
   for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == task->GetFd()) {
-      tasks_.at(i).push_back(task);
-      Logger::Info() << "AddTask: " << task->GetFd() << task->GetEvent()
-                     << std::endl;
+      std::vector<AIOTask *>::iterator it =
+          std::find(tasks_.at(i).begin(), tasks_.at(i).end(), (AIOTask *)NULL);
+      if (it != tasks_.at(i).end())
+        *it = task;
+      else
+        tasks_.at(i).push_back(task);
       return;
     }
   }
   struct pollfd fd = {task->GetFd(), POLLIN | POLLOUT, 0};
+  for (unsigned int i = 0; i < fds_.size(); i++) {
+    if (fds_.at(i).fd == -1) {
+      fds_.at(i) = fd;
+      tasks_.at(i).push_back(task);
+      return;
+    }
+  }
   std::vector<AIOTask *> tmp;
   tmp.push_back(task);
   tasks_.push_back(tmp);
   fds_.push_back(fd);
-  Logger::Info() << "AddTask: " << task->GetFd() << task->GetEvent()
-                 << std::endl;
 }
 
 void IOTaskManager::RemoveReadTask(AIOTask *task) {

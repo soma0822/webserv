@@ -18,6 +18,8 @@ class IOTaskManager {
   static void RemoveReadTask(AIOTask *task);
   static void RemoveWriteTask(AIOTask *task);
   static void ExecuteTasks();
+  static const std::vector<std::vector<AIOTask *> > &GetTasks();
+  static const std::vector<struct pollfd> &GetFds();
 
  private:
   IOTaskManager();
