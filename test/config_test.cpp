@@ -308,11 +308,10 @@ TEST(SerchLocation, DefaultTest) {
   Config config = ConfigParser::Parse("test/conf_test/search_location.conf");
   const ServerContext &tmp =
       config.SearchServer("8002", "127.0.0.1", "localhost");
-  ASSERT_EQ(&(tmp.GetLocation().at("/")), &(tmp.SearchLocation("/")));
-  ASSERT_EQ(&(tmp.GetLocation().at("/red")), &(tmp.SearchLocation("/red/bin")));
-  ASSERT_EQ(&(tmp.GetLocation().at("= /red")), &(tmp.SearchLocation("/red")));
-  ASSERT_EQ(&(tmp.GetLocation().at("/tours")),
-            &(tmp.SearchLocation("/tours/usrs")));
-  ASSERT_EQ(&(tmp.GetLocation().at("/tours/usr")),
-            &(tmp.SearchLocation("/tours/usr/sina")));
+  ASSERT_EQ("/", tmp.SearchLocation("/").Unwrap().GetPath());
+  ASSERT_EQ("/red", tmp.SearchLocation("/red/bin").Unwrap().GetPath());
+  ASSERT_EQ("= /red", tmp.SearchLocation("/red").Unwrap().GetPath());
+  ASSERT_EQ("/tours", tmp.SearchLocation("/tours/usrs").Unwrap().GetPath());
+  ASSERT_EQ("/tours/usr",
+            tmp.SearchLocation("/tours/usr/sina").Unwrap().GetPath());
 }
