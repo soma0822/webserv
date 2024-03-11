@@ -23,6 +23,7 @@ class ReadRequestFromClient : public AIOTask {
                         const IConfig &config);
   virtual ~ReadRequestFromClient();
   virtual Result<int, std::string> Execute();
+  HTTPResponse *CreateBadRequest();
   const std::string &GetPort() const;
   const std::string &GetIp() const;
 
@@ -35,6 +36,7 @@ class ReadRequestFromClient : public AIOTask {
   const IConfig &config_;
   HTTPRequestParser parser_;
   static const int buf_size_ = 1024;
+  static const HTTPResponse BadResponse;
   enum Responce { kOk, kContinue, kBadRequest };
 };
 
