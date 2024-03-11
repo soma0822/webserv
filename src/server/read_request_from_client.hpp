@@ -34,6 +34,7 @@ class ReadRequestFromClient : public AIOTask {
   std::string ip_;
   const IConfig &config_;
   HTTPRequestParser parser_;
+  static const int buf_size_ = 1024;
   enum Responce { kOk, kContinue, kBadRequest };
 };
 
