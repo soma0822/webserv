@@ -5,6 +5,11 @@
 #include "config_parser.hpp"
 #include "server_context.hpp"
 
+TEST(ConfigTest, EmptyConfig) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/empty.conf"),
+               std::invalid_argument);
+}
+
 TEST(ConfigTest, DefaultPath) {
   Config config = ConfigParser::Parse("test/conf_test/default.conf");
   ASSERT_EQ(config.GetServer().size(), 1);

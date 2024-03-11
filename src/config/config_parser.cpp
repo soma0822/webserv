@@ -26,5 +26,8 @@ Config ConfigParser::Parse(const std::string &file) {
   }
   if (ServerParser::UniqueListen() == false)
     throw std::invalid_argument("同じポート、同じipで複数設定されています");
+  if (config.GetServer().empty()) {
+    throw std::invalid_argument("serverがありません");
+  }
   return config;
 }
