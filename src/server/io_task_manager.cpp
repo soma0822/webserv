@@ -31,7 +31,7 @@ void IOTaskManager::AddTask(AIOTask *task) {
     }
   }
   struct pollfd fd = {task->GetFd(), POLLIN | POLLOUT, 0};
-  for (unsigned int i = 0; i < fds_.size(); i++) {
+  for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == -1) {
       fds_.at(i) = fd;
       tasks_.at(i).push_back(task);

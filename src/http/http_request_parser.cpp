@@ -155,7 +155,7 @@ int HTTPRequestParser::SetRequestBody() {
 
 // utils
 std::string HTTPRequestParser::StrToUpper(std::string s) {
-  for (size_t i = 0; i < s.length(); i++) {
+  for (size_t i = 0; i < s.length(); ++i) {
     s[i] = std::toupper(s[i]);
   }
   return s;
