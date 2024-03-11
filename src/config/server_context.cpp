@@ -42,7 +42,7 @@ Result<LocationContext, std::string> ServerContext::SearchLocation(
   std::map<std::string, LocationContext>::const_iterator it = location_.begin();
   std::map<std::string, LocationContext>::const_iterator ret = location_.end();
   long unsigned int ret_len = 0;
-  for (; it != location_.end(); it++) {
+  for (; it != location_.end(); ++it{
     if (it->first[0] == '=' && it->first.substr(2) == path) {
       return Ok(it->second);
     } else {
