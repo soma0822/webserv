@@ -22,6 +22,8 @@ int main(int ac, char **av) {
          it != m.end(); ++it) {
       std::cout << *it << std::endl;
     }
+    ServerContext ctx = config.SearchServer("8002", "127.0.0.1", "localhost");
+    std::cout << ctx.SearchLocation("/red").Unwrap() << std::endl;
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
