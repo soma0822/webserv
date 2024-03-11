@@ -3,8 +3,10 @@
 #include "config.hpp"
 #include "config_parser.hpp"
 #include "logger.hpp"
+#include "server.hpp"
 
 int main(int ac, char **av) {
+  Logger::SetHandler(new FileStreamWrapper("log.txt"));
   std::string config_file;
   if (ac == 1)
     config_file = ConfigParser::default_file_;
@@ -16,12 +18,13 @@ int main(int ac, char **av) {
   }
   Logger::Info() << "Reading " << config_file << std::endl;
   try {
-    Config config = ConfigParser::Parse(config_file);
-    std::vector<ServerContext> m = config.GetServer();
-    for (std::vector<ServerContext>::const_iterator it = m.begin();
-         it != m.end(); ++it) {
-      std::cout << *it << std::endl;
-    }
+    const Config config = ConfigParser::Parse(config_file);
+    // std::vector<ServerContext> m = config.GetServer();
+    // for (std::vector<ServerContext>::const_iterator it = m.begin();
+    //      it != m.end(); ++it) {
+    //   std::cout << *it << std::endl;
+    // }
+    Server::Run(config);
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
