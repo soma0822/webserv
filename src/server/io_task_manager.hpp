@@ -27,7 +27,7 @@ class IOTaskManager {
   IOTaskManager &operator=(const IOTaskManager &other);
   static std::vector<std::vector<AIOTask *> > tasks_;
   static std::vector<struct pollfd> fds_;
-
+  static const int poll_time_out_ = 5000;
   enum Error { kOk, kDelete };
 };
 

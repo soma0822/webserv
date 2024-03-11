@@ -76,7 +76,7 @@ void IOTaskManager::RemoveWriteTask(AIOTask *task) {
 
 void IOTaskManager::ExecuteTasks() {
   while (true) {
-    int ret = poll(&fds_[0], fds_.size(), 5000);
+    int ret = poll(&fds_[0], fds_.size(), poll_time_out_);
     if (ret == -1) {
       std::cerr << "poll error" << std::endl;
       return;
