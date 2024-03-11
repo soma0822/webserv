@@ -8,18 +8,19 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config,
                                      const std::string &port,
                                      const std::string &ip) {
   if (!request) {
-    // 505を返す
+    // 500を返す
   }
-  (void)config;
-  (void)port;
-  (void)ip;
+  const ServerContext &server_context =
+      config.SearchServer(port, ip, request->GetHostHeader());
+  std::string requested_file_path =
+      ResolvePath(server_context, request->GetUri());
   return new HTTPResponse();
 }
 
 HTTPResponse *RequestHandler::Get(const HTTPRequest *request,
                                   const std::string &requested_file_path) {
   if (!request) {
-    // 505を返す
+    // 500を返す
   }
   // TODO リクエストのヘッダを処理する
 
@@ -46,3 +47,16 @@ RequestHandler &RequestHandler::operator=(const RequestHandler &other) {
 }
 
 RequestHandler::~RequestHandler() {}
+
+std::string RequestHandler::ResolvePath(const IServerContext &context,
+                                        const std::string &uri) {
+  const LocationContext &location_context = context.SearchLocation(uri);
+
+  // rootの絶対パスを取得
+  std::string root = context.GetRoot();
+  if (location_context.GetRoot().empty()) {
+    root = location_context.GetRoot();
+  }
+
+  return root + uri;
+}

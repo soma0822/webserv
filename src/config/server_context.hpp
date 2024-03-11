@@ -18,6 +18,7 @@ class IServerContext {
   virtual bool HavePort(const std::string &port) const = 0;
   virtual bool HaveServerName(const std::string &server_name) const = 0;
   virtual bool IsValidContext() const = 0;
+  virtual const LocationContext &SearchLocation(const std::string &path) const = 0;
   // ゲッター
   virtual const std::string &GetIp() const = 0;
   virtual const std::string &GetRoot() const = 0;
