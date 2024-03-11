@@ -29,8 +29,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
              result.UnwrapErr() == HTTPRequestParser::kBadRequest) {
     std::cout << "bad request" << std::endl;
     // TODO: badrequestの処理
-     IOTaskManager::AddTask(new WriteResponseToClient(fd_,
-     CreateBadRequest()));
+    IOTaskManager::AddTask(new WriteResponseToClient(fd_, CreateBadRequest()));
   } else {
     HTTPResponse *response =
         RequestHandler::Handle(config_, result.Unwrap(), port_, ip_);
@@ -45,11 +44,14 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
   return Ok(0);
 }
 
-HTTPResponse *ReadRequestFromClient::CreateBadRequest(){
+HTTPResponse *ReadRequestFromClient::CreateBadRequest() {
   HTTPResponse *bad_res = new HTTPResponse;
   bad_res->SetHTTPVersion("HTTP/1.1");
   bad_res->SetStatusCode(http::kBadRequest);
-  bad_res->SetBody("<html><head><title>400 Bad Request</title></head><body><center><h1>400 Bad Request</h1></center><hr><center>nginx/1.25.3</center></body></html>");
+  bad_res->SetBody(
+      "<html><head><title>400 Bad Request</title></head><body><center><h1>400 "
+      "Bad "
+      "Request</h1></center><hr><center>nginx/1.25.3</center></body></html>");
   bad_res->AddHeader("Content-Length", "157");
   return bad_res;
 }
