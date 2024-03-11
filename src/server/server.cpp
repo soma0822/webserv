@@ -26,7 +26,7 @@ bool Server::Run(const IConfig &config) {
       }
     }
   }
-  // IOTaskManager::ExecuteTasks();
+  IOTaskManager::ExecuteTasks();
   return true;
 }
 

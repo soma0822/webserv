@@ -91,7 +91,7 @@ bool ServerParser::UniqueListen() {
   std::map<std::string,
            std::map<std::string, std::set<std::string> > >::iterator it =
       parsed_pair_.begin();
-  for (; it != parsed_pair_.end(); it++) {
+  for (; it != parsed_pair_.end(); ++it) {
     if (it->second.size() > 1 && it->second.count("") > 0) return false;
   }
   return true;
