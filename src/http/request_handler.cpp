@@ -61,14 +61,14 @@ std::string RequestHandler::ResolvePath(const IServerContext &server_ctx,
   // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
   // origin-form = absolute-path [ "?" query ]
   // rootが/で終わっている場合には/が重複してしまうので削除する
-  if (root.back() == '/') {
-    root.pop_back();
+  if (root.at(root.size() - 1) == '/') {
+    root.erase(root.size() - 1, 1);
   }
 
   // リクエストされたファイルのパスがディレクトリの場合には、indexファイルを返す
   std::string request_file_path = root + uri;
   if (file_utils::IsDirectory(request_file_path)) {
-    if (request_file_path.back() != '/') {
+    if (request_file_path.at(request_file_path.size() - 1) != '/') {
       request_file_path += '/';
     }
     request_file_path += location_ctx_result.IsOk()

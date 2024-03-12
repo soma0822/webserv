@@ -18,7 +18,7 @@ Result<std::string, file_utils::Error> file_utils::ReadFile(
 }
 
 bool file_utils::IsDirectory(const std::string &path) {
-  struct stat st {};
+  struct stat st;
   if (stat(path.c_str(), &st) != 0) {
     return false;
   }
