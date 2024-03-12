@@ -76,9 +76,12 @@ Result<std::string, HTTPResponse *> RequestHandler::ResolvePath(
     if (request_file_path.at(request_file_path.size() - 1) != '/') {
       // 正しいuriを指定して301を返す
     }
-    request_file_path += location_ctx_result.IsOk()
-                             ? location_ctx_result.Unwrap().GetIndex()
-                             : server_ctx.GetIndex();
+    if (!server_ctx.GetIndex().empty()) {
+      return Ok(request_file_path += server_ctx.GetIndex());
+    } else if (location_ctx_result.IsOk() &&
+               !location_ctx_result.Unwrap().GetIndex().empty()) {
+      return Ok(request_file_path + location_ctx_result.Unwrap().GetIndex());
+    }
   }
 
   return Ok(request_file_path);
