@@ -11,7 +11,7 @@ Accept &Accept::operator=(const Accept &other) {
   return *this;
 }
 
-//ここでのエラーは流すのでkOkで返すことでServer側で何もしないようにしている
+// ここでのエラーは流すのでkOkで返すことでServer側で何もしないようにしている
 Result<int, std::string> Accept::Execute() {
   struct sockaddr_in client_addr;
   socklen_t len = sizeof(client_addr);
@@ -20,7 +20,7 @@ Result<int, std::string> Accept::Execute() {
     Logger::Error() << "accept エラー" << std::endl;
     return Ok(kOk);
   }
-  if (fcntl(client_sock, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1){
+  if (fcntl(client_sock, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1) {
     close(client_sock);
     return Ok(kOk);
   }

@@ -27,7 +27,13 @@ class Server {
                                  const std::string &ip);
 
   // TODO : errornoによって定義していく
-  enum Error { kSocketError, kSetSockOptError, kListenError, kBindError, kFcntlError };
+  enum Error {
+    kSocketError,
+    kSetSockOptError,
+    kListenError,
+    kBindError,
+    kFcntlError
+  };
 };
 
 #endif

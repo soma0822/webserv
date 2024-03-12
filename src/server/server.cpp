@@ -22,6 +22,7 @@ bool Server::Run(const IConfig &config) {
                                           server_it->GetIp(), config));
       } else {
         Logger::Error() << "リッスンに失敗しました" << std::endl;
+        IOTaskManager::DeleteTasks();
         return false;
       }
     }
@@ -34,9 +35,8 @@ Result<int, int> Server::Listen(const std::string &port,
                                 const std::string &ip) {
   int optval = 1;
   int sock = socket(AF_INET, SOCK_STREAM, 0);
-  if (sock == -1)
-    return Err(kSocketError);
-  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval,sizeof(optval)) == -1)
+  if (sock == -1) return Err(kSocketError);
+  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
     return Err(kSetSockOptError);
   struct sockaddr_in addr;
   Result<int, std::string> result = string_utils::StrToI(port);
