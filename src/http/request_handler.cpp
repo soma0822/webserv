@@ -57,9 +57,11 @@ Result<std::string, HTTPResponse *> RequestHandler::ResolvePath(
       server_ctx.SearchLocation(uri);
 
   // rootを取得する
-  std::string root = location_ctx_result.IsOk()
-                         ? location_ctx_result.Unwrap().GetRoot()
-                         : server_ctx.GetRoot();
+  std::string root = server_ctx.GetRoot();
+  if (location_ctx_result.IsOk() &&
+      !location_ctx_result.Unwrap().GetRoot().empty()) {
+    root = location_ctx_result.Unwrap().GetRoot();
+  }
 
   // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
   // origin-form = absolute-path [ "?" query ]
