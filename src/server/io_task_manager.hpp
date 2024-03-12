@@ -1,5 +1,5 @@
-#ifndef WEBSERV_SRC_SERVER_IOTASKMANAGER_HPP
-#define WEBSERV_SRC_SERVER_IOTASKMANAGER_HPP
+#ifndef WEBSERV_SRC_SERVER_IO_TASK_MANAGER_HPP
+#define WEBSERV_SRC_SERVER_IO_TASK_MANAGER_HPP
 
 #include <poll.h>
 
@@ -15,8 +15,11 @@ class IOTaskManager {
  public:
   ~IOTaskManager();
   static void AddTask(AIOTask *task);
-  static void RemoveTask(AIOTask *task);
+  static void RemoveReadTask(AIOTask *task);
+  static void RemoveWriteTask(AIOTask *task);
   static void ExecuteTasks();
+  static const std::vector<std::vector<AIOTask *> > &GetTasks();
+  static const std::vector<struct pollfd> &GetFds();
 
  private:
   IOTaskManager();
@@ -24,7 +27,7 @@ class IOTaskManager {
   IOTaskManager &operator=(const IOTaskManager &other);
   static std::vector<std::vector<AIOTask *> > tasks_;
   static std::vector<struct pollfd> fds_;
-
+  static const int poll_time_out_ = 5000;
   enum Error { kOk, kDelete };
 };
 

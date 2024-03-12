@@ -18,6 +18,7 @@ class HTTPRequestParser {
     kEndParse = 3,
   };
   HTTPRequestParser();
+  HTTPRequestParser(const HTTPRequestParser &other);
   ~HTTPRequestParser();
 
   const Result<HTTPRequest *, int> Parser(std::string request_line);
@@ -32,7 +33,6 @@ class HTTPRequestParser {
   std::string row_line_;
   int parser_state_;
 
-  HTTPRequestParser(const HTTPRequestParser &other);
   HTTPRequestParser &operator=(const HTTPRequestParser &other);
 
   bool IsFillRequestLine();

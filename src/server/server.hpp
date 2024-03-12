@@ -7,13 +7,13 @@
 
 #include "accept.hpp"
 #include "config.hpp"
+#include "io_task_manager.hpp"
 #include "logger.hpp"
 #include "result.hpp"
-// #include "io_task_manager.hpp"
 
 class Server {
  public:
-  static void Run(const IConfig &config);
+  static bool Run(const IConfig &config);
 
  private:
   Server();

@@ -19,15 +19,11 @@ ServerContext &ServerContext::operator=(const ServerContext &other) {
 }
 
 bool ServerContext::HavePort(const std::string &port) const {
-  if (port_.end() == std::find(port_.begin(), port_.end(), port)) return false;
-  return true;
+  return (port_ == port);
 }
 
 bool ServerContext::HaveServerName(const std::string &server_name) const {
-  if (server_name_.end() ==
-      std::find(server_name_.begin(), server_name_.end(), server_name))
-    return false;
-  return true;
+  return (server_name_ == server_name);
 }
 
 // ポートを指定しないサーバー設定はエラー。他はなくてもいい。portについてもデフォルト決めるのもあり
@@ -38,14 +34,17 @@ bool ServerContext::IsValidContext() const {
     return true;
 }
 
-const LocationContext &ServerContext::SearchLocation(
+Result<LocationContext, std::string> ServerContext::SearchLocation(
     const std::string &path) const {
+  if (location_.empty()) {
+    return Err("locationが設定されていません");
+  }
   std::map<std::string, LocationContext>::const_iterator it = location_.begin();
   std::map<std::string, LocationContext>::const_iterator ret = location_.end();
   long unsigned int ret_len = 0;
-  for (; it != location_.end(); it++) {
+  for (; it != location_.end(); ++it) {
     if (it->first[0] == '=' && it->first.substr(2) == path) {
-      return it->second;
+      return Ok(it->second);
     } else {
       if (path.find(it->first) == 0 && ret_len < it->first.length() &&
           (path.length() == it->first.length() ||
@@ -55,19 +54,18 @@ const LocationContext &ServerContext::SearchLocation(
       }
     }
   }
-  return ret->second;
+  if (ret == location_.end()) {
+    return Err("locationが見つかりません");
+  }
+  return Ok(ret->second);
 }
 
 // ゲッター
 const std::string &ServerContext::GetIp() const { return ip_; }
 const std::string &ServerContext::GetRoot() const { return root_; }
-const std::vector<std::string> &ServerContext::GetIndex() const {
-  return index_;
-}
-const std::vector<std::string> &ServerContext::GetPort() const { return port_; }
-const std::vector<std::string> &ServerContext::GetServerName() const {
-  return server_name_;
-}
+const std::string &ServerContext::GetIndex() const { return index_; }
+const std::string &ServerContext::GetPort() const { return port_; }
+const std::string &ServerContext::GetServerName() const { return server_name_; }
 const std::map<std::string, std::string> &ServerContext::GetErrorPage() const {
   return error_page_;
 }
@@ -79,21 +77,10 @@ const std::map<std::string, LocationContext> &ServerContext::GetLocation()
 // セッター
 void ServerContext::SetIp(const std::string &ip) { ip_ = ip; }
 void ServerContext::SetRoot(const std::string &root) { root_ = root; }
-void ServerContext::AddIndex(const std::string &index) {
-  if (index_.end() != std::find(index_.begin(), index_.end(), index))
-    throw std::invalid_argument("indexで同じものが複数指定されています");
-  index_.push_back(index);
-}
-void ServerContext::AddPort(const std::string &port) {
-  if (port_.end() != std::find(port_.begin(), port_.end(), port))
-    throw std::invalid_argument("portで同じものが複数指定されています");
-  port_.push_back(port);
-}
-void ServerContext::AddServerName(const std::string &server_name) {
-  if (server_name_.end() !=
-      std::find(server_name_.begin(), server_name_.end(), server_name))
-    throw std::invalid_argument("server_nameで同じものが複数指定されています");
-  server_name_.push_back(server_name);
+void ServerContext::SetIndex(const std::string &index) { index_ = index; }
+void ServerContext::SetPort(const std::string &port) { port_ = port; }
+void ServerContext::SetServerName(const std::string &server_name) {
+  server_name_ = server_name;
 }
 void ServerContext::AddErrorPage(const std::string &key,
                                  const std::string &value) {
@@ -112,33 +99,13 @@ void ServerContext::AddLocation(const std::string &key,
 
 std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
   os << SERVER;
-  std::vector<std::string> tmp = obj.GetPort();
+  std::vector<std::string> tmp;
   os << "port: ";
-  if (tmp.size() == 0)
-    os << "no set";
-  else {
-    for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); ++it)
-      os << *it << " ";
-  }
-  tmp = obj.GetServerName();
+  os << obj.GetPort();
   os << "\nserver_name: ";
-  if (tmp.size() == 0)
-    os << "no set";
-  else {
-    for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); ++it)
-      os << *it << " ";
-  }
-  tmp = obj.GetIndex();
+  os << obj.GetServerName();
   os << "\nindex: ";
-  if (tmp.size() == 0)
-    os << "no set";
-  else {
-    for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); ++it)
-      os << *it << " ";
-  }
+  os << obj.GetIndex();
   os << "\nerror page: ";
   if (obj.GetErrorPage().size() == 0)
     os << "no set";
@@ -150,7 +117,6 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
          << "    ";
   }
   os << "\nroot: " << (obj.GetRoot().empty() ? "no set" : obj.GetRoot());
-  // os << "\nport: " << obj.getPort();
   os << "\nip: " << (obj.GetIp().empty() ? "no set" : obj.GetIp());
   for (std::map<std::string, LocationContext>::const_iterator it =
            obj.GetLocation().begin();
@@ -165,33 +131,13 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
 
 std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
   os << SERVER;
-  std::vector<std::string> tmp = obj.GetPort();
+  std::vector<std::string> tmp;
   os << "port: ";
-  if (tmp.size() == 0)
-    os << "no set";
-  else {
-    for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); ++it)
-      os << *it << " ";
-  }
-  tmp = obj.GetServerName();
+  os << obj.GetPort();
   os << "\nserver_name: ";
-  if (tmp.size() == 0)
-    os << "no set";
-  else {
-    for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); ++it)
-      os << *it << " ";
-  }
-  tmp = obj.GetIndex();
+  os << obj.GetServerName();
   os << "\nindex: ";
-  if (tmp.size() == 0)
-    os << "no set";
-  else {
-    for (std::vector<std::string>::const_iterator it = tmp.begin();
-         it != tmp.end(); ++it)
-      os << *it << " ";
-  }
+  os << obj.GetIndex();
   os << "\nerror page: ";
   if (obj.GetErrorPage().size() == 0)
     os << "no set";
@@ -203,7 +149,6 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
          << "    ";
   }
   os << "\nroot: " << (obj.GetRoot().empty() ? "no set" : obj.GetRoot());
-  // os << "\nport: " << obj.getPort();
   os << "\nip: " << (obj.GetIp().empty() ? "no set" : obj.GetIp());
   for (std::map<std::string, LocationContext>::const_iterator it =
            obj.GetLocation().begin();

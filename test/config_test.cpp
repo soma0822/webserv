@@ -5,14 +5,19 @@
 #include "config_parser.hpp"
 #include "server_context.hpp"
 
+TEST(ConfigTest, EmptyConfig) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/empty.conf"),
+               std::invalid_argument);
+}
+
 TEST(ConfigTest, DefaultPath) {
   Config config = ConfigParser::Parse("test/conf_test/default.conf");
   ASSERT_EQ(config.GetServer().size(), 1);
   ASSERT_EQ(config.GetServer()[0].GetIp(), "127.0.0.1");
   ASSERT_EQ(config.GetServer()[0].GetRoot(), "docs/fusion_web/");
-  ASSERT_EQ(config.GetServer()[0].GetIndex()[0], "index.html");
-  ASSERT_EQ(config.GetServer()[0].GetPort()[0], "8002");
-  ASSERT_EQ(config.GetServer()[0].GetServerName()[0], "localhost");
+  ASSERT_EQ(config.GetServer()[0].GetIndex(), "index.html");
+  ASSERT_EQ(config.GetServer()[0].GetPort(), "8002");
+  ASSERT_EQ(config.GetServer()[0].GetServerName(), "localhost");
   ASSERT_EQ(config.GetServer()[0].GetErrorPage().size(), 2);
   std::map<std::string, std::string>::const_iterator it =
       config.GetServer()[0].GetErrorPage().begin();
@@ -30,7 +35,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
-  ASSERT_EQ(it2->second.GetIndex().size(), 0);
+  ASSERT_EQ(it2->second.GetIndex(), "");
   ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 0);
   std::map<std::string, bool>::const_iterator it3 =
@@ -49,11 +54,11 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->first, "/cgi-bin");
   ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
+  // ASSERT_EQ(it2->second.GetPath(), "/cgi-bin");
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "./");
-  ASSERT_EQ(it2->second.GetIndex().size(), 1);
-  ASSERT_EQ(it2->second.GetIndex()[0], "time.py");
+  ASSERT_EQ(it2->second.GetIndex(), "time.py");
   ASSERT_EQ(it2->second.GetCgiPath().size(), 2);
   ASSERT_EQ(it2->second.GetCgiPath()[0], "/usr/bin/python3");
   ASSERT_EQ(it2->second.GetCgiPath()[1], "/bin/bash");
@@ -75,7 +80,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetReturn(), "/tours");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
-  ASSERT_EQ(it2->second.GetIndex().size(), 0);
+  ASSERT_EQ(it2->second.GetIndex(), "");
   ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 0);
   std::map<std::string, bool>::const_iterator it6 =
@@ -93,8 +98,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
-  ASSERT_EQ(it2->second.GetIndex().size(), 1);
-  ASSERT_EQ(it2->second.GetIndex()[0], "tours1.html");
+  ASSERT_EQ(it2->second.GetIndex(), "tours1.html");
   ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtention().size(), 0);
   std::map<std::string, bool>::const_iterator it7 =
@@ -107,6 +111,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   ++it2;
   ASSERT_EQ(it2->first, "= /red");
+  ASSERT_EQ(it2->second.GetPath(), "= /red");
   ++it2;
   ASSERT_EQ(it2, config.GetServer()[0].GetLocation().end());
 }
@@ -262,18 +267,39 @@ TEST(ConfigTest, DoubleLocationErrorPage) {
       std::invalid_argument);
 }
 
+TEST(ConfigTest, PortIp) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/port_ip.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, PortIpServerName) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/port_ip_server_name.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, HostListen) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/host_listen.conf"),
+               std::invalid_argument);
+}
+
+TEST(ConfigTest, HostListenServername) {
+  ASSERT_THROW(
+      ConfigParser::Parse("test/conf_test/host_listen_server_name.conf"),
+      std::invalid_argument);
+}
+
 // SerchServer
 TEST(SerchServer, DefaultTest) {
   Config config = ConfigParser::Parse("test/conf_test/search_server.conf");
-  const ServerContext &tmp = config.SearchServer("8002", "127.0.0.2", "");
-  ASSERT_EQ(&config.GetServer().at(2), &tmp);
+  const ServerContext &tmp = config.SearchServer("8002", "127.0.0.1", "");
+  ASSERT_EQ(&config.GetServer().at(0), &tmp);
   const ServerContext &tmp1 = config.SearchServer("8000", "127.0.0.1", "");
   ASSERT_EQ(&config.GetServer().at(1), &tmp1);
   const ServerContext &tmp2 =
       config.SearchServer("8000", "127.0.0.1", "tokazaki");
   ASSERT_EQ(&config.GetServer().at(1), &tmp2);
   const ServerContext &tmp3 =
-      config.SearchServer("8002", "127.0.0.2", "tkuramot");
+      config.SearchServer("8002", "127.0.0.1", "tkuramot");
   ASSERT_EQ(&config.GetServer().at(2), &tmp3);
 }
 
@@ -282,11 +308,10 @@ TEST(SerchLocation, DefaultTest) {
   Config config = ConfigParser::Parse("test/conf_test/search_location.conf");
   const ServerContext &tmp =
       config.SearchServer("8002", "127.0.0.1", "localhost");
-  ASSERT_EQ(&(tmp.GetLocation().at("/")), &(tmp.SearchLocation("/")));
-  ASSERT_EQ(&(tmp.GetLocation().at("/red")), &(tmp.SearchLocation("/red/bin")));
-  ASSERT_EQ(&(tmp.GetLocation().at("= /red")), &(tmp.SearchLocation("/red")));
-  ASSERT_EQ(&(tmp.GetLocation().at("/tours")),
-            &(tmp.SearchLocation("/tours/usrs")));
-  ASSERT_EQ(&(tmp.GetLocation().at("/tours/usr")),
-            &(tmp.SearchLocation("/tours/usr/sina")));
+  ASSERT_EQ("/", tmp.SearchLocation("/").Unwrap().GetPath());
+  ASSERT_EQ("/red", tmp.SearchLocation("/red/bin").Unwrap().GetPath());
+  ASSERT_EQ("= /red", tmp.SearchLocation("/red").Unwrap().GetPath());
+  ASSERT_EQ("/tours", tmp.SearchLocation("/tours/usrs").Unwrap().GetPath());
+  ASSERT_EQ("/tours/usr",
+            tmp.SearchLocation("/tours/usr/sina").Unwrap().GetPath());
 }

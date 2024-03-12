@@ -6,16 +6,21 @@
 #include <iostream>
 #include <string>
 
+#include "config.hpp"
+#include "http_request.hpp"
+#include "http_request_parser.hpp"
 #include "http_response.hpp"
-// #include "http_request.hpp"
 #include "io_task.hpp"
+#include "io_task_manager.hpp"
 #include "logger.hpp"
 #include "request_handler.hpp"
 #include "result.hpp"
+#include "write_response_to_client.hpp"
 
 class ReadRequestFromClient : public AIOTask {
  public:
-  ReadRequestFromClient(int fd, const std::string &port, const std::string &ip);
+  ReadRequestFromClient(int fd, const std::string &port, const std::string &ip,
+                        const IConfig &config);
   virtual ~ReadRequestFromClient();
   virtual Result<int, std::string> Execute();
   const std::string &GetPort() const;
@@ -27,7 +32,10 @@ class ReadRequestFromClient : public AIOTask {
   ReadRequestFromClient &operator=(const ReadRequestFromClient &other);
   std::string port_;
   std::string ip_;
-  // RequestParser parser_;
+  const IConfig &config_;
+  HTTPRequestParser parser_;
+  static const int buf_size_ = 1024;
+  enum Responce { kOk, kContinue, kBadRequest };
 };
 
 #endif

@@ -6,7 +6,8 @@
 HTTPRequestParser::HTTPRequestParser()
     : request_(NULL), row_line_(""), parser_state_(kBeforeProcess) {}
 HTTPRequestParser::~HTTPRequestParser() { delete request_; }
-HTTPRequestParser::HTTPRequestParser(const HTTPRequestParser &other) {
+HTTPRequestParser::HTTPRequestParser(const HTTPRequestParser &other)
+    : request_(NULL), row_line_(""), parser_state_(kBeforeProcess) {
   (void)other;
 }
 HTTPRequestParser &HTTPRequestParser::operator=(
@@ -32,9 +33,9 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   // Headerの内容を確認
   if (parser_state_ == kNeedHeader) {
     return_state = SetRequestHeaders();
-    if (return_state == kBadRequest)
+    if (return_state == kBadRequest) {
       return BadRequest();
-    else if (return_state == kNotEnough)
+    } else if (return_state == kNotEnough)
       return Err(kNotEnough);
     else {
       if (IsNeedBody() == true) {
@@ -196,7 +197,7 @@ int HTTPRequestParser::SetChunkedBody() {
 
 // utils
 std::string HTTPRequestParser::StrToUpper(std::string s) {
-  for (size_t i = 0; i < s.length(); i++) {
+  for (size_t i = 0; i < s.length(); ++i) {
     s[i] = std::toupper(s[i]);
   }
   return s;
