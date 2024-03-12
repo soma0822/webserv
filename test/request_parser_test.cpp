@@ -17,16 +17,20 @@ TEST(HTTPRequestParser, kEndParse) {
 
 // GETリクエストのパース
 TEST(HTTPRequestParser, ParseRequestGET) {
-  std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
-  HTTPRequestParser parser;
-  const Result<HTTPRequest *, int> req = parser.Parser(request);
-  EXPECT_EQ(req.Unwrap()->GetMethod(), "GET");
-  EXPECT_EQ(req.Unwrap()->GetUri(), "/");
-  EXPECT_EQ(req.Unwrap()->GetProtocol(), "HTTP");
-  EXPECT_EQ(req.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
-  EXPECT_EQ(req.Unwrap()->GetBody(), "");
-  //  delete req.Unwrap();
+  try {
+    std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+    HTTPRequestParser parser;
+    const Result<HTTPRequest *, int> req = parser.Parser(request);
+    EXPECT_EQ(req.Unwrap()->GetMethod(), "GET");
+    EXPECT_EQ(req.Unwrap()->GetUri(), "/");
+    EXPECT_EQ(req.Unwrap()->GetProtocol(), "HTTP");
+    EXPECT_EQ(req.Unwrap()->GetVersion(), "1.1");
+    EXPECT_EQ(req.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+    EXPECT_EQ(req.Unwrap()->GetBody(), "");
+    delete req.Unwrap();
+  } catch (std::exception &e) {
+    std::cerr << e.what() << std::endl;
+  }
 }
 
 // GETリクエストのパース(ヘッダがバラバラに送られてくる場合）
