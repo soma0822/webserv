@@ -30,10 +30,14 @@ bool Server::Run(const IConfig &config) {
   return true;
 }
 
-// bind, listenのエラーハンドリングするためにAcceptのコンストラクタから移行する
 Result<int, int> Server::Listen(const std::string &port,
                                 const std::string &ip) {
+  int optval = 1;
   int sock = socket(AF_INET, SOCK_STREAM, 0);
+  if (sock == -1)
+    return Err(kSocketError);
+  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &optval,sizeof(optval)) == -1)
+    return Err(kSetSockOptError);
   struct sockaddr_in addr;
   Result<int, std::string> result = string_utils::StrToI(port);
 
@@ -43,11 +47,11 @@ Result<int, int> Server::Listen(const std::string &port,
   // TODO:
   // inet_addrは使用可能ではないため、自作の必要あり　空文字列の場合INADDR_ANYを返してくる
   addr.sin_addr.s_addr = inet_addr(ip.c_str());
-
-  // TODO：errornoを見て処理を変える
   if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1)
     return Err(kBindError);
   if (listen(sock, SOMAXCONN) == -1) return Err(kListenError);
+  if (fcntl(sock, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1)
+    return Err(kFcntlError);
   Logger::Info() << port << " : リッスン開始" << std::endl;
   return Ok(sock);
 }
