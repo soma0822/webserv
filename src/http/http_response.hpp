@@ -8,6 +8,23 @@
 
 class HTTPResponse {
  public:
+  class Builder {
+   public:
+    Builder();
+    ~Builder();
+    Builder &SetStatusCode(http::StatusCode status_code);
+    Builder &AddHeader(const std::string &key, const std::string &value);
+    Builder &SetBody(const std::string &body);
+    HTTPResponse *Build();
+
+   private:
+    static const std::string kHTTPVersion;
+    HTTPResponse *response_;
+
+    Builder(const Builder &other);
+    const Builder &operator=(const Builder &other);
+  };
+
   HTTPResponse();
   HTTPResponse(const HTTPResponse &other);
   HTTPResponse &operator=(const HTTPResponse &other);
