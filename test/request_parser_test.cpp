@@ -26,7 +26,7 @@ TEST(HTTPRequestParser, ParseRequestGET) {
   EXPECT_EQ(req.Unwrap()->GetVersion(), "1.1");
   EXPECT_EQ(req.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req.Unwrap()->GetBody(), "");
-//  delete req.Unwrap();
+  //  delete req.Unwrap();
 }
 
 // GETリクエストのパース(ヘッダがバラバラに送られてくる場合）
