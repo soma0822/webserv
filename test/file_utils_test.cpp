@@ -20,3 +20,23 @@ TEST(FileUtilsTest, ReadFile) {
 
   unlink(test_file_path.c_str());
 }
+
+TEST(FileUtilsTest, IsDirectoryDirectory) {
+  const std::string test_dir_path = "/tmp/test_dir";
+  mkdir(test_dir_path.c_str(), 0755);
+
+  ASSERT_TRUE(file_utils::IsDirectory(test_dir_path));
+
+  rmdir(test_dir_path.c_str());
+}
+
+TEST(FileUtilsTest, IsDirectoryFile) {
+  const std::string test_file_path = "/tmp/test_file";
+  std::ofstream ofs(test_file_path);
+  ofs << "Hello, world!";
+  ofs.close();
+
+  ASSERT_FALSE(file_utils::IsDirectory(test_file_path));
+
+  unlink(test_file_path.c_str());
+}
