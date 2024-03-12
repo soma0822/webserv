@@ -6,7 +6,6 @@
 #include "logger.hpp"
 #include "server.hpp"
 
-
 int main(int ac, char **av) {
   Logger::SetHandler(new FileStreamWrapper("log.txt"));
   std::string config_file;
