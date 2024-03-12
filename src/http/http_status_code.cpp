@@ -91,7 +91,8 @@ std::string GetStatusMessage(StatusCode status_code) {
       return "Gateway Timeout";
     case kHttpVersionNotSupported:
       return "HTTP Version Not Supported";
+    default:
+      return "";
   }
-  return "";
 }
 }  // namespace http
