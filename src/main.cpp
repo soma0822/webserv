@@ -2,6 +2,7 @@
 
 #include "config.hpp"
 #include "config_parser.hpp"
+#include "http_request_parser.hpp"
 #include "logger.hpp"
 #include "server.hpp"
 
@@ -28,5 +29,4 @@ int main(int ac, char **av) {
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
-  return 0;
 }

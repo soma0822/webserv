@@ -61,6 +61,16 @@ void IOTaskManager::RemoveReadTask(AIOTask *task) {
   }
 }
 
+void IOTaskManager::DeleteTasks() {
+  for (unsigned int i = 0; i < tasks_.size(); i++) {
+    for (unsigned int j = 0; j < tasks_.at(i).size(); j++) {
+      if (tasks_.at(i).at(j) != NULL) delete tasks_.at(i).at(j);
+    }
+  }
+  tasks_.clear();
+  fds_.clear();
+}
+
 void IOTaskManager::RemoveWriteTask(AIOTask *task) {
   WriteResponseToClient *tmp = dynamic_cast<WriteResponseToClient *>(task);
   if (!tmp) return;
@@ -87,9 +97,10 @@ void IOTaskManager::ExecuteTasks() {
         if (tasks_.at(i).at(j) == NULL) continue;
         if (fds_.at(i).revents & tasks_.at(i).at(j)->GetEvent()) {
           Result<int, std::string> result = tasks_.at(i).at(j)->Execute();
-          if (result.IsErr())
+          if (result.IsErr()) {
+            DeleteTasks();
             throw std::invalid_argument("taskエラー");
-          else if (result.Unwrap() == AIOTask::kWriteDelete) {
+          } else if (result.Unwrap() == AIOTask::kWriteDelete) {
             RemoveWriteTask(tasks_.at(i).at(j));
             --j;
           } else if (result.Unwrap() == AIOTask::kReadDelete) {
