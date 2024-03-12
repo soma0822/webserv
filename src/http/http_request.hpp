@@ -17,7 +17,7 @@ class HTTPRequest {
   void SetVersion(const std::string &version);
   void SetHostHeader(const std::string &host_header);
   void AddHeader(const std::string &key, const std::string &value);
-  void SetBody(const std::string &body);
+  void AddBody(const std::string &body);
   const std::string &GetMethod() const;
   const std::string &GetUri() const;
   const std::string &GetProtocol() const;
