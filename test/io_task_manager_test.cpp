@@ -36,4 +36,5 @@ TEST(IOTaskManager, DefaultTest) {
   IOTaskManager::DeleteTasks();
   ASSERT_EQ(0, IOTaskManager::GetFds().size());
   ASSERT_EQ(0, IOTaskManager::GetTasks().size());
+  IOTaskManager::DeleteTasks();
 }
