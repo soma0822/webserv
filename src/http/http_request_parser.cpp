@@ -227,7 +227,8 @@ int HTTPRequestParser::BadChunkedBody(int &chunked_state,
 
 bool HTTPRequestParser::IsNeedBody() {
   if ((request_->GetHeaders().count("CONTENT-LENGTH") > 0) ||
-      (request_->GetHeaders().find("TRANSFER-ENCODING")->second == "CHUNKED"))
+      ((request_->GetHeaders().count("TRANSFER-ENCODING")) &&
+       (request_->GetHeaders().find("TRANSFER-ENCODING")->second == "CHUNKED")))
     return true;
   return false;
 }
