@@ -18,8 +18,8 @@ class RequestHandler {
   RequestHandler &operator=(const RequestHandler &other);
   ~RequestHandler();
 
-  static std::string ResolvePath(const IServerContext &server_ctx,
-                                 const std::string &uri);
+  static Result<std::string, HTTPResponse *> ResolvePath(
+      const IServerContext &server_ctx, const std::string &uri);
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_

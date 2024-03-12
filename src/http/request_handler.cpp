@@ -12,8 +12,11 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config,
   }
   const ServerContext &server_context =
       config.SearchServer(port, ip, request->GetHostHeader());
-  std::string requested_file_path =
+  Result<std::string, HTTPResponse *> file_path =
       ResolvePath(server_context, request->GetUri());
+  if (file_path.IsErr()) {
+    return file_path.UnwrapErr();
+  }
   return new HTTPResponse();
 }
 
@@ -48,8 +51,8 @@ RequestHandler &RequestHandler::operator=(const RequestHandler &other) {
 
 RequestHandler::~RequestHandler() {}
 
-std::string RequestHandler::ResolvePath(const IServerContext &server_ctx,
-                                        const std::string &uri) {
+Result<std::string, HTTPResponse *> RequestHandler::ResolvePath(
+    const IServerContext &server_ctx, const std::string &uri) {
   Result<LocationContext, std::string> location_ctx_result =
       server_ctx.SearchLocation(uri);
 
@@ -69,12 +72,12 @@ std::string RequestHandler::ResolvePath(const IServerContext &server_ctx,
   std::string request_file_path = root + uri;
   if (file_utils::IsDirectory(request_file_path)) {
     if (request_file_path.at(request_file_path.size() - 1) != '/') {
-      request_file_path += '/';
+      // 正しいuriを指定して301を返す
     }
     request_file_path += location_ctx_result.IsOk()
                              ? location_ctx_result.Unwrap().GetIndex()
                              : server_ctx.GetIndex();
   }
 
-  return request_file_path;
+  return Ok(request_file_path);
 }
