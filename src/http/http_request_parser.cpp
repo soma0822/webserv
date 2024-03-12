@@ -33,9 +33,9 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   // Headerの内容を確認
   if (parser_state_ == kNeedHeader) {
     return_state = SetRequestHeaders();
-    if (return_state == kBadRequest) {
+    if (return_state == kBadRequest)
       return BadRequest();
-    } else if (return_state == kNotEnough)
+    else if (return_state == kNotEnough)
       return Err(kNotEnough);
     else {
       if (IsNeedBody() == true) {
