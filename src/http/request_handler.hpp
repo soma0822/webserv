@@ -18,7 +18,7 @@ class RequestHandler {
   RequestHandler &operator=(const RequestHandler &other);
   ~RequestHandler();
 
-  static std::string ResolvePath(const IServerContext &context,
+  static std::string ResolvePath(const IServerContext &server_ctx,
                                  const std::string &uri);
 };
 

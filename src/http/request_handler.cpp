@@ -48,15 +48,33 @@ RequestHandler &RequestHandler::operator=(const RequestHandler &other) {
 
 RequestHandler::~RequestHandler() {}
 
-std::string RequestHandler::ResolvePath(const IServerContext &context,
+std::string RequestHandler::ResolvePath(const IServerContext &server_ctx,
                                         const std::string &uri) {
-  const LocationContext &location_context = context.SearchLocation(uri);
+  Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
 
-  // rootの絶対パスを取得
-  std::string root = context.GetRoot();
-  if (location_context.GetRoot().empty()) {
-    root = location_context.GetRoot();
+  // rootを取得する
+  std::string root = location_ctx_result.IsOk()
+                         ? location_ctx_result.Unwrap().GetRoot()
+                         : server_ctx.GetRoot();
+
+  // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
+  // origin-form = absolute-path [ "?" query ]
+  // rootが/で終わっている場合には/が重複してしまうので削除する
+  if (root.back() == '/') {
+    root.pop_back();
   }
 
-  return root + uri;
+  // リクエストされたファイルのパスがディレクトリの場合には、indexファイルを返す
+  std::string request_file_path = root + uri;
+  if (file_utils::IsDirectory(request_file_path)) {
+    if (request_file_path.back() != '/') {
+      request_file_path += '/';
+    }
+    request_file_path += location_ctx_result.IsOk()
+                             ? location_ctx_result.Unwrap().GetIndex()
+                             : server_ctx.GetIndex();
+  }
+
+  return request_file_path;
 }
