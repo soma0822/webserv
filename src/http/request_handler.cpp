@@ -48,7 +48,6 @@ HTTPResponse *RequestHandler::Get(const IServerContext &server_ctx,
   }
   // パーミッションがない場合には403を返す
   if (!(file_stat.st_mode & S_IROTH)) {
-    std::cout << (file_stat.st_mode & S_IROTH) << std::endl;
     return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
   }
 
