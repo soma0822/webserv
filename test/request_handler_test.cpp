@@ -5,15 +5,16 @@
 #include <fakeit.hpp>
 #include <fstream>
 
+#include "logger.hpp"
+
 using namespace fakeit;
 
 TEST(RequestHandlerTest, GetMethodNormal) {
   const std::string root = "/tmp";
   const std::string uri = "/index.html";
-  const std::string body = "Hello, world!\n";
   const std::string test_file_path = root + uri;
   std::ofstream ofs(test_file_path.c_str());
-  ofs << body << std::endl;
+  ofs << "Hello, world!" << std::endl;
   ofs.close();
 
   LocationContext ctx;
@@ -29,7 +30,7 @@ TEST(RequestHandlerTest, GetMethodNormal) {
   const HTTPResponse *response = RequestHandler::Get(mock.get(), &request);
 
   ASSERT_EQ(response->GetStatusCode(), 200);
-  ASSERT_EQ(response->GetBody(), body);
+  ASSERT_EQ(response->GetBody(), "Hello, world!\n");
 
   unlink(test_file_path.c_str());
 
