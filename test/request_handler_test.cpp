@@ -26,7 +26,7 @@ TEST(RequestHandlerTest, GetMethodNormal) {
   When(Method(mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
   HTTPRequest request;
-  request.SetUri("/index.html");
+  request.SetUri(uri);
   const HTTPResponse *response = RequestHandler::Get(mock.get(), &request);
 
   ASSERT_EQ(response->GetStatusCode(), 200);
