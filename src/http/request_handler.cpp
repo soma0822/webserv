@@ -16,6 +16,7 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config,
   }
   const IServerContext &server_ctx =
       config.SearchServer(port, ip, request->GetHostHeader());
+  (void)server_ctx;
   return new HTTPResponse();
 }
 
