@@ -11,7 +11,7 @@ enum Error {
   kFileOpenError = 1,
 };
 
-Result<std::string, file_utils::Error> ReadFile(const std::string &file_path);
+std::string ReadFile(const std::string &file_path);
 
 bool IsDirectory(const std::string &path);
 

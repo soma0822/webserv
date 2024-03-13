@@ -30,7 +30,7 @@ TEST(ConfigTest, DefaultPath) {
   std::map<std::string, LocationContext>::const_iterator it2 =
       config.GetServer()[0].GetLocation().begin();
   ASSERT_EQ(it2->first, "/");
-  ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
+  ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
@@ -52,7 +52,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it4->second, "error_pages/404.html");
   ++it2;
   ASSERT_EQ(it2->first, "/cgi-bin");
-  ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
+  ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   // ASSERT_EQ(it2->second.GetPath(), "/cgi-bin");
   ASSERT_EQ(it2->second.GetReturn(), "");
@@ -75,7 +75,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   ++it2;
   ASSERT_EQ(it2->first, "/red");
-  ASSERT_EQ(it2->second.GetCnaAutoIndex(), true);
+  ASSERT_EQ(it2->second.GetCanAutoIndex(), true);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   ASSERT_EQ(it2->second.GetReturn(), "/tours");
   ASSERT_EQ(it2->second.GetAlias(), "");
@@ -93,7 +93,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   ++it2;
   ASSERT_EQ(it2->first, "/tours");
-  ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
+  ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");

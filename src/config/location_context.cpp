@@ -27,7 +27,7 @@ LocationContext &LocationContext::operator=(const LocationContext &other) {
   return *this;
 }
 // ゲッター
-bool LocationContext::GetCnaAutoIndex() const { return can_auto_index_; }
+bool LocationContext::GetCanAutoIndex() const { return can_auto_index_; }
 int LocationContext::GetLimitClientBody() const {
   return limit_client_body_bytes_;
 }
@@ -116,7 +116,7 @@ std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
        it != obj.GetCgiExtention().end(); ++it) {
     os << *it << " ";
   }
-  os << "\nautoindex: " << (obj.GetCnaAutoIndex() == true ? "on" : "off");
+  os << "\nautoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
   os << "\nreturn: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
   os << "\nalias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
   os << "\nlimit client body: " << obj.GetLimitClientBody();
@@ -161,7 +161,7 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
          it != obj.GetCgiExtention().end(); ++it)
       os << *it << " ";
   }
-  os << "\nautoindex: " << (obj.GetCnaAutoIndex() == true ? "on" : "off");
+  os << "\nautoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
   os << "\nreturn: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
   os << "\nalias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
   os << "\nlimit client body: " << obj.GetLimitClientBody();
