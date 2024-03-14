@@ -13,10 +13,8 @@ TEST(FileUtilsTest, ReadFile) {
   ofs << expected;
   ofs.close();
 
-  Result<std::string, file_utils::Error> result =
-      file_utils::ReadFile(test_file_path);
-  ASSERT_TRUE(result.IsOk());
-  EXPECT_EQ(result.Unwrap(), expected);
+  std::string result = file_utils::ReadFile(test_file_path);
+  EXPECT_EQ(result, expected);
 
   unlink(test_file_path.c_str());
 }
