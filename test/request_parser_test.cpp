@@ -165,7 +165,6 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked2) {
   EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
   delete req2.Unwrap();
-=======
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
   delete req2.Unwrap();
 }
