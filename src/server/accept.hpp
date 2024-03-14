@@ -6,6 +6,7 @@
 #include <cstring>
 // struct sockaddr_in
 #include <arpa/inet.h>
+#include <fcntl.h>
 // socket
 #include <sys/socket.h>
 

@@ -18,4 +18,6 @@ TEST(RequestHandlerTest, GetMethodNormal) {
   ASSERT_EQ(response->GetBody(), "Hello, world!\n");
 
   unlink(test_file_path.c_str());
+
+  delete response;
 }

@@ -8,18 +8,22 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config,
                                      const std::string &port,
                                      const std::string &ip) {
   if (!request) {
-    // 505を返す
+    // 500を返す
   }
-  (void)config;
-  (void)port;
-  (void)ip;
+  const ServerContext &server_context =
+      config.SearchServer(port, ip, request->GetHostHeader());
+  Result<std::string, HTTPResponse *> file_path =
+      ResolvePath(server_context, request->GetUri());
+  if (file_path.IsErr()) {
+    return file_path.UnwrapErr();
+  }
   return new HTTPResponse();
 }
 
 HTTPResponse *RequestHandler::Get(const HTTPRequest *request,
                                   const std::string &requested_file_path) {
   if (!request) {
-    // 505を返す
+    // 500を返す
   }
   // TODO リクエストのヘッダを処理する
 
@@ -46,3 +50,39 @@ RequestHandler &RequestHandler::operator=(const RequestHandler &other) {
 }
 
 RequestHandler::~RequestHandler() {}
+
+Result<std::string, HTTPResponse *> RequestHandler::ResolvePath(
+    const IServerContext &server_ctx, const std::string &uri) {
+  Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
+
+  // rootを取得する
+  std::string root = server_ctx.GetRoot();
+  if (location_ctx_result.IsOk() &&
+      !location_ctx_result.Unwrap().GetRoot().empty()) {
+    root = location_ctx_result.Unwrap().GetRoot();
+  }
+
+  // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
+  // origin-form = absolute-path [ "?" query ]
+  // rootが/で終わっている場合には/が重複してしまうので削除する
+  if (root.at(root.size() - 1) == '/') {
+    root.erase(root.size() - 1, 1);
+  }
+
+  // リクエストされたファイルのパスがディレクトリの場合には、indexファイルを返す
+  std::string request_file_path = root + uri;
+  if (file_utils::IsDirectory(request_file_path)) {
+    if (request_file_path.at(request_file_path.size() - 1) != '/') {
+      // 正しいuriを指定して301を返す
+    }
+    if (!server_ctx.GetIndex().empty()) {
+      return Ok(request_file_path += server_ctx.GetIndex());
+    } else if (location_ctx_result.IsOk() &&
+               !location_ctx_result.Unwrap().GetIndex().empty()) {
+      return Ok(request_file_path + location_ctx_result.Unwrap().GetIndex());
+    }
+  }
+
+  return Ok(request_file_path);
+}

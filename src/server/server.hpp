@@ -1,6 +1,9 @@
 #ifndef WEBSERV_SRC_SERVER_SERVER_HPP
 #define WEBSERV_SRC_SERVER_SERVER_HPP
 
+#include <fcntl.h>
+#include <sys/socket.h>
+
 #include <map>
 #include <string>
 #include <vector>
@@ -24,7 +27,13 @@ class Server {
                                  const std::string &ip);
 
   // TODO : errornoによって定義していく
-  enum Error { kListenError, kBindError };
+  enum Error {
+    kSocketError,
+    kSetSockOptError,
+    kListenError,
+    kBindError,
+    kFcntlError
+  };
 };
 
 #endif
