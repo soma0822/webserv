@@ -1,7 +1,5 @@
 #include "read_request_from_client.hpp"
 
-#include "cgi_handler.hpp"
-
 ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
                                              const std::string &ip,
                                              const IConfig &config)
