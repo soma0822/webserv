@@ -1,6 +1,7 @@
 #ifndef WEBSERV_SRC_SERVER_READ_CGI_HPP
 #define WEBSERV_SRC_SERVER_READ_CGI_HPP
 
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "config.hpp"
