@@ -38,6 +38,8 @@ class HTTPRequestParser {
   bool IsFillRequestLine();
   bool IsFillHeaders();
   bool IsFillBody();
+  bool IsChunked();
+  bool IsContentLength();
   bool CheckNeedBodyHeader();
 
   int SetRequestLine();

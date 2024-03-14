@@ -221,14 +221,21 @@ int HTTPRequestParser::BadChunkedBody(int &chunked_state,
   return kBadRequest;
 }
 
+bool HTTPRequestParser::IsChunked() {
+  if ((request_->GetHeaders().count("TRANSFER-ENCODING") > 0) &&
+      (request_->GetHeaders().find("TRANSFER-ENCODING")->second == "CHUNKED"))
+    return true;
+  return false;
+}
+
+bool HTTPRequestParser::IsContentLength() {
+  if (request_->GetHeaders().count("CONTENT-LENGTH") > 0) return true;
+  return false;
+}
+
 bool HTTPRequestParser::CheckNeedBodyHeader() {
-  if ((request_->GetHeaders().count("CONTENT-LENGTH") > 0) &&
-      ((request_->GetHeaders().count("TRANSFER-ENCODING")) &&
-       (request_->GetHeaders().find("TRANSFER-ENCODING")->second == "CHUNKED")))
-    return false;
-  if ((request_->GetHeaders().count("CONTENT-LENGTH") > 0) ||
-      ((request_->GetHeaders().count("TRANSFER-ENCODING")) &&
-       (request_->GetHeaders().find("TRANSFER-ENCODING")->second == "CHUNKED")))
+  if (IsChunked() && IsContentLength()) return false;
+  if (IsChunked() || IsContentLength())
     parser_state_ = kNeedBody;
   else
     parser_state_ = kBeforeProcess;
