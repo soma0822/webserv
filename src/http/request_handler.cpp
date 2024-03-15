@@ -104,14 +104,17 @@ HTTPResponse *RequestHandler::Post(const IServerContext &server_ctx,
   // リクエストターゲットがディレクトリの場合には400を返す
   if (request_file_path.at(request_file_path.size() - 1) != '/') {
     return HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build();
-    }
+  }
 
-  // TODO ファイルが作成可能かどうかの確認
+  const std::string parent_dir =
+      request_file_path.substr(0, request_file_path.find_last_of('/'));
+  struct stat parent_dir_stat;
+  if (stat(parent_dir.c_str(), &parent_dir_stat) == -1) {
+    return HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build();
+  }
 
   // TODO location headerの設定
-  return HTTPResponse::Builder()
-      .SetStatusCode(http::kCreated)
-      .Build();
+  return HTTPResponse::Builder().SetStatusCode(http::kCreated).Build();
 }
 
 RequestHandler::RequestHandler() {}
