@@ -57,6 +57,32 @@ HTTPResponse *RequestHandler::Get(const IServerContext &server_ctx,
       .Build();
 }
 
+HTTPResponse *RequestHandler::Post(const IServerContext &server_ctx,
+                                   const HTTPRequest *request) {
+  const Result<LocationContext, std::string> &location_ctx =
+      server_ctx.SearchLocation(request->GetUri());
+  const std::string request_file_path =
+      ResolvePath(server_ctx, request->GetUri());
+
+  if (file_utils::IsDirectory(request_file_path)) {
+    // リクエストターゲットのディレクトリが/で終わっていない場合には301を返す
+    if (request_file_path.at(request_file_path.size() - 1) != '/') {
+      return HTTPResponse::Builder()
+          .SetStatusCode(http::kMovedPermanently)
+          .AddHeader("Location", request->GetUri() + "/")
+          .Build();
+    }
+    // TODO ディレクトリがPOSTに対応しているかどうかの確認
+  }
+
+  // TODO ファイルが作成可能かどうかの確認
+
+  return HTTPResponse::Builder()
+      .SetStatusCode(http::kCreated)
+      .SetBody(file_utils::ReadFile(request_file_path))
+      .Build();
+}
+
 RequestHandler::RequestHandler() {}
 
 RequestHandler::RequestHandler(const RequestHandler &other) { (void)other; }
