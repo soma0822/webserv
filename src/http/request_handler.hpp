@@ -12,7 +12,7 @@ class RequestHandler {
   static HTTPResponse *Get(const IServerContext &server_ctx,
                            const HTTPRequest *request);
   static HTTPResponse *Post(const IServerContext &server_ctx,
-                                     const HTTPRequest *request);
+                            const HTTPRequest *request);
 
  private:
   RequestHandler();
@@ -20,8 +20,6 @@ class RequestHandler {
   RequestHandler &operator=(const RequestHandler &other);
   ~RequestHandler();
 
-  static std::string ResolvePath(const IServerContext &server_ctx,
-                                 const std::string &uri);
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_

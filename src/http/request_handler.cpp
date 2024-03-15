@@ -22,10 +22,34 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config,
 
 HTTPResponse *RequestHandler::Get(const IServerContext &server_ctx,
                                   const HTTPRequest *request) {
-  const Result<LocationContext, std::string> &location_ctx =
-      server_ctx.SearchLocation(request->GetUri());
-  const std::string request_file_path =
-      ResolvePath(server_ctx, request->GetUri());
+  const std::string &uri = request->GetUri();
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
+
+  // rootを取得する
+  std::string root = server_ctx.GetRoot();
+  if (location_ctx_result.IsOk() &&
+      !location_ctx_result.Unwrap().GetRoot().empty()) {
+    root = location_ctx_result.Unwrap().GetRoot();
+  }
+
+  // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
+  // origin-form = absolute-path [ "?" query ]
+  // rootが/で終わっている場合には/が重複してしまうので削除する
+  if (root.at(root.size() - 1) == '/') {
+    root.erase(root.size() - 1, 1);
+  }
+
+  // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
+  std::string request_file_path = root + uri;
+  if (file_utils::IsDirectory(request_file_path)) {
+    if (!server_ctx.GetIndex().empty()) {
+      request_file_path += server_ctx.GetIndex();
+    } else if (location_ctx_result.IsOk() &&
+               !location_ctx_result.Unwrap().GetIndex().empty()) {
+      request_file_path += location_ctx_result.Unwrap().GetIndex();
+    }
+  }
 
   if (file_utils::IsDirectory(request_file_path)) {
     // リクエストターゲットのディレクトリが/で終わっていない場合には301を返す
@@ -36,7 +60,8 @@ HTTPResponse *RequestHandler::Get(const IServerContext &server_ctx,
           .Build();
     }
     // AutoIndexが有効な場合にはディレクトリの中身を表示する
-    if (location_ctx.IsOk() && location_ctx.Unwrap().GetCanAutoIndex()) {
+    if (location_ctx_result.IsOk() &&
+        location_ctx_result.Unwrap().GetCanAutoIndex()) {
       // TODO: AutoIndex
     }
   }
@@ -59,27 +84,33 @@ HTTPResponse *RequestHandler::Get(const IServerContext &server_ctx,
 
 HTTPResponse *RequestHandler::Post(const IServerContext &server_ctx,
                                    const HTTPRequest *request) {
-  const Result<LocationContext, std::string> &location_ctx =
-      server_ctx.SearchLocation(request->GetUri());
-  const std::string request_file_path =
-      ResolvePath(server_ctx, request->GetUri());
+  const std::string &uri = request->GetUri();
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
 
-  if (file_utils::IsDirectory(request_file_path)) {
-    // リクエストターゲットのディレクトリが/で終わっていない場合には301を返す
-    if (request_file_path.at(request_file_path.size() - 1) != '/') {
-      return HTTPResponse::Builder()
-          .SetStatusCode(http::kMovedPermanently)
-          .AddHeader("Location", request->GetUri() + "/")
-          .Build();
-    }
-    // TODO ディレクトリがPOSTに対応しているかどうかの確認
+  // rootを取得する
+  std::string root = server_ctx.GetRoot();
+  if (location_ctx_result.IsOk() &&
+      !location_ctx_result.Unwrap().GetRoot().empty()) {
+    root = location_ctx_result.Unwrap().GetRoot();
   }
+
+  // rootが/で終わっている場合には/が重複してしまうので削除する
+  if (root.at(root.size() - 1) == '/') {
+    root.erase(root.size() - 1, 1);
+  }
+
+  const std::string request_file_path = root + uri;
+  // リクエストターゲットがディレクトリの場合には400を返す
+  if (request_file_path.at(request_file_path.size() - 1) != '/') {
+    return HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build();
+    }
 
   // TODO ファイルが作成可能かどうかの確認
 
+  // TODO location headerの設定
   return HTTPResponse::Builder()
       .SetStatusCode(http::kCreated)
-      .SetBody(file_utils::ReadFile(request_file_path))
       .Build();
 }
 
@@ -93,36 +124,3 @@ RequestHandler &RequestHandler::operator=(const RequestHandler &other) {
 }
 
 RequestHandler::~RequestHandler() {}
-
-std::string RequestHandler::ResolvePath(const IServerContext &server_ctx,
-                                        const std::string &uri) {
-  Result<LocationContext, std::string> location_ctx_result =
-      server_ctx.SearchLocation(uri);
-
-  // rootを取得する
-  std::string root = server_ctx.GetRoot();
-  if (location_ctx_result.IsOk() &&
-      !location_ctx_result.Unwrap().GetRoot().empty()) {
-    root = location_ctx_result.Unwrap().GetRoot();
-  }
-
-  // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
-  // origin-form = absolute-path [ "?" query ]
-  // rootが/で終わっている場合には/が重複してしまうので削除する
-  if (root.at(root.size() - 1) == '/') {
-    root.erase(root.size() - 1, 1);
-  }
-
-  // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
-  std::string request_file_path = root + uri;
-  if (file_utils::IsDirectory(request_file_path)) {
-    if (!server_ctx.GetIndex().empty()) {
-      return request_file_path += server_ctx.GetIndex();
-    } else if (location_ctx_result.IsOk() &&
-               !location_ctx_result.Unwrap().GetIndex().empty()) {
-      return request_file_path + location_ctx_result.Unwrap().GetIndex();
-    }
-  }
-
-  return request_file_path;
-}
