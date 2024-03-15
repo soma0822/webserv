@@ -38,11 +38,7 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
     else if (return_state == kNotEnough)
       return Err(kNotEnough);
     else {
-      if (IsNeedBody() == true) {
-        parser_state_ = kNeedBody;
-      } else {
-        parser_state_ = kBeforeProcess;
-      }
+      if (CheckNeedBodyHeader() == false) return BadRequest();
     }
   }
   // bodyの内容を確認
@@ -225,10 +221,23 @@ int HTTPRequestParser::BadChunkedBody(int &chunked_state,
   return kBadRequest;
 }
 
-bool HTTPRequestParser::IsNeedBody() {
-  if ((request_->GetHeaders().count("CONTENT-LENGTH") > 0) ||
-      ((request_->GetHeaders().count("TRANSFER-ENCODING")) &&
-       (request_->GetHeaders().find("TRANSFER-ENCODING")->second == "CHUNKED")))
+bool HTTPRequestParser::IsChunked() {
+  if ((request_->GetHeaders().count("TRANSFER-ENCODING") > 0) &&
+      (request_->GetHeaders().find("TRANSFER-ENCODING")->second == "CHUNKED"))
     return true;
   return false;
+}
+
+bool HTTPRequestParser::IsContentLength() {
+  if (request_->GetHeaders().count("CONTENT-LENGTH") > 0) return true;
+  return false;
+}
+
+bool HTTPRequestParser::CheckNeedBodyHeader() {
+  if (IsChunked() && IsContentLength()) return false;
+  if (IsChunked() || IsContentLength())
+    parser_state_ = kNeedBody;
+  else
+    parser_state_ = kBeforeProcess;
+  return true;
 }

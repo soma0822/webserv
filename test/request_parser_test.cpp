@@ -244,3 +244,13 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked_Error4) {
   Result<HTTPRequest *, int> req3 = parser.Parser(request);
   EXPECT_EQ(req3.UnwrapErr(), HTTPRequestParser::kBadRequest);
 }
+
+// Transfer-Encodingとcontent-lengthが両方ある場合
+TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked_ContentLength) {
+  HTTPRequestParser parser;
+  std::string request =
+      "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
+      "chunked\r\nContent-Length: 5\r\n\r\n";
+  Result<HTTPRequest *, int> req = parser.Parser(request);
+  EXPECT_EQ(req.UnwrapErr(), HTTPRequestParser::kBadRequest);
+}
