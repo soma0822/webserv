@@ -5,6 +5,11 @@
 #include "config_parser.hpp"
 #include "server_context.hpp"
 
+TEST(ConfigTest, EmptyConfig) {
+  ASSERT_THROW(ConfigParser::Parse("test/conf_test/empty.conf"),
+               std::invalid_argument);
+}
+
 TEST(ConfigTest, DefaultPath) {
   Config config = ConfigParser::Parse("test/conf_test/default.conf");
   ASSERT_EQ(config.GetServer().size(), 1);
@@ -25,7 +30,7 @@ TEST(ConfigTest, DefaultPath) {
   std::map<std::string, LocationContext>::const_iterator it2 =
       config.GetServer()[0].GetLocation().begin();
   ASSERT_EQ(it2->first, "/");
-  ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
+  ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
@@ -47,7 +52,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it4->second, "error_pages/404.html");
   ++it2;
   ASSERT_EQ(it2->first, "/cgi-bin");
-  ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
+  ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   // ASSERT_EQ(it2->second.GetPath(), "/cgi-bin");
   ASSERT_EQ(it2->second.GetReturn(), "");
@@ -70,7 +75,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   ++it2;
   ASSERT_EQ(it2->first, "/red");
-  ASSERT_EQ(it2->second.GetCnaAutoIndex(), true);
+  ASSERT_EQ(it2->second.GetCanAutoIndex(), true);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   ASSERT_EQ(it2->second.GetReturn(), "/tours");
   ASSERT_EQ(it2->second.GetAlias(), "");
@@ -88,7 +93,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   ++it2;
   ASSERT_EQ(it2->first, "/tours");
-  ASSERT_EQ(it2->second.GetCnaAutoIndex(), false);
+  ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
   ASSERT_EQ(it2->second.GetReturn(), "");
   ASSERT_EQ(it2->second.GetAlias(), "");
@@ -303,11 +308,10 @@ TEST(SerchLocation, DefaultTest) {
   Config config = ConfigParser::Parse("test/conf_test/search_location.conf");
   const ServerContext &tmp =
       config.SearchServer("8002", "127.0.0.1", "localhost");
-  ASSERT_EQ(&(tmp.GetLocation().at("/")), &(tmp.SearchLocation("/")));
-  ASSERT_EQ(&(tmp.GetLocation().at("/red")), &(tmp.SearchLocation("/red/bin")));
-  ASSERT_EQ(&(tmp.GetLocation().at("= /red")), &(tmp.SearchLocation("/red")));
-  ASSERT_EQ(&(tmp.GetLocation().at("/tours")),
-            &(tmp.SearchLocation("/tours/usrs")));
-  ASSERT_EQ(&(tmp.GetLocation().at("/tours/usr")),
-            &(tmp.SearchLocation("/tours/usr/sina")));
+  ASSERT_EQ("/", tmp.SearchLocation("/").Unwrap().GetPath());
+  ASSERT_EQ("/red", tmp.SearchLocation("/red/bin").Unwrap().GetPath());
+  ASSERT_EQ("= /red", tmp.SearchLocation("/red").Unwrap().GetPath());
+  ASSERT_EQ("/tours", tmp.SearchLocation("/tours/usrs").Unwrap().GetPath());
+  ASSERT_EQ("/tours/usr",
+            tmp.SearchLocation("/tours/usr/sina").Unwrap().GetPath());
 }

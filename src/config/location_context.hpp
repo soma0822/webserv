@@ -13,7 +13,7 @@ class LocationContext {
   LocationContext(const LocationContext &other);
   LocationContext &operator=(const LocationContext &other);
   // ゲッター
-  bool GetCnaAutoIndex() const;
+  bool GetCanAutoIndex() const;
   int GetLimitClientBody() const;
   const std::string &GetPath() const;
   const std::string &GetReturn() const;

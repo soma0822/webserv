@@ -7,12 +7,15 @@
 #include <string>
 
 #include "config.hpp"
+#include "http_request.hpp"
+#include "http_request_parser.hpp"
 #include "http_response.hpp"
-// #include "http_request.hpp"
 #include "io_task.hpp"
+#include "io_task_manager.hpp"
 #include "logger.hpp"
 #include "request_handler.hpp"
 #include "result.hpp"
+#include "write_response_to_client.hpp"
 
 class ReadRequestFromClient : public AIOTask {
  public:
@@ -30,7 +33,9 @@ class ReadRequestFromClient : public AIOTask {
   std::string port_;
   std::string ip_;
   const IConfig &config_;
-  // RequestParser parser_;
+  HTTPRequestParser parser_;
+  static const int buf_size_ = 1024;
+  enum Responce { kOk, kContinue, kBadRequest };
 };
 
 #endif

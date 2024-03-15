@@ -6,6 +6,7 @@
 
 namespace http {
 enum StatusCode {
+  kNone = 0,
   kContinue = 100,
   kSwitchingProtocols = 101,
   kOk = 200,

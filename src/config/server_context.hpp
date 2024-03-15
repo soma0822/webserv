@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "location_context.hpp"
+#include "result.hpp"
 
 #define LOCATION "\033[1;32m"
 #define SERVER "\033[1;33m"
@@ -18,6 +19,8 @@ class IServerContext {
   virtual bool HavePort(const std::string &port) const = 0;
   virtual bool HaveServerName(const std::string &server_name) const = 0;
   virtual bool IsValidContext() const = 0;
+  virtual Result<LocationContext, std::string> SearchLocation(
+      const std::string &path) const = 0;
   // ゲッター
   virtual const std::string &GetIp() const = 0;
   virtual const std::string &GetRoot() const = 0;
@@ -47,7 +50,8 @@ class ServerContext : public IServerContext {
   bool HavePort(const std::string &port) const;
   bool HaveServerName(const std::string &server_name) const;
   bool IsValidContext() const;
-  const LocationContext &SearchLocation(const std::string &path) const;
+  Result<LocationContext, std::string> SearchLocation(
+      const std::string &path) const;
   // ゲッター
   const std::string &GetIp() const;
   const std::string &GetRoot() const;

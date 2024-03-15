@@ -15,19 +15,24 @@ class HTTPRequestParser {
     kBadRequest = 0,
     kNotEnough = 1,
     kOk = 2,
+    kEndParse = 3,
   };
   HTTPRequestParser();
+  HTTPRequestParser(const HTTPRequestParser &other);
   ~HTTPRequestParser();
 
   const Result<HTTPRequest *, int> Parser(std::string request_line);
 
  private:
   enum StatusFlag { kBeforeProcess, kNeedHeader, kEndHeader, kNeedBody };
+  enum chunked_state {
+    kNeedChunkedSize,
+    kNeedChunkedBody,
+  };
   HTTPRequest *request_;
   std::string row_line_;
   int parser_state_;
 
-  HTTPRequestParser(const HTTPRequestParser &other);
   HTTPRequestParser &operator=(const HTTPRequestParser &other);
 
   bool IsFillRequestLine();
@@ -38,6 +43,8 @@ class HTTPRequestParser {
   int SetRequestLine();
   int SetRequestHeaders();
   int SetRequestBody();
+  int SetChunkedBody();
+  int BadChunkedBody(int &chunked_state, size_t &chunked_size);
 
   const Result<HTTPRequest *, int> BadRequest();
   const Result<HTTPRequest *, int> OkRequest();

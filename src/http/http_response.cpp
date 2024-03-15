@@ -2,6 +2,54 @@
 
 #include <sstream>
 
+const std::string HTTPResponse::Builder::kHTTPVersion = "HTTP/1.1";
+
+HTTPResponse::Builder::Builder() : response_(new HTTPResponse) {
+  response_->SetStatusCode(http::kNone);
+}
+
+// response_はBuildした後に返すためdeleteしない
+HTTPResponse::Builder::~Builder() {}
+
+HTTPResponse::Builder &HTTPResponse::Builder::SetStatusCode(
+    http::StatusCode status_code) {
+  response_->SetStatusCode(status_code);
+  return *this;
+}
+
+HTTPResponse::Builder &HTTPResponse::Builder::AddHeader(
+    const std::string &key, const std::string &value) {
+  response_->AddHeader(key, value);
+  return *this;
+}
+
+HTTPResponse::Builder &HTTPResponse::Builder::SetBody(const std::string &body) {
+  response_->SetBody(body);
+  return *this;
+}
+
+HTTPResponse *HTTPResponse::Builder::Build() {
+  response_->SetHTTPVersion(kHTTPVersion);
+  if (response_->GetStatusCode() == http::kNone) {
+    delete response_;
+    return NULL;
+  }
+  return response_;
+}
+
+// copy constructor
+HTTPResponse::Builder::Builder(const HTTPResponse::Builder &other)
+    : response_(new HTTPResponse(*(other.response_))) {}
+
+const HTTPResponse::Builder &HTTPResponse::Builder::operator=(
+    const HTTPResponse::Builder &other) {
+  if (this == &other) {
+    return *this;
+  }
+  (void)other;
+  return *this;
+}
+
 HTTPResponse::HTTPResponse() {}
 
 HTTPResponse::HTTPResponse(const HTTPResponse &other)
