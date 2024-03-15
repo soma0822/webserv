@@ -126,7 +126,7 @@ HTTPResponse *RequestHandler::Post(const IServerContext &server_ctx,
   }
   std::cout << "body" << request->GetBody() << std::endl;
   ofs << request->GetBody();
-        ofs.close();
+  ofs.close();
 
   return HTTPResponse::Builder()
       .SetStatusCode(http::kCreated)

@@ -68,8 +68,8 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
 
   std::ifstream ifs(test_file_path);
   // read all data from file
-        std::string created_body((std::istreambuf_iterator<char>(ifs)),
-                                 (std::istreambuf_iterator<char>()));
+  std::string created_body((std::istreambuf_iterator<char>(ifs)),
+                           (std::istreambuf_iterator<char>()));
 
   ASSERT_STRCASEEQ(body.c_str(), created_body.c_str());
 }
