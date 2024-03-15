@@ -102,7 +102,7 @@ HTTPResponse *RequestHandler::Post(const IServerContext &server_ctx,
 
   const std::string request_file_path = root + uri;
   // リクエストターゲットがディレクトリの場合には400を返す
-  if (request_file_path.at(request_file_path.size() - 1) != '/') {
+  if (request_file_path.at(request_file_path.size() - 1) == '/') {
     return HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build();
   }
 
@@ -118,17 +118,19 @@ HTTPResponse *RequestHandler::Post(const IServerContext &server_ctx,
     return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
   }
 
-  std::ofstream ofs(request_file_path);
+  std::ofstream ofs(request_file_path.c_str());
   if (!ofs) {
     return HTTPResponse::Builder()
         .SetStatusCode(http::kInternalServerError)
         .Build();
   }
+  std::cout << "body" << request->GetBody() << std::endl;
   ofs << request->GetBody();
+        ofs.close();
 
   return HTTPResponse::Builder()
       .SetStatusCode(http::kCreated)
-      .AddHeader("Location", request_file_path)
+      .AddHeader("Location", uri)
       .Build();
 }
 
