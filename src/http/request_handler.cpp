@@ -109,8 +109,13 @@ HTTPResponse *RequestHandler::Post(const IServerContext &server_ctx,
   const std::string parent_dir =
       request_file_path.substr(0, request_file_path.find_last_of('/'));
   struct stat parent_dir_stat;
+  // 親ディレクトリが存在しない場合には404を返す
   if (stat(parent_dir.c_str(), &parent_dir_stat) == -1) {
     return HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build();
+  }
+  // 親ディレクトリに書き込み権限がない場合には403を返す
+  if (!(parent_dir_stat.st_mode & S_IWOTH)) {
+    return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
   }
 
   // TODO location headerの設定
