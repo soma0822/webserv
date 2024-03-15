@@ -118,8 +118,18 @@ HTTPResponse *RequestHandler::Post(const IServerContext &server_ctx,
     return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
   }
 
-  // TODO location headerの設定
-  return HTTPResponse::Builder().SetStatusCode(http::kCreated).Build();
+  std::ofstream ofs(request_file_path);
+  if (!ofs) {
+    return HTTPResponse::Builder()
+        .SetStatusCode(http::kInternalServerError)
+        .Build();
+  }
+  ofs << request->GetBody();
+
+  return HTTPResponse::Builder()
+      .SetStatusCode(http::kCreated)
+      .AddHeader("Location", request_file_path)
+      .Build();
 }
 
 RequestHandler::RequestHandler() {}
