@@ -131,21 +131,18 @@ int HTTPRequestParser::SetRequestHeaders() {
 // bodyのパース
 int HTTPRequestParser::SetRequestBody() {
   std::string request_line = row_line_;
-  size_t pos = 0;
-
   // content-length
   if (request_->GetHeaders().count("CONTENT-LENGTH") > 0) {
-    pos = request_line.find("\r\n");
-    if (pos == std::string::npos) pos = request_line.length();
+    // content-lengthの値を取得
     std::string length = request_->GetHeaders().find("CONTENT-LENGTH")->second;
     Result<int, std::string> result = string_utils::StrToI(length);
     if (result.IsErr()) return kBadRequest;
-    if (static_cast<int>(request_line.length()) < result.Unwrap())
-      return kNotEnough;
-    else {
-      row_line_ = request_line.substr(pos);
-      request_->AddBody(request_line.substr(0, pos));
-    }
+    // request_lineを取得して、長さの確認
+    int pos = static_cast<int>(request_line.length());
+    if (pos < result.Unwrap()) return kNotEnough;
+    if (result.Unwrap() < pos) pos = result.Unwrap();
+    row_line_ = request_line.substr(pos);
+    request_->AddBody(request_line.substr(0, pos));
   }
   // trasfer-encoding
   else {
