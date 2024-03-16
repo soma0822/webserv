@@ -17,8 +17,9 @@ Result<int, std::string> StrToI(const std::string &str) {
 }
 
 std::string SkipSpace(std::string s) {
-  size_t pos = s.find_first_not_of(" ");
-  s = s.substr(pos);
-  return s;
+  const std::string whitespace = " \t\f\v\n\r";
+  size_t pos_first = s.find_first_not_of(whitespace);
+  size_t pos_last = s.find_last_not_of(whitespace);
+  return s.substr(pos_first, pos_last - pos_first + 1);
 }
 }  // namespace string_utils

@@ -15,9 +15,9 @@ TEST(HTTPRequestParser, kEndParse) {
   EXPECT_EQ(req.UnwrapErr(), HTTPRequestParser::kEndParse);
 }
 
-// GETリクエストのパース
+// GETリクエストのパース(余計なスペースがある場合)
 TEST(HTTPRequestParser, ParseRequestGET) {
-  std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+  std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080    \r\n\r\n";
   HTTPRequestParser parser;
   const Result<HTTPRequest *, int> req = parser.Parser(request);
   EXPECT_EQ(req.Unwrap()->GetMethod(), "GET");
