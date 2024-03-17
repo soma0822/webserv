@@ -12,7 +12,7 @@ ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
 ReadRequestFromClient::~ReadRequestFromClient() {}
 
 Result<int, std::string> ReadRequestFromClient::Execute() {
-  char buf[buf_size_];
+  char buf[buf_size_ + 1];
   int len = read(fd_, buf, buf_size_);
   if (len == -1) {
     Logger::Error() << "read エラー" << std::endl;
