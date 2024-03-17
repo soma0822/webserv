@@ -1,5 +1,5 @@
-#ifndef WEBSERVE_SRC_HTTP_HTTP_REQUEST_PARSER_HPP
-#define WEBSERVE_SRC_HTTP_HTTP_REQUEST_PARSER_HPP
+#ifndef WEBSERVE_SRC_HTTP_CGI_PARSER_HPP
+#define WEBSERVE_SRC_HTTP_CGI_PARSER_HPP
 
 #include <algorithm>
 #include <iostream>
@@ -12,12 +12,12 @@
 
 class AParser;
 
-class HTTPRequestParser : public AParser {
+class CGIParser : public AParser {
  public:
-  HTTPRequestParser();
-  ~HTTPRequestParser();
+  CGIParser();
+  ~CGIParser();
 
   const Result<HTTPRequest *, int> Parser(std::string request_line);
 };
 
-#endif  // WEBSERVE_SRC_HTTP_HTTP_REQUEST_PARSER_HPP
+#endif  // WEBSERVE_SRC_HTTP_CGI_PARSER_HPP
