@@ -11,6 +11,15 @@ bool IsNumber(const std::string &str) {
   return true;
 }
 
+bool IsHexNumber(const std::string &str) {
+  for (size_t i = 0; i < str.size(); ++i) {
+    if (!std::isxdigit(str[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool IsPath(const std::string &str) {
   if (str[0] != '/') {
     return false;
