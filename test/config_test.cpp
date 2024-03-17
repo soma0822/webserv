@@ -291,14 +291,14 @@ TEST(ConfigTest, HostListenServername) {
 // SerchServer
 TEST(SerchServer, DefaultTest) {
   Config config = ConfigParser::Parse("test/conf_test/search_server.conf");
-  const ServerContext &tmp = config.SearchServer("8002", "127.0.0.1", "");
+  const IServerContext &tmp = config.SearchServer("8002", "127.0.0.1", "");
   ASSERT_EQ(&config.GetServer().at(0), &tmp);
-  const ServerContext &tmp1 = config.SearchServer("8000", "127.0.0.1", "");
+  const IServerContext &tmp1 = config.SearchServer("8000", "127.0.0.1", "");
   ASSERT_EQ(&config.GetServer().at(1), &tmp1);
-  const ServerContext &tmp2 =
+  const IServerContext &tmp2 =
       config.SearchServer("8000", "127.0.0.1", "tokazaki");
   ASSERT_EQ(&config.GetServer().at(1), &tmp2);
-  const ServerContext &tmp3 =
+  const IServerContext &tmp3 =
       config.SearchServer("8002", "127.0.0.1", "tkuramot");
   ASSERT_EQ(&config.GetServer().at(2), &tmp3);
 }
@@ -306,7 +306,7 @@ TEST(SerchServer, DefaultTest) {
 // SerchLocation
 TEST(SerchLocation, DefaultTest) {
   Config config = ConfigParser::Parse("test/conf_test/search_location.conf");
-  const ServerContext &tmp =
+  const IServerContext &tmp =
       config.SearchServer("8002", "127.0.0.1", "localhost");
   ASSERT_EQ("/", tmp.SearchLocation("/").Unwrap().GetPath());
   ASSERT_EQ("/red", tmp.SearchLocation("/red/bin").Unwrap().GetPath());
