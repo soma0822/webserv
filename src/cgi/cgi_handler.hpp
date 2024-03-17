@@ -16,12 +16,6 @@ class CgiHandler {
   CgiHandler() {}
   ~CgiHandler() {}
 
-  void run() {
-    std::cout << "Content-type: text/html" << std::endl << std::endl;
-    std::cout << "<html><head><title>CGI Test</title></head><body><h1>CGI "
-                 "Test</h1></body></html>"
-              << std::endl;
-  }
   void Handle(HTTPRequest *req, int client_fd, const IConfig &config_,
               const std::string &port, const std::string &ip);
 };

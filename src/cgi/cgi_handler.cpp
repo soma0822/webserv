@@ -9,6 +9,14 @@ void CgiHandler::Handle(HTTPRequest *req, int client_fd, const IConfig &config,
     Logger::Error() << "pipe エラー" << std::endl;
     return;
   }
+  if (fcntl(fd[0], F_SETFL, O_NONBLOCK) == -1) {
+    Logger::Error() << "fcntl エラー" << std::endl;
+    return;
+  }
+  if (fcntl(fd[1], F_SETFL, O_NONBLOCK) == -1) {
+    Logger::Error() << "fcntl エラー" << std::endl;
+    return;
+  }
   pid = fork();
   if (pid == -1) {
     Logger::Error() << "fork エラー" << std::endl;
@@ -20,6 +28,14 @@ void CgiHandler::Handle(HTTPRequest *req, int client_fd, const IConfig &config,
     int fd2[2];
     if (pipe(fd2) == -1) {
       Logger::Error() << "pipe エラー" << std::endl;
+      return;
+    }
+    if (fcntl(fd2[0], F_SETFL, O_NONBLOCK) == -1) {
+      Logger::Error() << "fcntl エラー" << std::endl;
+      return;
+    }
+    if (fcntl(fd2[0], F_SETFL, O_NONBLOCK) == -1) {
+      Logger::Error() << "fcntl エラー" << std::endl;
       return;
     }
     write(fd2[1], body.c_str(), body.size());
