@@ -17,7 +17,7 @@ void Config::AddServer(const ServerContext &server) {
 
 const std::vector<ServerContext> &Config::GetServer() const { return server_; }
 
-const ServerContext &Config::SearchServer(
+const IServerContext &Config::SearchServer(
     const std::string &port, const std::string &ip,
     const std::string &server_name) const {
   std::vector<ServerContext>::const_iterator ans = server_.end();
