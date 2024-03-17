@@ -13,8 +13,11 @@ ReadCGI::ReadCGI(int pid, int fd, int client_fd, const std::string &port,
 ReadCGI::~ReadCGI() {}
 
 Result<int, std::string> ReadCGI::Execute() {
-  char buf[buf_size_];
+  char buf[buf_size_ + 1];
   int status;
+  int len = read(fd_, buf, buf_size_);
+  buf[len] = '\0';
+  buf_.append(buf);
   int result = waitpid(pid_, &status, WNOHANG);
   if (result == -1) {  // エラー
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
@@ -26,25 +29,20 @@ Result<int, std::string> ReadCGI::Execute() {
     Logger::Error() << "cgi エラー" << std::endl;
     return Ok(kReadDelete);
   }
-  int len = read(fd_, buf, buf_size_);
-  buf[len] = '\0';
-  if (len == 0 && buf_.size() == 0) return Ok(0);
-  if (len == buf_size_) {
-    buf_.append(buf);
-    return Ok(0);
+  if (len == 0) {
+    // Result<HTTPRequest *, int> result = parser_.Parser(buf);
+    HTTPResponse *response = new HTTPResponse();
+    response->SetHTTPVersion("HTTP/1.1");
+    response->SetStatusCode(http::kOk);
+    response->AddHeader("Content-Type", "text/html");
+    std::stringstream ss;
+    ss << buf_.size();
+    response->AddHeader("Content-Length", ss.str());
+    response->SetBody(buf_);
+    Logger::Info() << "CGI response: " << buf_ << "\nsize: " << len << std::endl;
+    //   RequestHandler::Handle(config_, result.Unwrap(), port_, ip_);
+    IOTaskManager::AddTask(new WriteResponseToClient(client_fd_, response));
+    return Ok(kReadDelete);
   }
-  buf_.append(buf);
-  // Result<HTTPRequest *, int> result = parser_.Parser(buf);
-  HTTPResponse *response = new HTTPResponse();
-  response->SetHTTPVersion("HTTP/1.1");
-  response->SetStatusCode(http::kOk);
-  response->AddHeader("Content-Type", "text/html");
-  std::stringstream ss;
-  ss << buf_.size();
-  response->AddHeader("Content-Length", ss.str());
-  response->SetBody(buf_);
-  Logger::Info() << "CGI response: " << buf_ << "\nsize: " << len << std::endl;
-  //   RequestHandler::Handle(config_, result.Unwrap(), port_, ip_);
-  IOTaskManager::AddTask(new WriteResponseToClient(client_fd_, response));
-  return Ok(kReadDelete);
+  return Ok(0);
 }
