@@ -28,8 +28,8 @@ class Config : public IConfig {
   void AddServer(const ServerContext &server);
   const std::vector<ServerContext> &GetServer() const;
   const IServerContext &SearchServer(const std::string &port,
-                                    const std::string &ip,
-                                    const std::string &server_name) const;
+                                     const std::string &ip,
+                                     const std::string &server_name) const;
 
  private:
   Config &operator=(const Config &other);
