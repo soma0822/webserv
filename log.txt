@@ -1,0 +1,56 @@
+[INFO] Reading ./conf/default.conf
+[INFO] 8004 : リッスン開始
+[INFO] 8004 : 接続しました
+[INFO] 8004 : 接続しました
+[INFO] 8004 : リクエストをパースしました : POST /cgi-bin/cgi_test.py HTTP/1.1
+Host: localhost:8004
+Connection: keep-alive
+Content-Length: 49
+Cache-Control: max-age=0
+sec-ch-ua: "Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"
+sec-ch-ua-mobile: ?0
+sec-ch-ua-platform: "macOS"
+Upgrade-Insecure-Requests: 1
+Origin: http://localhost:8004
+Content-Type: application/x-www-form-urlencoded
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Referer: http://localhost:8004/cgi-bin/cgi_test.py
+Accept-Encoding: gzip, deflate, br
+Accept-Language: ja,en-US;q=0.9,en;q=0.8
+Cookie: _xsrf=2|6d2af643|76b448d71992c7891a765b00a9fccbc4|1702276896
+
+food=%E3%82%8A%E3%82%93%E3%81%94&season=%E5%86%AC994
+[INFO] 8004 : レスポンスのタスクを追加しました
+[INFO] CGI response: <meta charset="UTF-8">
+<html><body>
+<p>food: りんご</p>
+<p>season: 冬</p>
+</body></html>
+
+size: 93
+[INFO] 接続を削除しました
+[INFO] ライトタスクを削除しました
+[INFO] 8004 : リクエストをパースしました : GET /favicon.ico HTTP/1.1
+Host: localhost:8004
+Connection: keep-alive
+sec-ch-ua: "Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"
+sec-ch-ua-mobile: ?0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
+sec-ch-ua-platform: "macOS"
+Accept: image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: no-cors
+Sec-Fetch-Dest: image
+Referer: http://localhost:8004/cgi-bin/cgi_test.py
+Accept-Encoding: gzip, deflate, br
+Accept-Language: ja,en-US;q=0.9,en;q=0.8
+Cookie: _xsrf=2|6d2af643|76b448d71992c7891a765b00a9fccbc4|1702276896
+
+685
+[INFO] 8004 : レスポンスのタスクを追加しました
+[INFO] ライトタスクを削除しました

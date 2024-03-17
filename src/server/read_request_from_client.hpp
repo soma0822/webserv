@@ -16,6 +16,7 @@
 #include "request_handler.hpp"
 #include "result.hpp"
 #include "write_response_to_client.hpp"
+#include "cgi_handler.hpp"
 
 class ReadRequestFromClient : public AIOTask {
  public:

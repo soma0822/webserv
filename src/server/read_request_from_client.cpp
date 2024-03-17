@@ -36,11 +36,11 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
                    << "リクエストをパースしました : " << buf << len
                    << std::endl;
     // TODO: CGIへの投げ方要相談
-    // if (result.Unwrap()->GetMethod() == "POST") {
-    //   CgiHandler cgi_handler;
-    //   cgi_handler.Handle(result.Unwrap(), fd_, config_, port_, ip_);
-    //   delete result.Unwrap();
-    // } else {
+    if (result.Unwrap()->GetMethod() == "POST") {
+      CgiHandler cgi_handler;
+      cgi_handler.Handle(result.Unwrap(), fd_, config_, port_, ip_);
+      delete result.Unwrap();
+    } else {
     // ひとまずかーくんのCGIのhtmlが帰ってる
     HTTPResponse *response = new HTTPResponse();
     response->SetHTTPVersion("HTTP/1.1");
@@ -60,7 +60,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     // RequestHandler::Handle(config_, result.Unwrap(), port_, ip_);
     IOTaskManager::AddTask(new WriteResponseToClient(fd_, response));
     delete result.Unwrap();
-    // }
+    }
   }
   Logger::Info() << port_ << " : "
                  << "レスポンスのタスクを追加しました" << std::endl;
