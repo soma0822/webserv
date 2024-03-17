@@ -8,7 +8,7 @@
 
 #include "http_request.hpp"
 
-// GETリクエストのパース(余計なスペースがある場合)
+//CGIParserの基本的なテスト
 TEST(CGIParser, CGIParserNomalRequest) {
   std::string request = "Host: localhost:8080    \r\n\r\naaaaa\r\n";
   CGIParser parser;
