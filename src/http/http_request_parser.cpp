@@ -1,7 +1,5 @@
 #include "http_request_parser.hpp"
 
-#include <cstddef>
-
 // canonical
 HTTPRequestParser::HTTPRequestParser() {}
 HTTPRequestParser::~HTTPRequestParser() { delete request_; }

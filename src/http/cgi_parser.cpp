@@ -1,7 +1,5 @@
 #include "cgi_parser.hpp"
 
-#include <cstddef>
-
 // canonical
 CGIParser::CGIParser() {}
 CGIParser::~CGIParser() { delete request_; }
