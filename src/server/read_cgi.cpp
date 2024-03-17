@@ -39,7 +39,8 @@ Result<int, std::string> ReadCGI::Execute() {
     ss << buf_.size();
     response->AddHeader("Content-Length", ss.str());
     response->SetBody(buf_);
-    Logger::Info() << "CGI response: " << buf_ << "\nsize: " << len << std::endl;
+    Logger::Info() << "CGI response: " << buf_ << "\nsize: " << len
+                   << std::endl;
     //   RequestHandler::Handle(config_, result.Unwrap(), port_, ip_);
     IOTaskManager::AddTask(new WriteResponseToClient(client_fd_, response));
     return Ok(kReadDelete);
