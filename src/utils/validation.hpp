@@ -9,6 +9,7 @@
 #include "string_utils.hpp"
 namespace validation {
 bool IsNumber(const std::string &str);
+bool IsHexNumber(const std::string &str);
 bool IsPath(const std::string &str);
 bool IsIp(const std::string &str);
 bool IsPort(const std::string &str);
