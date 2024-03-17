@@ -1,5 +1,8 @@
 #include "http_response.hpp"
 
+#include <sys/stat.h>
+
+#include <file_utils.hpp>
 #include <sstream>
 
 const std::string HTTPResponse::Builder::kHTTPVersion = "HTTP/1.1";
@@ -115,4 +118,22 @@ std::string HTTPResponse::ToString() {
   ss << body_;
 
   return ss.str();
+}
+
+HTTPResponse *GenerateErrorResponse(http::StatusCode status_code,
+                                    const IConfig &config) {
+  // エラーページが存在しないときは、それ自体はリクエストやレスポンスに直接関わらないので404は返さない
+  // TODO configからエラーページを取得する
+  const std::string error_page_path;
+
+  struct stat file_st;
+  if (stat(error_page_path.c_str(), &file_st) == -1) {
+    return HTTPResponse::Builder().SetStatusCode(status_code).Build();
+  }
+
+  return HTTPResponse::Builder()
+      .SetStatusCode(status_code)
+      .AddHeader("Content-Type", "text/html")
+      .SetBody(file_utils::ReadFile(error_page_path))
+      .Build();
 }
