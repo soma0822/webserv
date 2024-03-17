@@ -89,15 +89,20 @@ TEST_F(RequestHandlerTest, PostMethodDirectoryRequest) {
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
-  Mock<IServerContext> mock;
-  When(Method(mock, SearchLocation))
+  // server context mock
+  Mock<IServerContext> server_ctx_mock;
+  When(Method(server_ctx_mock, SearchLocation))
       .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
-  When(Method(mock, GetRoot)).AlwaysReturn(root);
-  When(Method(mock, GetIndex)).AlwaysReturn(uri.substr(1));
+  When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+
+  // config mock
+  Mock<IConfig> config_mock;
+  When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
 
   HTTPRequest request;
   request.SetUri(uri);
-  response = RequestHandler::Post(mock.get(), &request);
+  response = RequestHandler::Post(config_mock.get(), &request, "80", "");
 
   ASSERT_EQ(response->GetStatusCode(), http::kBadRequest);
 }
