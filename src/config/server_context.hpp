@@ -10,9 +10,6 @@
 #include "location_context.hpp"
 #include "result.hpp"
 
-#define LOCATION "\033[1;32m"
-#define SERVER "\033[1;33m"
-
 class IServerContext {
  public:
   virtual ~IServerContext() {}
@@ -27,7 +24,6 @@ class IServerContext {
   virtual const std::string &GetIndex() const = 0;
   virtual const std::string &GetPort() const = 0;
   virtual const std::string &GetServerName() const = 0;
-  virtual const std::map<std::string, std::string> &GetErrorPage() const = 0;
   virtual const std::map<std::string, LocationContext> &GetLocation() const = 0;
   // セッター
   virtual void SetIp(const std::string &ip) = 0;
@@ -35,8 +31,6 @@ class IServerContext {
   virtual void SetIndex(const std::string &index) = 0;
   virtual void SetPort(const std::string &port) = 0;
   virtual void SetServerName(const std::string &server_name) = 0;
-  virtual void AddErrorPage(const std::string &key,
-                            const std::string &value) = 0;
   virtual void AddLocation(const std::string &key,
                            const LocationContext &value) = 0;
 };
@@ -58,7 +52,6 @@ class ServerContext : public IServerContext {
   const std::string &GetIndex() const;
   const std::string &GetPort() const;
   const std::string &GetServerName() const;
-  const std::map<std::string, std::string> &GetErrorPage() const;
   const std::map<std::string, LocationContext> &GetLocation() const;
   // セッター
   void SetIp(const std::string &ip);
@@ -66,7 +59,6 @@ class ServerContext : public IServerContext {
   void SetIndex(const std::string &index);
   void SetPort(const std::string &port);
   void SetServerName(const std::string &server_name);
-  void AddErrorPage(const std::string &key, const std::string &value);
   void AddLocation(const std::string &key, const LocationContext &value);
 
  private:
@@ -75,8 +67,8 @@ class ServerContext : public IServerContext {
   std::string index_;
   std::string port_;
   std::string server_name_;
-  std::map<std::string, std::string> error_page_;
   std::map<std::string, LocationContext> location_;
+  static const std::string kDefaultRoot;
 };
 
 std::ostream &operator<<(std::ostream &os, ServerContext &obj);

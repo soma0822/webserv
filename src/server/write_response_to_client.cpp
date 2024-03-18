@@ -12,7 +12,7 @@ Result<int, std::string> WriteResponseToClient::Execute() {
   std::string response_str = response_->ToString();
   unsigned int bytes_written =
       write(fd_, response_str.c_str(), response_str.size());
-  if ((writed_ += bytes_written) == response_str.size())
-    return Ok(kWriteDelete);
+  if ((wrote_size_ += bytes_written) == response_str.size())
+    return Ok(kTaskDelete);
   return Ok(0);
 }

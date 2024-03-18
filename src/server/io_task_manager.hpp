@@ -15,8 +15,8 @@ class IOTaskManager {
  public:
   ~IOTaskManager();
   static void AddTask(AIOTask *task);
-  static void RemoveReadTask(AIOTask *task);
-  static void RemoveWriteTask(AIOTask *task);
+  static void RemoveFd(AIOTask *task);
+  static void RemoveTask(AIOTask *task);
   static void DeleteTasks();
   static void ExecuteTasks();
   static const std::vector<std::vector<AIOTask *> > &GetTasks();

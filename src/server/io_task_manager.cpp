@@ -44,9 +44,7 @@ void IOTaskManager::AddTask(AIOTask *task) {
   fds_.push_back(fd);
 }
 
-void IOTaskManager::RemoveReadTask(AIOTask *task) {
-  ReadRequestFromClient *tmp = dynamic_cast<ReadRequestFromClient *>(task);
-  if (!tmp) return;
+void IOTaskManager::RemoveFd(AIOTask *task) {
   for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == task->GetFd()) {
       for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
@@ -71,7 +69,7 @@ void IOTaskManager::DeleteTasks() {
   fds_.clear();
 }
 
-void IOTaskManager::RemoveWriteTask(AIOTask *task) {
+void IOTaskManager::RemoveTask(AIOTask *task) {
   WriteResponseToClient *tmp = dynamic_cast<WriteResponseToClient *>(task);
   if (!tmp) return;
   for (unsigned int i = 0; i < fds_.size(); ++i) {
@@ -100,11 +98,11 @@ void IOTaskManager::ExecuteTasks() {
           if (result.IsErr()) {
             DeleteTasks();
             throw std::invalid_argument("taskエラー");
-          } else if (result.Unwrap() == AIOTask::kWriteDelete) {
-            RemoveWriteTask(tasks_.at(i).at(j));
+          } else if (result.Unwrap() == AIOTask::kTaskDelete) {
+            RemoveTask(tasks_.at(i).at(j));
             --j;
-          } else if (result.Unwrap() == AIOTask::kReadDelete) {
-            RemoveReadTask(tasks_.at(i).at(j));
+          } else if (result.Unwrap() == AIOTask::kFdDelete) {
+            RemoveFd(tasks_.at(i).at(j));
             --i;
           }
         }

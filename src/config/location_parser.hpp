@@ -37,12 +37,10 @@ class LocationParser {
                          LocationContext &location);
   static bool ParseCgiPath(const std::vector<std::string> &value,
                            LocationContext &location);
-  static bool ParseCgiExtention(const std::vector<std::string> &value,
+  static bool ParseCgiExtension(const std::vector<std::string> &value,
                                 LocationContext &location);
   static bool ParseAllowMethod(const std::vector<std::string> &value,
                                LocationContext &location);
-  static bool ParseErrorPage(const std::vector<std::string> &value,
-                             LocationContext &location);
   static void RemoveSemicolon(std::string &line);
   static bool parsed_auto_index_;
   static bool parsed_limit_client_body_;
