@@ -135,7 +135,7 @@ int AParser::SetChunkedBody() {
       if (pos == 0) return kBadRequest;
       if (pos == std::string::npos) return kNotEnough;
       Result<int, std::string> result =
-          string_utils::StrToI(row_line_.substr(0, pos));
+          string_utils::StrToHex(row_line_.substr(0, pos));
       if (result.IsErr()) return BadChunkedBody(chunked_state, chunked_size);
       chunked_size = static_cast<size_t>(result.Unwrap());
       row_line_ = row_line_.substr(pos + 2);

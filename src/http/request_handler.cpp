@@ -1,6 +1,7 @@
 #include "request_handler.hpp"
 
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "config.hpp"
 #include "file_utils.hpp"
@@ -76,7 +77,7 @@ HTTPResponse *RequestHandler::Get(const IConfig &config,
     return HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build();
   }
   // パーミッションがない場合には403を返す
-  if (!(file_stat.st_mode & S_IROTH)) {
+  if (!(file_stat.st_mode & S_IRUSR)) {
     return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
   }
 
@@ -122,7 +123,7 @@ HTTPResponse *RequestHandler::Post(const IConfig &config,
     return HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build();
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
-  if (!(parent_dir_stat.st_mode & S_IWOTH)) {
+  if (!(parent_dir_stat.st_mode & S_IWUSR)) {
     return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
   }
 
@@ -132,7 +133,6 @@ HTTPResponse *RequestHandler::Post(const IConfig &config,
         .SetStatusCode(http::kInternalServerError)
         .Build();
   }
-  std::cout << "body" << request->GetBody() << std::endl;
   ofs << request->GetBody();
   ofs.close();
 
@@ -140,6 +140,56 @@ HTTPResponse *RequestHandler::Post(const IConfig &config,
       .SetStatusCode(http::kCreated)
       .AddHeader("Location", uri)
       .Build();
+}
+
+HTTPResponse *RequestHandler::Delete(const IConfig &config,
+                                     const HTTPRequest *request,
+                                     const std::string &port,
+                                     const std::string &ip) {
+  const IServerContext &server_ctx =
+      config.SearchServer(port, ip, request->GetHostHeader());
+  const std::string &uri = request->GetUri();
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
+
+  // rootを取得する
+  std::string root = server_ctx.GetRoot();
+  if (location_ctx_result.IsOk() &&
+      !location_ctx_result.Unwrap().GetRoot().empty()) {
+    root = location_ctx_result.Unwrap().GetRoot();
+  }
+
+  // rootが/で終わっている場合には/が重複してしまうので削除する
+  if (root.at(root.size() - 1) == '/') {
+    root.erase(root.size() - 1, 1);
+  }
+
+  const std::string request_file_path = root + uri;
+
+  // リクエストターゲットがディレクトリの場合には400を返す
+  if (uri.at(uri.size() - 1) == '/' || file_utils::IsDirectory(root + uri)) {
+    return HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build();
+  }
+
+  // ファイルが存在しない場合には404を返す
+  struct stat file_stat;
+  if (stat(request_file_path.c_str(), &file_stat) == -1) {
+    return HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build();
+  }
+
+  // パーミッションがない場合には403を返す
+  if (!(file_stat.st_mode & S_IWUSR) && !(file_stat.st_mode & S_IXUSR)) {
+    return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
+  }
+
+  // ファイルを削除する
+  if (unlink(request_file_path.c_str()) == -1) {
+    return HTTPResponse::Builder()
+        .SetStatusCode(http::kInternalServerError)
+        .Build();
+  }
+
+  return HTTPResponse::Builder().SetStatusCode(http::kOk).Build();
 }
 
 RequestHandler::RequestHandler() {}

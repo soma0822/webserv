@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 
+#include "config.hpp"
 #include "http_status_code.hpp"
 
 class HTTPResponse {
@@ -48,5 +49,8 @@ class HTTPResponse {
   std::map<std::string, std::string> headers_;
   std::string body_;
 };
+
+HTTPResponse *GenerateErrorResponse(http::StatusCode status_code,
+                                    const IConfig &config);
 
 #endif  // WEBSERV_SRC_HTTP_HTTP_RESPONSE_HPP_

@@ -16,7 +16,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
   int len = read(fd_, buf, buf_size_);
   if (len == -1) {
     Logger::Error() << "read エラー" << std::endl;
-    return Err("read error");
+    return Ok(kFdDelete);
   }
   if (len == 0) return Ok(kFdDelete);
   buf[len] = '\0';
