@@ -206,15 +206,20 @@ HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
   if (!dir) {
     return GenerateErrorResponse(http::kInternalServerError, config);
   }
-  struct dirent *dp;
+
+  dirent *dp;
   std::string body =
       "<html><head><title>AutoIndex</title></head><body><h1>AutoIndex</h1><ul>";
   while ((dp = readdir(dir)) != NULL) {
     body += "<li><a href=\"" + request->GetUri() + "/" + dp->d_name + "\">" +
             dp->d_name + "</a></li>";
   }
+  if (errno != 0) {
+    return GenerateErrorResponse(http::kInternalServerError, config);
+  }
   body += "</ul></body></html>";
   closedir(dir);
+
   return HTTPResponse::Builder().SetStatusCode(http::kOk).SetBody(body).Build();
 }
 
