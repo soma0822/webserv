@@ -45,8 +45,6 @@ void IOTaskManager::AddTask(AIOTask *task) {
 }
 
 void IOTaskManager::RemoveReadTask(AIOTask *task) {
-  ReadRequestFromClient *tmp = dynamic_cast<ReadRequestFromClient *>(task);
-  if (!tmp) return;
   for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == task->GetFd()) {
       for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
