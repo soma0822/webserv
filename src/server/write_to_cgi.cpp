@@ -9,7 +9,7 @@ Result<int, std::string> WriteToCGI::Execute() {
   int ret = write(fd_, body_.c_str() + writed_, body_.size() - writed_);
   writed_ += ret;
   if (writed_ == body_.size()) {
-    return Ok(kTaskDelete);
+    return Ok(kFdDelete);
   }
   return Ok(kOk);
 }

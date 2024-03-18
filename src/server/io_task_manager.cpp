@@ -96,6 +96,7 @@ void IOTaskManager::ExecuteTasks() {
         if (fds_.at(i).revents & tasks_.at(i).at(j)->GetEvent()) {
           Result<int, std::string> result = tasks_.at(i).at(j)->Execute();
           if (result.IsErr()) {
+            Logger::Error() << result.UnwrapErr() << std::endl;
             DeleteTasks();
             throw std::invalid_argument("taskエラー");
           } else if (result.Unwrap() == AIOTask::kTaskDelete) {

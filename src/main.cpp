@@ -1,4 +1,5 @@
 #include <iostream>
+#include <signal.h>
 
 #include "config.hpp"
 #include "config_parser.hpp"
@@ -7,6 +8,7 @@
 #include "server.hpp"
 
 int main(int ac, char **av) {
+  signal(SIGPIPE, SIG_IGN);
   Logger::SetHandler(new FileStreamWrapper("log.txt"));
   std::string config_file;
   if (ac == 1)

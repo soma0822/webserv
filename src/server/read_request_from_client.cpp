@@ -14,10 +14,6 @@ ReadRequestFromClient::~ReadRequestFromClient() {}
 Result<int, std::string> ReadRequestFromClient::Execute() {
   char buf[buf_size_ + 1];
   int len = read(fd_, buf, buf_size_);
-  if (len == -1) {
-    Logger::Error() << "read エラー" << std::endl;
-    return Err("read error");
-  }
   if (len == 0) return Ok(kFdDelete);
   buf[len] = '\0';
   Result<HTTPRequest *, int> result = parser_.Parser(buf);

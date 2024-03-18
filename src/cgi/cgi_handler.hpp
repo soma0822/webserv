@@ -9,7 +9,8 @@
 #include "http_response.hpp"
 #include "io_task.hpp"
 #include "io_task_manager.hpp"
-#include "read_cgi.hpp"
+#include "read_from_cgi.hpp"
+#include "write_to_cgi.hpp"
 
 class CgiHandler {
  public:
