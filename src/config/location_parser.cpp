@@ -44,7 +44,6 @@ void LocationParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   func["cgi_path"] = &LocationParser::ParseCgiPath;
   func["cgi_extention"] = &LocationParser::ParseCgiExtention;
   func["allow_methods"] = &LocationParser::ParseAllowMethod;
-  func["error_page"] = &LocationParser::ParseErrorPage;
   parsed_auto_index_ = false;
   parsed_limit_client_body_ = false;
   parsed_return_ = false;
@@ -129,15 +128,7 @@ bool LocationParser::ParseAllowMethod(const std::vector<std::string> &value,
     location.AddAllowMethod(value.at(i));
   return true;
 }
-bool LocationParser::ParseErrorPage(const std::vector<std::string> &value,
-                                    LocationContext &location) {
-  if (value.size() < 2) return false;
-  for (unsigned int i = 0; i < value.size() - 1; ++i) {
-    if (validation::IsNumber(value.at(i)) == false) return false;
-    location.AddErrorPage(value.at(i), *(value.end() - 1));
-  }
-  return true;
-}
+
 
 void LocationParser::RemoveSemicolon(std::string &line) {
   std::stringstream ss(line);

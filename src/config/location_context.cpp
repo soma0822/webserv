@@ -23,7 +23,6 @@ LocationContext &LocationContext::operator=(const LocationContext &other) {
   cgi_path_ = other.cgi_path_;
   cgi_extention_ = other.cgi_extention_;
   allow_method_ = other.allow_method_;
-  error_page_ = other.error_page_;
   return *this;
 }
 // ゲッター
@@ -44,10 +43,6 @@ const std::vector<std::string> &LocationContext::GetCgiExtention() const {
 }
 const std::map<std::string, bool> &LocationContext::GetAllowMethod() const {
   return allow_method_;
-}
-const std::map<std::string, std::string> &LocationContext::GetErrorPage()
-    const {
-  return error_page_;
 }
 // セッター
 void LocationContext::SetCanAutoIndex(bool can_auto_index) {
@@ -79,26 +74,12 @@ void LocationContext::AddAllowMethod(const std::string &key) {
     throw std::invalid_argument("allow_methodで同じものが複数指定されています");
   allow_method_[key] = true;
 }
-void LocationContext::AddErrorPage(const std::string &key,
-                                   const std::string &value) {
-  std::map<std::string, std::string>::iterator it = error_page_.find(key);
-  if (it != error_page_.end())
-    throw std::invalid_argument("error_pageで同じものが複数指定されています");
-  error_page_[key] = value;
-}
 
 // 出力
 std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
   os << "path: " << obj.GetPath();
   os << "\nindex: ";
   os << obj.GetIndex();
-  os << "\nerror page: ";
-  for (std::map<std::string, std::string>::const_iterator it =
-           obj.GetErrorPage().begin();
-       it != obj.GetErrorPage().end(); ++it) {
-    os << it->first << "[" << it->second << "]"
-       << "    ";
-  }
   os << "\nroot: " << obj.GetRoot();
   const std::map<std::string, bool> allow_method = obj.GetAllowMethod();
   for (std::map<std::string, bool>::const_iterator it = allow_method.begin();
@@ -127,16 +108,6 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
   os << "path: " << obj.GetPath();
   os << "\nindex: ";
   os << obj.GetIndex();
-  os << "\nerror page: ";
-  if (obj.GetErrorPage().size() == 0)
-    os << "no set";
-  else {
-    for (std::map<std::string, std::string>::const_iterator it =
-             obj.GetErrorPage().begin();
-         it != obj.GetErrorPage().end(); ++it)
-      os << it->first << "[" << it->second << "]"
-         << "    ";
-  }
   os << "\nroot: " << (obj.GetRoot().empty() ? "no set" : obj.GetRoot());
   os << "\nallow method: ";
   const std::map<std::string, bool> allow_method = obj.GetAllowMethod();
