@@ -21,7 +21,7 @@ LocationContext &LocationContext::operator=(const LocationContext &other) {
   root_ = other.root_;
   index_ = other.index_;
   cgi_path_ = other.cgi_path_;
-  cgi_extention_ = other.cgi_extention_;
+  cgi_extension_ = other.cgi_extension_;
   allow_method_ = other.allow_method_;
   return *this;
 }
@@ -38,8 +38,8 @@ const std::string &LocationContext::GetIndex() const { return index_; }
 const std::vector<std::string> &LocationContext::GetCgiPath() const {
   return cgi_path_;
 }
-const std::vector<std::string> &LocationContext::GetCgiExtention() const {
-  return cgi_extention_;
+const std::vector<std::string> &LocationContext::GetCgiExtension() const {
+  return cgi_extension_;
 }
 const std::map<std::string, bool> &LocationContext::GetAllowMethod() const {
   return allow_method_;
@@ -62,12 +62,12 @@ void LocationContext::AddCgiPath(const std::string &cgi_path) {
     throw std::invalid_argument("cgi_pathで同じものが複数指定されています");
   cgi_path_.push_back(cgi_path);
 }
-void LocationContext::AddCgiExtention(const std::string &cgi_extention) {
-  if (cgi_extention_.end() !=
-      std::find(cgi_extention_.begin(), cgi_extention_.end(), cgi_extention))
+void LocationContext::AddCgiExtension(const std::string &cgi_extension) {
+  if (cgi_extension_.end() !=
+      std::find(cgi_extension_.begin(), cgi_extension_.end(), cgi_extension))
     throw std::invalid_argument(
-        "cgi_extentionで同じものが複数指定されています");
-  cgi_extention_.push_back(cgi_extention);
+        "cgi_extensionで同じものが複数指定されています");
+  cgi_extension_.push_back(cgi_extension);
 }
 void LocationContext::AddAllowMethod(const std::string &key) {
   if (allow_method_[key] == true)
@@ -91,10 +91,10 @@ std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
        it != obj.GetCgiPath().end(); ++it) {
     os << *it << " ";
   }
-  os << "\n cgiExtention: ";
+  os << "\n cgiExtension: ";
   for (std::vector<std::string>::const_iterator it =
-           obj.GetCgiExtention().begin();
-       it != obj.GetCgiExtention().end(); ++it) {
+           obj.GetCgiExtension().begin();
+       it != obj.GetCgiExtension().end(); ++it) {
     os << *it << " ";
   }
   os << "\n autoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
@@ -124,13 +124,13 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
          it != obj.GetCgiPath().end(); ++it)
       os << *it << " ";
   }
-  os << "\n cgiExtention: ";
-  if (obj.GetCgiExtention().size() == 0)
+  os << "\n cgiExtension: ";
+  if (obj.GetCgiExtension().size() == 0)
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it =
-             obj.GetCgiExtention().begin();
-         it != obj.GetCgiExtention().end(); ++it)
+             obj.GetCgiExtension().begin();
+         it != obj.GetCgiExtension().end(); ++it)
       os << *it << " ";
   }
   os << "\n autoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
