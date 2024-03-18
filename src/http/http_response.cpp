@@ -120,12 +120,19 @@ std::string HTTPResponse::ToString() {
   return ss.str();
 }
 
-HTTPResponse *GenerateErrorResponse(http::StatusCode status_code,
+HTTPResponse *GenerateErrorResponse(const http::StatusCode status_code,
                                     const IConfig &config) {
-  // エラーページが存在しないときは、それ自体はリクエストやレスポンスに直接関わらないので404は返さない
-  // TODO configからエラーページを取得する
-  const std::string error_page_path;
+  const std::map<std::string, std::string> &error_pages = config.GetErrorPage();
+  std::map<std::string, std::string>::const_iterator it =
+      error_pages.find(std::to_string(status_code));
+  if (it == error_pages.end()) {
+    return HTTPResponse::Builder()
+        .SetStatusCode(status_code)
+        .SetBody(GetErrorPage(status_code))
+        .Build();
+  }
 
+  const std::string error_page_path = it->second;
   struct stat file_st;
   if (stat(error_page_path.c_str(), &file_st) == -1) {
     return HTTPResponse::Builder().SetStatusCode(status_code).Build();
