@@ -10,3 +10,4 @@ a.out
 *.json
 *.swp
 .DS*
+log.txt

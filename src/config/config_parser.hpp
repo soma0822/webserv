@@ -17,6 +17,7 @@ class Config;
 class ConfigParser {
  public:
   static Config Parse(const std::string &file);
+  static bool ParseErrorPage(const std::vector<std::string> &value, Config &config);
   static const std::string default_file_;
 };
 

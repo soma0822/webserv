@@ -10,9 +10,6 @@
 #include "location_context.hpp"
 #include "result.hpp"
 
-#define LOCATION "\033[1;32m"
-#define SERVER "\033[1;33m"
-
 class IServerContext {
  public:
   virtual ~IServerContext() {}

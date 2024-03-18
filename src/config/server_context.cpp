@@ -87,7 +87,6 @@ void ServerContext::AddLocation(const std::string &key,
 }
 
 std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
-  os << SERVER;
   std::vector<std::string> tmp;
   os << "port: ";
   os << obj.GetPort();
@@ -100,8 +99,7 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
   for (std::map<std::string, LocationContext>::const_iterator it =
            obj.GetLocation().begin();
        it != obj.GetLocation().end(); ++it) {
-    os << LOCATION << "\nLocation: ";
-    os << it->first << "\n";
+    os << it->first << " {\n";
     os << it->second << "\n";
     os << "}\n";
   }
@@ -109,7 +107,6 @@ std::ostream &operator<<(std::ostream &os, ServerContext &obj) {
 }
 
 std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
-  os << SERVER;
   std::vector<std::string> tmp;
   os << "port: ";
   os << obj.GetPort();
@@ -122,8 +119,7 @@ std::ostream &operator<<(std::ostream &os, const ServerContext &obj) {
   for (std::map<std::string, LocationContext>::const_iterator it =
            obj.GetLocation().begin();
        it != obj.GetLocation().end(); ++it) {
-    os << LOCATION << "\nLocation: ";
-    os << it->first << "\n";
+    os << it->first << " {\n";
     os << it->second << "\n";
     os << "}\n";
   }

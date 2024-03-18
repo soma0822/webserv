@@ -78,44 +78,44 @@ void LocationContext::AddAllowMethod(const std::string &key) {
 // 出力
 std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
   os << "path: " << obj.GetPath();
-  os << "\nindex: ";
+  os << "\n index: ";
   os << obj.GetIndex();
-  os << "\nroot: " << obj.GetRoot();
+  os << "\n root: " << obj.GetRoot();
   const std::map<std::string, bool> allow_method = obj.GetAllowMethod();
   for (std::map<std::string, bool>::const_iterator it = allow_method.begin();
        it != allow_method.end(); ++it) {
     os << (it->second ? it->first + " " : "");
   }
-  os << "\ncgiPath: ";
+  os << "\n cgiPath: ";
   for (std::vector<std::string>::const_iterator it = obj.GetCgiPath().begin();
        it != obj.GetCgiPath().end(); ++it) {
     os << *it << " ";
   }
-  os << "\ncgiExtention: ";
+  os << "\n cgiExtention: ";
   for (std::vector<std::string>::const_iterator it =
            obj.GetCgiExtention().begin();
        it != obj.GetCgiExtention().end(); ++it) {
     os << *it << " ";
   }
-  os << "\nautoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
-  os << "\nreturn: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
-  os << "\nalias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
-  os << "\nlimit client body: " << obj.GetLimitClientBody();
+  os << "\n autoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
+  os << "\n return: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
+  os << "\n alias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
+  os << "\n limit client body: " << obj.GetLimitClientBody();
   return os;
 }
 
 std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
-  os << "path: " << obj.GetPath();
-  os << "\nindex: ";
+  os << " path: " << obj.GetPath();
+  os << "\n index: ";
   os << obj.GetIndex();
-  os << "\nroot: " << (obj.GetRoot().empty() ? "no set" : obj.GetRoot());
-  os << "\nallow method: ";
+  os << "\n root: " << (obj.GetRoot().empty() ? "no set" : obj.GetRoot());
+  os << "\n allow method: ";
   const std::map<std::string, bool> allow_method = obj.GetAllowMethod();
   for (std::map<std::string, bool>::const_iterator it = allow_method.begin();
        it != allow_method.end(); ++it) {
     os << (it->second ? it->first + " " : "");
   }
-  os << "\ncgiPath: ";
+  os << "\n cgiPath: ";
   if (obj.GetCgiPath().size() == 0)
     os << "no set";
   else {
@@ -123,7 +123,7 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
          it != obj.GetCgiPath().end(); ++it)
       os << *it << " ";
   }
-  os << "\ncgiExtention: ";
+  os << "\n cgiExtention: ";
   if (obj.GetCgiExtention().size() == 0)
     os << "no set";
   else {
@@ -132,9 +132,9 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
          it != obj.GetCgiExtention().end(); ++it)
       os << *it << " ";
   }
-  os << "\nautoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
-  os << "\nreturn: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
-  os << "\nalias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
-  os << "\nlimit client body: " << obj.GetLimitClientBody();
+  os << "\n autoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
+  os << "\n return: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
+  os << "\n alias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
+  os << "\n limit client body: " << obj.GetLimitClientBody();
   return os;
 }
