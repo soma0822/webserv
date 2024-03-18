@@ -137,7 +137,7 @@ HTTPResponse *GenerateErrorResponse(const http::StatusCode status_code,
   struct stat file_st;
   // エラーページが存在しない、または読み込み権限がない場合はデフォルトのエラーページを返す
   if (stat(error_page_path.c_str(), &file_st) == -1 ||
-      !S_ISREG(file_st.st_mode) || !(file_st.st_mode & S_IRUSR)) {
+      S_ISDIR(file_st.st_mode) || !(file_st.st_mode & S_IRUSR)) {
     return HTTPResponse::Builder()
         .SetStatusCode(status_code)
         .SetBody(GetErrorPage(status_code))
