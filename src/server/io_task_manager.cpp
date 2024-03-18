@@ -13,9 +13,7 @@ IOTaskManager::~IOTaskManager() {
   }
 }
 
-const std::vector<Tasks> &IOTaskManager::GetTasks() {
-  return tasks_array_;
-}
+const std::vector<Tasks> &IOTaskManager::GetTasks() { return tasks_array_; }
 const std::vector<struct pollfd> &IOTaskManager::GetFds() { return fds_; }
 
 void IOTaskManager::AddTask(AIOTask *task) {
@@ -86,19 +84,24 @@ void IOTaskManager::ExecuteTasks() {
           fd_tasks.index = 0;
           break;
         }
-      } while (fd_tasks.tasks.at(fd_tasks.index) == NULL || !(fd_tasks.tasks.at(fd_tasks.index)->GetEvent() & fds_.at(i).revents));
-      if (fd_tasks.tasks.at(fd_tasks.index) != NULL && (fd_tasks.tasks.at(fd_tasks.index)->GetEvent() & fds_.at(i).revents)){
-        Result<int, std::string> result = fd_tasks.tasks.at(fd_tasks.index)->Execute();
-          if (result.IsErr()) {
-            DeleteTasks();
-            throw std::invalid_argument("taskエラー");
-          } else if (result.Unwrap() == AIOTask::kTaskDelete) {
-            delete fd_tasks.tasks.at(fd_tasks.index);
-            fd_tasks.tasks.at(fd_tasks.index) = NULL;
-          } else if (result.Unwrap() == AIOTask::kFdDelete) {
-            RemoveFd(fd_tasks.tasks.at(fd_tasks.index));
-            --i;
-          }
+      } while (fd_tasks.tasks.at(fd_tasks.index) == NULL ||
+               !(fd_tasks.tasks.at(fd_tasks.index)->GetEvent() &
+                 fds_.at(i).revents));
+      if (fd_tasks.tasks.at(fd_tasks.index) != NULL &&
+          (fd_tasks.tasks.at(fd_tasks.index)->GetEvent() &
+           fds_.at(i).revents)) {
+        Result<int, std::string> result =
+            fd_tasks.tasks.at(fd_tasks.index)->Execute();
+        if (result.IsErr()) {
+          DeleteTasks();
+          throw std::invalid_argument("taskエラー");
+        } else if (result.Unwrap() == AIOTask::kTaskDelete) {
+          delete fd_tasks.tasks.at(fd_tasks.index);
+          fd_tasks.tasks.at(fd_tasks.index) = NULL;
+        } else if (result.Unwrap() == AIOTask::kFdDelete) {
+          RemoveFd(fd_tasks.tasks.at(fd_tasks.index));
+          --i;
+        }
       }
     }
   }

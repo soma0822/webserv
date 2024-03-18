@@ -15,14 +15,14 @@ TEST(IOTaskManager, DefaultTest) {
   WriteResponseToClient *res = new WriteResponseToClient(4, new HTTPResponse);
   IOTaskManager::AddTask(res);
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
-  ASSERT_EQ(2, IOTaskManager::GetTasks().at(1).size());
+  ASSERT_EQ(2, IOTaskManager::GetTasks().at(1).tasks.size());
   ASSERT_EQ(2, IOTaskManager::GetFds().size());
   IOTaskManager::RemoveFd(req);
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
   ASSERT_EQ(2, IOTaskManager::GetFds().size());
   // ASSERT_EQ(0, IOTaskManager::GetTasks().at(0).size());
   ASSERT_EQ(-1, IOTaskManager::GetFds().at(1).fd);
-  ASSERT_EQ(0, IOTaskManager::GetTasks().at(1).size());
+  ASSERT_EQ(0, IOTaskManager::GetTasks().at(1).tasks.size());
   req = new ReadRequestFromClient(5, "8080", "", conf);
   IOTaskManager::AddTask(req);
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
@@ -30,7 +30,7 @@ TEST(IOTaskManager, DefaultTest) {
   res = new WriteResponseToClient(5, new HTTPResponse);
   IOTaskManager::AddTask(res);
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
-  ASSERT_EQ(2, IOTaskManager::GetTasks().at(1).size());
+  ASSERT_EQ(2, IOTaskManager::GetTasks().at(1).tasks.size());
   ASSERT_EQ(2, IOTaskManager::GetFds().size());
   ASSERT_EQ(5, IOTaskManager::GetFds().at(1).fd);
   IOTaskManager::DeleteTasks();
