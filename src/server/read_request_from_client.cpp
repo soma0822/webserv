@@ -18,7 +18,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     Logger::Error() << "read エラー" << std::endl;
     return Err("read error");
   }
-  if (len == 0) return Ok(kReadDelete);
+  if (len == 0) return Ok(kFdDelete);
   buf[len] = '\0';
   Result<HTTPRequest *, int> result = parser_.Parser(buf);
   if (result.IsErr() && result.UnwrapErr() == HTTPRequestParser::kNotEnough) {
