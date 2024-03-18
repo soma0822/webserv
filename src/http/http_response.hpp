@@ -4,6 +4,7 @@
 #include <map>
 #include <string>
 
+#include "config.hpp"
 #include "http_status_code.hpp"
 
 class HTTPResponse {
@@ -49,6 +50,10 @@ class HTTPResponse {
   std::string body_;
 };
 
+
 std::string GenerateAutoIndexPage(const std::string &path);
+
+HTTPResponse *GenerateErrorResponse(http::StatusCode status_code,
+                                    const IConfig &config);
 
 #endif  // WEBSERV_SRC_HTTP_HTTP_RESPONSE_HPP_

@@ -55,6 +55,8 @@ enum StatusCode {
 
 std::string GetStatusMessage(StatusCode status_code);
 
+std::string GetErrorPage(StatusCode status_code);
+
 }  // namespace http
 
 #endif  // WEBSERV_SRC_HTTP_STATUS_CODE_HPP

@@ -1,5 +1,8 @@
 #include "http_response.hpp"
 
+#include <sys/stat.h>
+
+#include <file_utils.hpp>
 #include <sstream>
 
 const std::string HTTPResponse::Builder::kHTTPVersion = "HTTP/1.1";
@@ -118,4 +121,35 @@ std::string HTTPResponse::ToString() {
 }
 
 std::string GenerateAutoIndexPage(const std::string &abs_path) {
+}
+
+HTTPResponse *GenerateErrorResponse(const http::StatusCode status_code,
+                                    const IConfig &config) {
+  const std::map<std::string, std::string> &error_pages = config.GetErrorPage();
+  std::stringstream ss;
+  ss << status_code;
+  // エラーページが設定されていない場合はデフォルトのエラーページを返す
+  if (error_pages.count(ss.str()) == 0) {
+    return HTTPResponse::Builder()
+        .SetStatusCode(status_code)
+        .SetBody(GetErrorPage(status_code))
+        .Build();
+  }
+
+  const std::string error_page_path = error_pages.at(ss.str());
+  struct stat file_st;
+  // エラーページが存在しない、または読み込み権限がない場合はデフォルトのエラーページを返す
+  if (stat(error_page_path.c_str(), &file_st) == -1 ||
+      S_ISDIR(file_st.st_mode) || !(file_st.st_mode & S_IRUSR)) {
+    return HTTPResponse::Builder()
+        .SetStatusCode(status_code)
+        .SetBody(GetErrorPage(status_code))
+        .Build();
+  }
+
+  return HTTPResponse::Builder()
+      .SetStatusCode(status_code)
+      .AddHeader("Content-Type", "text/html")
+      .SetBody(file_utils::ReadFile(error_page_path))
+      .Build();
 }
