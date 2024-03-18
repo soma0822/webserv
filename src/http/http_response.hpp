@@ -49,4 +49,6 @@ class HTTPResponse {
   std::string body_;
 };
 
+std::string GenerateAutoIndexPage(const std::string &path);
+
 #endif  // WEBSERV_SRC_HTTP_HTTP_RESPONSE_HPP_

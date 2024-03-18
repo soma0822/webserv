@@ -116,3 +116,6 @@ std::string HTTPResponse::ToString() {
 
   return ss.str();
 }
+
+std::string GenerateAutoIndexPage(const std::string &abs_path) {
+}
