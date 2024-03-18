@@ -78,6 +78,7 @@ void IOTaskManager::ExecuteTasks() {
     for (unsigned int i = 0; i < fds_.size(); ++i) {
       if (fds_.at(i).fd == -1) continue;
       struct Tasks &fd_tasks = tasks_array_.at(i);
+      fd_tasks.index >= fd_tasks.tasks.size() ? fd_tasks.index = 0 : 0;
       while (fd_tasks.tasks.at(fd_tasks.index) == NULL ||
              !(fd_tasks.tasks.at(fd_tasks.index)->GetEvent() &
                fds_.at(i).revents)) {
