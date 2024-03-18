@@ -13,9 +13,7 @@ IOTaskManager::~IOTaskManager() {
   }
 }
 
-const std::vector<Tasks> &IOTaskManager::GetTasks() {
-  return tasks_array_;
-}
+const std::vector<Tasks> &IOTaskManager::GetTasks() { return tasks_array_; }
 const std::vector<struct pollfd> &IOTaskManager::GetFds() { return fds_; }
 
 void IOTaskManager::AddTask(AIOTask *task) {
@@ -79,27 +77,35 @@ void IOTaskManager::ExecuteTasks() {
     }
     for (unsigned int i = 0; i < fds_.size(); ++i) {
       if (fds_.at(i).fd == -1) continue;
-      Tasks &fd_tasks = tasks_array_.at(i);
-      do {
-        fd_tasks.index++;
+      struct Tasks &fd_tasks = tasks_array_.at(i);
+      while (fd_tasks.tasks.at(fd_tasks.index) == NULL ||
+             !(fd_tasks.tasks.at(fd_tasks.index)->GetEvent() &
+               fds_.at(i).revents)) {
+        ++(fd_tasks.index);
         if (fd_tasks.index >= fd_tasks.tasks.size()) {
           fd_tasks.index = 0;
           break;
         }
-      } while (fd_tasks.tasks.at(fd_tasks.index) == NULL || !(fd_tasks.tasks.at(fd_tasks.index)->GetEvent() & fds_.at(i).revents));
-      if (fd_tasks.tasks.at(fd_tasks.index) != NULL && (fd_tasks.tasks.at(fd_tasks.index)->GetEvent() & fds_.at(i).revents)){
-        Result<int, std::string> result = fd_tasks.tasks.at(fd_tasks.index)->Execute();
-          if (result.IsErr()) {
-            Logger::Error() << result.UnwrapErr() << std::endl;
-            DeleteTasks();
-            throw std::invalid_argument("taskエラー");
-          } else if (result.Unwrap() == AIOTask::kTaskDelete) {
-            delete fd_tasks.tasks.at(fd_tasks.index);
-            fd_tasks.tasks.at(fd_tasks.index) = NULL;
-          } else if (result.Unwrap() == AIOTask::kFdDelete) {
-            RemoveFd(fd_tasks.tasks.at(fd_tasks.index));
-            --i;
-          }
+      }
+      if (fd_tasks.tasks.at(fd_tasks.index) != NULL &&
+          (fd_tasks.tasks.at(fd_tasks.index)->GetEvent() &
+           fds_.at(i).revents)) {
+        Result<int, std::string> result =
+            fd_tasks.tasks.at(fd_tasks.index)->Execute();
+        if (result.IsErr()) {
+          DeleteTasks();
+          throw std::invalid_argument("taskエラー");
+        } else if (result.Unwrap() == AIOTask::kTaskDelete) {
+          delete fd_tasks.tasks.at(fd_tasks.index);
+          fd_tasks.tasks.at(fd_tasks.index) = NULL;
+        } else if (result.Unwrap() == AIOTask::kFdDelete) {
+          RemoveFd(fd_tasks.tasks.at(fd_tasks.index));
+          --i;
+        } else if (result.Unwrap() == AIOTask::kContinue) {
+          ;
+        } else if (result.Unwrap() == AIOTask::kOk) {
+          ++(fd_tasks.index);
+        }
       }
     }
   }

@@ -17,5 +17,5 @@ Result<int, std::string> WriteResponseToClient::Execute() {
   }
   if ((wrote_size_ += bytes_written) == response_str.size())
     return Ok(kTaskDelete);
-  return Ok(0);
+  return Ok(kContinue);
 }
