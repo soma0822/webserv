@@ -77,7 +77,7 @@ HTTPResponse *RequestHandler::Get(const IConfig &config,
     return HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build();
   }
   // パーミッションがない場合には403を返す
-  if (!(file_stat.st_mode & S_IROTH)) {
+  if (!(file_stat.st_mode & S_IRUSR)) {
     return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
   }
 
@@ -123,7 +123,7 @@ HTTPResponse *RequestHandler::Post(const IConfig &config,
     return HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build();
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
-  if (!(parent_dir_stat.st_mode & S_IWOTH)) {
+  if (!(parent_dir_stat.st_mode & S_IWUSR)) {
     return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
   }
 
@@ -133,7 +133,6 @@ HTTPResponse *RequestHandler::Post(const IConfig &config,
         .SetStatusCode(http::kInternalServerError)
         .Build();
   }
-  std::cout << "body" << request->GetBody() << std::endl;
   ofs << request->GetBody();
   ofs.close();
 
@@ -173,7 +172,7 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   }
 
   // パーミッションがない場合には403を返す
-  if (!(file_stat.st_mode & S_IWOTH) && !(file_stat.st_mode & S_IXOTH)) {
+  if (!(file_stat.st_mode & S_IWUSR) && !(file_stat.st_mode & S_IXUSR)) {
     return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
   }
 
