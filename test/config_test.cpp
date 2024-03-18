@@ -12,20 +12,19 @@ TEST(ConfigTest, EmptyConfig) {
 
 TEST(ConfigTest, DefaultPath) {
   Config config = ConfigParser::Parse("test/conf_test/default.conf");
+  std::map<std::string, std::string>::const_iterator it =
+      config.GetErrorPage().begin();
+  ASSERT_EQ(it->first, "404");
+  ASSERT_EQ(it->second, "error_pages/404.html");
+  ++it;
+  ASSERT_EQ(it->first, "405");
+  ASSERT_EQ(it->second, "error_pages/404.html");
   ASSERT_EQ(config.GetServer().size(), 1);
   ASSERT_EQ(config.GetServer()[0].GetIp(), "127.0.0.1");
   ASSERT_EQ(config.GetServer()[0].GetRoot(), "docs/fusion_web/");
   ASSERT_EQ(config.GetServer()[0].GetIndex(), "index.html");
   ASSERT_EQ(config.GetServer()[0].GetPort(), "8002");
   ASSERT_EQ(config.GetServer()[0].GetServerName(), "localhost");
-  ASSERT_EQ(config.GetServer()[0].GetErrorPage().size(), 2);
-  std::map<std::string, std::string>::const_iterator it =
-      config.GetServer()[0].GetErrorPage().begin();
-  ASSERT_EQ(it->first, "404");
-  ASSERT_EQ(it->second, "error_pages/404.html");
-  ++it;
-  ASSERT_EQ(it->first, "405");
-  ASSERT_EQ(it->second, "error_pages/404.html");
   ASSERT_EQ(config.GetServer()[0].GetLocation().size(), 5);
   std::map<std::string, LocationContext>::const_iterator it2 =
       config.GetServer()[0].GetLocation().begin();
@@ -45,11 +44,6 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it3->second, true);
   ++it3;
   ASSERT_EQ(it3->second, true);
-  ASSERT_EQ(it2->second.GetErrorPage().size(), 1);
-  std::map<std::string, std::string>::const_iterator it4 =
-      it2->second.GetErrorPage().begin();
-  ASSERT_EQ(it4->first, "404");
-  ASSERT_EQ(it4->second, "error_pages/404.html");
   ++it2;
   ASSERT_EQ(it2->first, "/cgi-bin");
   ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
@@ -72,7 +66,6 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it5->second, true);
   ++it5;
   ASSERT_EQ(it5->second, true);
-  ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   ++it2;
   ASSERT_EQ(it2->first, "/red");
   ASSERT_EQ(it2->second.GetCanAutoIndex(), true);
@@ -90,7 +83,6 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it6->second, false);
   ++it6;
   ASSERT_EQ(it6->second, false);
-  ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   ++it2;
   ASSERT_EQ(it2->first, "/tours");
   ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
@@ -108,7 +100,6 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it7->second, true);
   ++it7;
   ASSERT_EQ(it7->second, true);
-  ASSERT_EQ(it2->second.GetErrorPage().size(), 0);
   ++it2;
   ASSERT_EQ(it2->first, "= /red");
   ASSERT_EQ(it2->second.GetPath(), "= /red");
@@ -258,12 +249,6 @@ TEST(ConfigTest, DoubleLocationCgiExtention) {
 TEST(ConfigTest, DoubleLocationAllowMethod) {
   ASSERT_THROW(
       ConfigParser::Parse("test/conf_test/double_location_allow_method.conf"),
-      std::invalid_argument);
-}
-
-TEST(ConfigTest, DoubleLocationErrorPage) {
-  ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/double_location_error_page.conf"),
       std::invalid_argument);
 }
 

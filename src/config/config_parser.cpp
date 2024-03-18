@@ -18,10 +18,8 @@ Config ConfigParser::Parse(const std::string &file) {
     ss >> key;
     if (key.empty()) continue;
     if (key == "error_page"){
-      std::vector<std::string> value;
-      std::string tmp;
-      while (ss >> tmp) value.push_back(tmp);
-      if (ConfigParser::ParseErrorPage(value, config) == false)
+      RemoveSemicolon(line);
+      if (ConfigParser::ParseErrorPage(line, config) == false)
         throw std::invalid_argument("無効なerror_page: " + line);
       continue;
     }
@@ -40,12 +38,28 @@ Config ConfigParser::Parse(const std::string &file) {
   return config;
 }
 
-bool ConfigParser::ParseErrorPage(const std::vector<std::string> &value,
-                                    Config &config) {
+bool ConfigParser::ParseErrorPage(const std::string &line, Config &config) {
+  std::stringstream ss(line);
+  std::string key;
+  std::vector<std::string> value;
+  std::string tmp;
+  ss >> key;
+  while (ss >> tmp) value.push_back(tmp);
   if (value.size() < 2) return false;
   for (unsigned int i = 0; i < value.size() - 1; ++i) {
     if (validation::IsNumber(value.at(i)) == false) return false;
     config.AddErrorPage(value.at(i), *(value.end() - 1));
   }
   return true;
+}
+
+void ConfigParser::RemoveSemicolon(std::string &line) {
+  std::stringstream ss(line);
+  std::string key;
+  ss >> key;
+  if (line.at(line.size() - 1) == ';') {
+    line.erase(line.size() - 1, 1);
+    return;
+  }
+  throw std::invalid_argument("Syntaxエラー: semicolon: " + line);
 }
