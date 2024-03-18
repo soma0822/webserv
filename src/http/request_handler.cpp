@@ -199,9 +199,9 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   return HTTPResponse::Builder().SetStatusCode(http::kOk).Build();
 }
 
-HTTPResponse *RequestHandler::GenerateAutoIndexPage(const IConfig &config,
-                                    const HTTPRequest *request,
-                                    const std::string &abs_path) {
+HTTPResponse *RequestHandler::GenerateAutoIndexPage(
+    const IConfig &config, const HTTPRequest *request,
+    const std::string &abs_path) {
   DIR *dir = opendir(abs_path.c_str());
   if (!dir) {
     return GenerateErrorResponse(http::kInternalServerError, config);
