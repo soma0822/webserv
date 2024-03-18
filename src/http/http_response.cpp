@@ -120,9 +120,6 @@ std::string HTTPResponse::ToString() {
   return ss.str();
 }
 
-std::string GenerateAutoIndexPage(const std::string &abs_path) {
-}
-
 HTTPResponse *GenerateErrorResponse(const http::StatusCode status_code,
                                     const IConfig &config) {
   const std::map<std::string, std::string> &error_pages = config.GetErrorPage();

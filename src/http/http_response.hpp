@@ -50,9 +50,6 @@ class HTTPResponse {
   std::string body_;
 };
 
-
-std::string GenerateAutoIndexPage(const std::string &path);
-
 HTTPResponse *GenerateErrorResponse(http::StatusCode status_code,
                                     const IConfig &config);
 

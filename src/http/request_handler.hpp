@@ -15,6 +15,9 @@ class RequestHandler {
                             const std::string &port, const std::string &ip);
   static HTTPResponse *Delete(const IConfig &config, const HTTPRequest *request,
                               const std::string &port, const std::string &ip);
+  static HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
+                                             const HTTPRequest *request,
+                                             const std::string &abs_path);
 
  private:
   RequestHandler();
