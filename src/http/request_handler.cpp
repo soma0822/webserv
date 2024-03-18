@@ -165,6 +165,12 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   }
 
   const std::string request_file_path = root + uri;
+
+  // リクエストターゲットがディレクトリの場合には400を返す
+  if (uri.at(uri.size() - 1) == '/' || file_utils::IsDirectory(root + uri)) {
+    return HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build();
+  }
+
   // ファイルが存在しない場合には404を返す
   struct stat file_stat;
   if (stat(request_file_path.c_str(), &file_stat) == -1) {
