@@ -3,7 +3,7 @@
 
 #include <time.h>
 
-namespace time {
+namespace time_utils {
   struct timespec GetCurrentTime();
   bool TimeOut(const struct timespec &start, int timeout_s);
   bool operator<(const struct timespec &lhs, const struct timespec &rhs);
