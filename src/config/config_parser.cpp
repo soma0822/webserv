@@ -17,7 +17,7 @@ Config ConfigParser::Parse(const std::string &file) {
     std::string value;
     ss >> key;
     if (key.empty()) continue;
-    if (key == "error_page"){
+    if (key == "error_page") {
       RemoveSemicolon(line);
       if (ConfigParser::ParseErrorPage(line, config) == false)
         throw std::invalid_argument("無効なerror_page: " + line);

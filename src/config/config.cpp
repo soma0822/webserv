@@ -15,8 +15,7 @@ void Config::AddServer(const ServerContext &server) {
   server_.push_back(server);
 }
 
-void Config::AddErrorPage(const std::string &key,
-                                   const std::string &value) {
+void Config::AddErrorPage(const std::string &key, const std::string &value) {
   std::map<std::string, std::string>::iterator it = error_page_.find(key);
   if (it != error_page_.end())
     throw std::invalid_argument("error_pageで同じものが複数指定されています");

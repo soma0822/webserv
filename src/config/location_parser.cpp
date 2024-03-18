@@ -129,7 +129,6 @@ bool LocationParser::ParseAllowMethod(const std::vector<std::string> &value,
   return true;
 }
 
-
 void LocationParser::RemoveSemicolon(std::string &line) {
   std::stringstream ss(line);
   std::string key;

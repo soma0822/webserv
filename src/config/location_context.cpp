@@ -98,7 +98,8 @@ std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
     os << *it << " ";
   }
   os << "\n autoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
-  os << "\n return: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
+  os << "\n return: "
+     << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
   os << "\n alias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
   os << "\n limit client body: " << obj.GetLimitClientBody();
   return os;
@@ -133,7 +134,8 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
       os << *it << " ";
   }
   os << "\n autoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
-  os << "\n return: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
+  os << "\n return: "
+     << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
   os << "\n alias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
   os << "\n limit client body: " << obj.GetLimitClientBody();
   return os;

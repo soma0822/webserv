@@ -14,7 +14,8 @@ class IConfig {
  public:
   virtual ~IConfig() {}
   virtual void AddServer(const ServerContext &server) = 0;
-  virtual void AddErrorPage(const std::string &key, const std::string &value) = 0;
+  virtual void AddErrorPage(const std::string &key,
+                            const std::string &value) = 0;
   virtual const std::vector<ServerContext> &GetServer() const = 0;
   virtual const std::map<std::string, std::string> &GetErrorPage() const = 0;
   virtual const IServerContext &SearchServer(
