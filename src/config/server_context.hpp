@@ -77,6 +77,7 @@ class ServerContext : public IServerContext {
   std::string server_name_;
   std::map<std::string, std::string> error_page_;
   std::map<std::string, LocationContext> location_;
+  static const std::string kDefaultRoot;
 };
 
 std::ostream &operator<<(std::ostream &os, ServerContext &obj);

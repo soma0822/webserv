@@ -15,7 +15,7 @@ class IConfig {
   virtual ~IConfig() {}
   virtual void AddServer(const ServerContext &server) = 0;
   virtual const std::vector<ServerContext> &GetServer() const = 0;
-  virtual const ServerContext &SearchServer(
+  virtual const IServerContext &SearchServer(
       const std::string &port, const std::string &ip,
       const std::string &server_name) const = 0;
 };
@@ -27,9 +27,9 @@ class Config : public IConfig {
   Config(const Config &other);
   void AddServer(const ServerContext &server);
   const std::vector<ServerContext> &GetServer() const;
-  const ServerContext &SearchServer(const std::string &port,
-                                    const std::string &ip,
-                                    const std::string &server_name) const;
+  const IServerContext &SearchServer(const std::string &port,
+                                     const std::string &ip,
+                                     const std::string &server_name) const;
 
  private:
   Config &operator=(const Config &other);
