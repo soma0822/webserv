@@ -132,7 +132,6 @@ HTTPResponse *RequestHandler::Post(const IConfig &config,
         .SetStatusCode(http::kInternalServerError)
         .Build();
   }
-  std::cout << "body" << request->GetBody() << std::endl;
   ofs << request->GetBody();
   ofs.close();
 

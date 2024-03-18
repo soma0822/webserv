@@ -123,19 +123,24 @@ std::string HTTPResponse::ToString() {
 HTTPResponse *GenerateErrorResponse(const http::StatusCode status_code,
                                     const IConfig &config) {
   const std::map<std::string, std::string> &error_pages = config.GetErrorPage();
-  std::map<std::string, std::string>::const_iterator it =
-      error_pages.find(std::to_string(status_code));
-  if (it == error_pages.end()) {
+  std::stringstream ss;
+  ss << status_code;
+  // エラーページが設定されていない場合はデフォルトのエラーページを返す
+  if (error_pages.count(ss.str()) == 0) {
     return HTTPResponse::Builder()
         .SetStatusCode(status_code)
         .SetBody(GetErrorPage(status_code))
         .Build();
   }
 
-  const std::string error_page_path = it->second;
+  const std::string error_page_path = error_pages.at(ss.str());
   struct stat file_st;
+  // エラーページが存在しない場合はデフォルトのエラーページを返す
   if (stat(error_page_path.c_str(), &file_st) == -1) {
-    return HTTPResponse::Builder().SetStatusCode(status_code).Build();
+    return HTTPResponse::Builder()
+        .SetStatusCode(status_code)
+        .SetBody(GetErrorPage(status_code))
+        .Build();
   }
 
   return HTTPResponse::Builder()
