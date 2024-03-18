@@ -17,7 +17,7 @@ TEST(IOTaskManager, DefaultTest) {
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
   ASSERT_EQ(2, IOTaskManager::GetTasks().at(1).size());
   ASSERT_EQ(2, IOTaskManager::GetFds().size());
-  IOTaskManager::RemoveReadTask(req);
+  IOTaskManager::RemoveFd(req);
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
   ASSERT_EQ(2, IOTaskManager::GetFds().size());
   // ASSERT_EQ(0, IOTaskManager::GetTasks().at(0).size());

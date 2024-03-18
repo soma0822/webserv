@@ -1,7 +1,8 @@
-#include "read_cgi.hpp"
+#include "read_from_cgi.hpp"
 
-ReadCGI::ReadCGI(int pid, int fd, int client_fd, const std::string &port,
-                 const std::string &ip, const IConfig &config)
+ReadFromCGI::ReadFromCGI(int pid, int fd, int client_fd,
+                         const std::string &port, const std::string &ip,
+                         const IConfig &config)
     : AIOTask(fd, POLLIN),
       client_fd_(client_fd),
       port_(port),
@@ -10,9 +11,9 @@ ReadCGI::ReadCGI(int pid, int fd, int client_fd, const std::string &port,
       parser_(HTTPRequestParser()),
       pid_(pid) {}
 
-ReadCGI::~ReadCGI() {}
+ReadFromCGI::~ReadFromCGI() {}
 
-Result<int, std::string> ReadCGI::Execute() {
+Result<int, std::string> ReadFromCGI::Execute() {
   char buf[buf_size_ + 1];
   int status;
   int len = read(fd_, buf, buf_size_);
@@ -21,13 +22,13 @@ Result<int, std::string> ReadCGI::Execute() {
   int result = waitpid(pid_, &status, WNOHANG);
   if (result == -1) {  // エラー
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
-    return Ok(kReadDelete);
+    return Ok(kFdDelete);
   } else if (result == 0) {  // まだ終了していない
     return Ok(0);
   }
   if (WIFEXITED(status) == 0) {  // 異常終了
     Logger::Error() << "cgi エラー" << std::endl;
-    return Ok(kReadDelete);
+    return Ok(kFdDelete);
   }
   if (len == 0) {
     // Result<HTTPRequest *, int> result = parser_.Parser(buf);
@@ -43,7 +44,7 @@ Result<int, std::string> ReadCGI::Execute() {
                    << std::endl;
     //   RequestHandler::Handle(config_, result.Unwrap(), port_, ip_);
     IOTaskManager::AddTask(new WriteResponseToClient(client_fd_, response));
-    return Ok(kReadDelete);
+    return Ok(kFdDelete);
   }
   return Ok(0);
 }
