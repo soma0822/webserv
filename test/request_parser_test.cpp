@@ -15,9 +15,9 @@ TEST(HTTPRequestParser, kEndParse) {
   EXPECT_EQ(req.UnwrapErr(), HTTPRequestParser::kEndParse);
 }
 
-// GETリクエストのパース
+// GETリクエストのパース(余計なスペースがある場合)
 TEST(HTTPRequestParser, ParseRequestGET) {
-  std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+  std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080    \r\n\r\n";
   HTTPRequestParser parser;
   const Result<HTTPRequest *, int> req = parser.Parser(request);
   EXPECT_EQ(req.Unwrap()->GetMethod(), "GET");
@@ -124,6 +124,39 @@ TEST(HTTPRequestParser, ParseRequestPOST) {
   delete req2.Unwrap();
 }
 
+// POSTで次のリクエストもきてた時のパース
+TEST(HTTPRequestParser, ParseRequestPOST_Contentlength_twice) {
+  HTTPRequestParser parser;
+  std::string request =
+      "POST / HTTP/1.1\r\nHost: localhost:8080\r\nContent-Length: 5\r\n\r\n";
+  Result<HTTPRequest *, int> req = parser.Parser(request);
+  EXPECT_EQ(req.UnwrapErr(), HTTPRequestParser::kNotEnough);
+  request = "he";
+  Result<HTTPRequest *, int> req1 = parser.Parser(request);
+  EXPECT_EQ(req1.UnwrapErr(), HTTPRequestParser::kNotEnough);
+  request =
+      "lloPOST / HTTP/1.1\r\nHost: localhost:8080\r\nContent-Length: "
+      "5\r\n\r\nhello";
+  Result<HTTPRequest *, int> req2 = parser.Parser(request);
+  EXPECT_EQ(req2.Unwrap()->GetMethod(), "POST");
+  EXPECT_EQ(req2.Unwrap()->GetUri(), "/");
+  EXPECT_EQ(req2.Unwrap()->GetProtocol(), "HTTP");
+  EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
+  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
+  delete req2.Unwrap();
+  Result<HTTPRequest *, int> req3 = parser.Parser(request);
+  EXPECT_EQ(req3.Unwrap()->GetMethod(), "POST");
+  EXPECT_EQ(req3.Unwrap()->GetUri(), "/");
+  EXPECT_EQ(req3.Unwrap()->GetProtocol(), "HTTP");
+  EXPECT_EQ(req3.Unwrap()->GetVersion(), "1.1");
+  EXPECT_EQ(req3.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req3.Unwrap()->GetBody(), "hello");
+  delete req3.Unwrap();
+  request = "";
+  Result<HTTPRequest *, int> req4 = parser.Parser(request);
+  EXPECT_EQ(req4.UnwrapErr(), HTTPRequestParser::kEndParse);
+}
 // Transfer-Encodingのパース
 TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked) {
   HTTPRequestParser parser;
@@ -243,4 +276,14 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked_Error4) {
   request = "hel\r\n";
   Result<HTTPRequest *, int> req3 = parser.Parser(request);
   EXPECT_EQ(req3.UnwrapErr(), HTTPRequestParser::kBadRequest);
+}
+
+// Transfer-Encodingとcontent-lengthが両方ある場合
+TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked_ContentLength) {
+  HTTPRequestParser parser;
+  std::string request =
+      "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
+      "chunked\r\nContent-Length: 5\r\n\r\n";
+  Result<HTTPRequest *, int> req = parser.Parser(request);
+  EXPECT_EQ(req.UnwrapErr(), HTTPRequestParser::kBadRequest);
 }
