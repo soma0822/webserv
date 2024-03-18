@@ -20,7 +20,7 @@ class WriteResponseToClient : public AIOTask {
   WriteResponseToClient();
   WriteResponseToClient(const WriteResponseToClient &other);
   HTTPResponse *response_;
-  unsigned int writed_;
+  unsigned int wrote_size_;
 };
 
 #endif  // WEBSERV_SRC_WRITE_RESPONSE_TO_CLIENT_HPP
