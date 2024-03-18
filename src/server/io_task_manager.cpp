@@ -81,7 +81,7 @@ void IOTaskManager::ExecuteTasks() {
       while (fd_tasks.tasks.at(fd_tasks.index) == NULL ||
              !(fd_tasks.tasks.at(fd_tasks.index)->GetEvent() &
                fds_.at(i).revents)) {
-        fd_tasks.index++;
+        ++(fd_tasks.index);
         if (fd_tasks.index >= fd_tasks.tasks.size()) {
           fd_tasks.index = 0;
           break;
@@ -104,7 +104,7 @@ void IOTaskManager::ExecuteTasks() {
         } else if (result.Unwrap() == AIOTask::kContinue) {
           ;
         } else if (result.Unwrap() == AIOTask::kOk) {
-          fd_tasks.index++;
+          ++(fd_tasks.index);
         }
       }
     }
