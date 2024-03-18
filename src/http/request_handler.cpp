@@ -47,11 +47,11 @@ HTTPResponse *RequestHandler::Get(const IConfig &config,
   // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
   std::string request_file_path = root + uri;
   if (file_utils::IsDirectory(request_file_path)) {
-    if (!server_ctx.GetIndex().empty()) {
-      request_file_path += server_ctx.GetIndex();
-    } else if (location_ctx_result.IsOk() &&
-               !location_ctx_result.Unwrap().GetIndex().empty()) {
+    if (location_ctx_result.IsOk() &&
+        !location_ctx_result.Unwrap().GetIndex().empty()) {
       request_file_path += location_ctx_result.Unwrap().GetIndex();
+    } else if (!server_ctx.GetIndex().empty()) {
+      request_file_path += server_ctx.GetIndex();
     }
   }
 
