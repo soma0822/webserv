@@ -11,6 +11,11 @@
 #include "read_request_from_client.hpp"
 #include "write_response_to_client.hpp"
 
+struct Tasks {
+  std::vector<AIOTask *> tasks;
+  unsigned int index;
+};
+
 class IOTaskManager {
  public:
   ~IOTaskManager();
@@ -19,17 +24,16 @@ class IOTaskManager {
   static void RemoveTask(AIOTask *task);
   static void DeleteTasks();
   static void ExecuteTasks();
-  static const std::vector<std::vector<AIOTask *> > &GetTasks();
+  static const std::vector<Tasks> &GetTasks();
   static const std::vector<struct pollfd> &GetFds();
 
  private:
   IOTaskManager();
   IOTaskManager(const IOTaskManager &other);
   IOTaskManager &operator=(const IOTaskManager &other);
-  static std::vector<std::vector<AIOTask *> > tasks_;
+  static std::vector<Tasks> tasks_array_;
   static std::vector<struct pollfd> fds_;
   static const int poll_time_out_ = 5000;
-  enum Error { kOk, kDelete };
 };
 
 #endif

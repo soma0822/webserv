@@ -1,32 +1,33 @@
 #include "io_task_manager.hpp"
 
-std::vector<std::vector<AIOTask *> > IOTaskManager::tasks_;
+std::vector<Tasks> IOTaskManager::tasks_array_;
 std::vector<struct pollfd> IOTaskManager::fds_;
 
 IOTaskManager::IOTaskManager() {}
 
 IOTaskManager::~IOTaskManager() {
-  for (unsigned int i = 0; i < tasks_.size(); ++i) {
-    for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
-      delete tasks_.at(i).at(j);
+  for (unsigned int i = 0; i < tasks_array_.size(); ++i) {
+    for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); ++j) {
+      delete tasks_array_.at(i).tasks.at(j);
     }
   }
 }
 
-const std::vector<std::vector<AIOTask *> > &IOTaskManager::GetTasks() {
-  return tasks_;
+const std::vector<Tasks> &IOTaskManager::GetTasks() {
+  return tasks_array_;
 }
 const std::vector<struct pollfd> &IOTaskManager::GetFds() { return fds_; }
 
 void IOTaskManager::AddTask(AIOTask *task) {
   for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == task->GetFd()) {
-      std::vector<AIOTask *>::iterator it =
-          std::find(tasks_.at(i).begin(), tasks_.at(i).end(), (AIOTask *)NULL);
-      if (it != tasks_.at(i).end())
-        *it = task;
-      else
-        tasks_.at(i).push_back(task);
+      for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); ++j) {
+        if (tasks_array_.at(i).tasks.at(j) == NULL) {
+          tasks_array_.at(i).tasks.at(j) = task;
+          return;
+        }
+      }
+      tasks_array_.at(i).tasks.push_back(task);
       return;
     }
   }
@@ -34,24 +35,24 @@ void IOTaskManager::AddTask(AIOTask *task) {
   for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == -1) {
       fds_.at(i) = fd;
-      tasks_.at(i).push_back(task);
+      tasks_array_.at(i).tasks.push_back(task);
       return;
     }
   }
-  std::vector<AIOTask *> tmp;
-  tmp.push_back(task);
-  tasks_.push_back(tmp);
+  Tasks tmp = {std::vector<AIOTask *>(1, task), 0};
+  tasks_array_.push_back(tmp);
   fds_.push_back(fd);
 }
 
 void IOTaskManager::RemoveFd(AIOTask *task) {
   for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == task->GetFd()) {
-      for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
-        delete tasks_.at(i).at(j);
+      for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); ++j) {
+        delete tasks_array_.at(i).tasks.at(j);
       }
       close(fds_.at(i).fd);
-      tasks_.at(i).clear();
+      tasks_array_.at(i).tasks.clear();
+      tasks_array_.at(i).index = 0;
       fds_.at(i).fd = -1;
       Logger::Info() << "接続を削除しました" << std::endl;
       return;
@@ -60,26 +61,13 @@ void IOTaskManager::RemoveFd(AIOTask *task) {
 }
 
 void IOTaskManager::DeleteTasks() {
-  for (unsigned int i = 0; i < tasks_.size(); i++) {
-    for (unsigned int j = 0; j < tasks_.at(i).size(); j++) {
-      if (tasks_.at(i).at(j) != NULL) delete tasks_.at(i).at(j);
+  for (unsigned int i = 0; i < tasks_array_.size(); i++) {
+    for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); j++) {
+      delete tasks_array_.at(i).tasks.at(j);
     }
   }
-  tasks_.clear();
+  tasks_array_.clear();
   fds_.clear();
-}
-
-void IOTaskManager::RemoveTask(AIOTask *task) {
-  WriteResponseToClient *tmp = dynamic_cast<WriteResponseToClient *>(task);
-  if (!tmp) return;
-  for (unsigned int i = 0; i < fds_.size(); ++i) {
-    if (fds_.at(i).fd == task->GetFd()) {
-      *(std::find(tasks_.at(i).begin(), tasks_.at(i).end(), task)) = NULL;
-      delete task;
-      Logger::Info() << "ライトタスクを削除しました" << std::endl;
-      return;
-    }
-  }
 }
 
 void IOTaskManager::ExecuteTasks() {
@@ -91,22 +79,27 @@ void IOTaskManager::ExecuteTasks() {
     }
     for (unsigned int i = 0; i < fds_.size(); ++i) {
       if (fds_.at(i).fd == -1) continue;
-      for (unsigned int j = 0; j < tasks_.at(i).size(); ++j) {
-        if (tasks_.at(i).at(j) == NULL) continue;
-        if (fds_.at(i).revents & tasks_.at(i).at(j)->GetEvent()) {
-          Result<int, std::string> result = tasks_.at(i).at(j)->Execute();
+      Tasks &fd_tasks = tasks_array_.at(i);
+      do {
+        fd_tasks.index++;
+        if (fd_tasks.index >= fd_tasks.tasks.size()) {
+          fd_tasks.index = 0;
+          break;
+        }
+      } while (fd_tasks.tasks.at(fd_tasks.index) == NULL || !(fd_tasks.tasks.at(fd_tasks.index)->GetEvent() & fds_.at(i).revents));
+      if (fd_tasks.tasks.at(fd_tasks.index) != NULL && (fd_tasks.tasks.at(fd_tasks.index)->GetEvent() & fds_.at(i).revents)){
+        Result<int, std::string> result = fd_tasks.tasks.at(fd_tasks.index)->Execute();
           if (result.IsErr()) {
             Logger::Error() << result.UnwrapErr() << std::endl;
             DeleteTasks();
             throw std::invalid_argument("taskエラー");
           } else if (result.Unwrap() == AIOTask::kTaskDelete) {
-            RemoveTask(tasks_.at(i).at(j));
-            --j;
+            delete fd_tasks.tasks.at(fd_tasks.index);
+            fd_tasks.tasks.at(fd_tasks.index) = NULL;
           } else if (result.Unwrap() == AIOTask::kFdDelete) {
-            RemoveFd(tasks_.at(i).at(j));
+            RemoveFd(fd_tasks.tasks.at(fd_tasks.index));
             --i;
           }
-        }
       }
     }
   }
