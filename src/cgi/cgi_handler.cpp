@@ -37,9 +37,12 @@ void CgiHandler::Handle(HTTPRequest *req, int client_fd, const IConfig &config,
     std::stringstream ss;
     ss << "Content-length=" << body.size();
     std::string content_length = ss.str();
+    char cwd[1024];
+    getcwd(cwd, 1024);
+    std::string cgi_file = cwd + std::string("/cgi-bin/default.py");
     const char *ex[] = {"REQUEST_METHOD=POST", content_length.c_str(), NULL};
     const char *argv[] = {"/usr/bin/python3",
-                          "/Users/soma/Desktop/webserv/cgi-bin/default.py",
+                          cgi_file.c_str(),
                           NULL};
     Logger::Info() << "CGI実行" << std::endl;
     execve("/usr/bin/python3", const_cast<char *const *>(argv),
