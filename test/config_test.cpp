@@ -116,6 +116,11 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2, config.GetServer()[0].GetLocation().end());
 }
 
+TEST(ConfigTest, NoRootTest) {
+  const Config config = ConfigParser::Parse("test/conf_test/no_root.conf");
+  ASSERT_EQ(config.GetServer().at(0).GetRoot(), "./html");
+}
+
 TEST(ConfigTest, TooLargePortTest) {
   ASSERT_THROW(ConfigParser::Parse("test/conf_test/too_large_port.conf"),
                std::invalid_argument);

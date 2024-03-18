@@ -1,6 +1,8 @@
 #include "server_context.hpp"
 
-ServerContext::ServerContext() {}
+const std::string ServerContext::kDefaultRoot = "./html";
+
+ServerContext::ServerContext() : root_(kDefaultRoot) {}
 
 ServerContext::ServerContext(const ServerContext &other) { *this = other; }
 
