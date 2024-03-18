@@ -199,7 +199,7 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   return HTTPResponse::Builder().SetStatusCode(http::kOk).Build();
 }
 
-HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
+HTTPResponse *RequestHandler::GenerateAutoIndexPage(const IConfig &config,
                                     const HTTPRequest *request,
                                     const std::string &abs_path) {
   DIR *dir = opendir(abs_path.c_str());

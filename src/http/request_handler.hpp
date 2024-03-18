@@ -15,15 +15,16 @@ class RequestHandler {
                             const std::string &port, const std::string &ip);
   static HTTPResponse *Delete(const IConfig &config, const HTTPRequest *request,
                               const std::string &port, const std::string &ip);
-  static HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
-                                             const HTTPRequest *request,
-                                             const std::string &abs_path);
 
  private:
   RequestHandler();
   RequestHandler(const RequestHandler &other);
   RequestHandler &operator=(const RequestHandler &other);
   ~RequestHandler();
+
+  static HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
+                                             const HTTPRequest *request,
+                                             const std::string &abs_path);
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_
