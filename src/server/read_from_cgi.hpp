@@ -1,5 +1,5 @@
-#ifndef WEBSERV_SRC_SERVER_READ_CGI_HPP
-#define WEBSERV_SRC_SERVER_READ_CGI_HPP
+#ifndef WEBSERV_SRC_SERVER_READ_FROM_CGI_HPP
+#define WEBSERV_SRC_SERVER_READ_FROM_CGI_HPP
 
 #include <sys/wait.h>
 #include <unistd.h>
@@ -14,11 +14,11 @@
 #include "request_handler.hpp"
 #include "write_response_to_client.hpp"
 
-class ReadCGI : public AIOTask {
+class ReadFromCGI : public AIOTask {
  public:
-  ReadCGI(int pid, int fd, int client_fd, const std::string &port,
-          const std::string &ip, const IConfig &config);
-  ~ReadCGI();
+  ReadFromCGI(int pid, int fd, int client_fd, const std::string &port,
+              const std::string &ip, const IConfig &config);
+  ~ReadFromCGI();
   Result<int, std::string> Execute();
 
   const std::string &GetPort() const;
