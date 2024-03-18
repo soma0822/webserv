@@ -11,8 +11,6 @@ class RequestHandler {
                               const std::string &port, const std::string &ip);
   static HTTPResponse *Get(const IServerContext &server_ctx,
                            const HTTPRequest *request);
-  static HTTPResponse *Delete(const IServerContext &server_ctx,
-                              const HTTPRequest *request);
 
  private:
   RequestHandler();
