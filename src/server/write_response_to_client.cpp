@@ -10,8 +10,7 @@ WriteResponseToClient::~WriteResponseToClient() { delete response_; }
 
 Result<int, std::string> WriteResponseToClient::Execute() {
   std::string response_str = response_->ToString();
-  int bytes_written =
-      write(fd_, response_str.c_str(), response_str.size());
+  int bytes_written = write(fd_, response_str.c_str(), response_str.size());
   if (bytes_written == -1) {
     Logger::Error() << "write エラー" << std::endl;
     return Ok(kFdDelete);
