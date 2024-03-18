@@ -21,9 +21,8 @@ LocationContext &LocationContext::operator=(const LocationContext &other) {
   root_ = other.root_;
   index_ = other.index_;
   cgi_path_ = other.cgi_path_;
-  cgi_extention_ = other.cgi_extention_;
+  cgi_extension_ = other.cgi_extension_;
   allow_method_ = other.allow_method_;
-  error_page_ = other.error_page_;
   return *this;
 }
 // ゲッター
@@ -39,15 +38,11 @@ const std::string &LocationContext::GetIndex() const { return index_; }
 const std::vector<std::string> &LocationContext::GetCgiPath() const {
   return cgi_path_;
 }
-const std::vector<std::string> &LocationContext::GetCgiExtention() const {
-  return cgi_extention_;
+const std::vector<std::string> &LocationContext::GetCgiExtension() const {
+  return cgi_extension_;
 }
 const std::map<std::string, bool> &LocationContext::GetAllowMethod() const {
   return allow_method_;
-}
-const std::map<std::string, std::string> &LocationContext::GetErrorPage()
-    const {
-  return error_page_;
 }
 // セッター
 void LocationContext::SetCanAutoIndex(bool can_auto_index) {
@@ -67,84 +62,61 @@ void LocationContext::AddCgiPath(const std::string &cgi_path) {
     throw std::invalid_argument("cgi_pathで同じものが複数指定されています");
   cgi_path_.push_back(cgi_path);
 }
-void LocationContext::AddCgiExtention(const std::string &cgi_extention) {
-  if (cgi_extention_.end() !=
-      std::find(cgi_extention_.begin(), cgi_extention_.end(), cgi_extention))
+void LocationContext::AddCgiExtension(const std::string &cgi_extension) {
+  if (cgi_extension_.end() !=
+      std::find(cgi_extension_.begin(), cgi_extension_.end(), cgi_extension))
     throw std::invalid_argument(
-        "cgi_extentionで同じものが複数指定されています");
-  cgi_extention_.push_back(cgi_extention);
+        "cgi_extensionで同じものが複数指定されています");
+  cgi_extension_.push_back(cgi_extension);
 }
 void LocationContext::AddAllowMethod(const std::string &key) {
   if (allow_method_[key] == true)
     throw std::invalid_argument("allow_methodで同じものが複数指定されています");
   allow_method_[key] = true;
 }
-void LocationContext::AddErrorPage(const std::string &key,
-                                   const std::string &value) {
-  std::map<std::string, std::string>::iterator it = error_page_.find(key);
-  if (it != error_page_.end())
-    throw std::invalid_argument("error_pageで同じものが複数指定されています");
-  error_page_[key] = value;
-}
 
 // 出力
 std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
   os << "path: " << obj.GetPath();
-  os << "\nindex: ";
+  os << "\n index: ";
   os << obj.GetIndex();
-  os << "\nerror page: ";
-  for (std::map<std::string, std::string>::const_iterator it =
-           obj.GetErrorPage().begin();
-       it != obj.GetErrorPage().end(); ++it) {
-    os << it->first << "[" << it->second << "]"
-       << "    ";
-  }
-  os << "\nroot: " << obj.GetRoot();
+  os << "\n root: " << obj.GetRoot();
   const std::map<std::string, bool> allow_method = obj.GetAllowMethod();
   for (std::map<std::string, bool>::const_iterator it = allow_method.begin();
        it != allow_method.end(); ++it) {
     os << (it->second ? it->first + " " : "");
   }
-  os << "\ncgiPath: ";
+  os << "\n cgiPath: ";
   for (std::vector<std::string>::const_iterator it = obj.GetCgiPath().begin();
        it != obj.GetCgiPath().end(); ++it) {
     os << *it << " ";
   }
-  os << "\ncgiExtention: ";
+  os << "\n cgiExtension: ";
   for (std::vector<std::string>::const_iterator it =
-           obj.GetCgiExtention().begin();
-       it != obj.GetCgiExtention().end(); ++it) {
+           obj.GetCgiExtension().begin();
+       it != obj.GetCgiExtension().end(); ++it) {
     os << *it << " ";
   }
-  os << "\nautoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
-  os << "\nreturn: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
-  os << "\nalias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
-  os << "\nlimit client body: " << obj.GetLimitClientBody();
+  os << "\n autoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
+  os << "\n return: "
+     << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
+  os << "\n alias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
+  os << "\n limit client body: " << obj.GetLimitClientBody();
   return os;
 }
 
 std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
-  os << "path: " << obj.GetPath();
-  os << "\nindex: ";
+  os << " path: " << obj.GetPath();
+  os << "\n index: ";
   os << obj.GetIndex();
-  os << "\nerror page: ";
-  if (obj.GetErrorPage().size() == 0)
-    os << "no set";
-  else {
-    for (std::map<std::string, std::string>::const_iterator it =
-             obj.GetErrorPage().begin();
-         it != obj.GetErrorPage().end(); ++it)
-      os << it->first << "[" << it->second << "]"
-         << "    ";
-  }
-  os << "\nroot: " << (obj.GetRoot().empty() ? "no set" : obj.GetRoot());
-  os << "\nallow method: ";
+  os << "\n root: " << (obj.GetRoot().empty() ? "no set" : obj.GetRoot());
+  os << "\n allow method: ";
   const std::map<std::string, bool> allow_method = obj.GetAllowMethod();
   for (std::map<std::string, bool>::const_iterator it = allow_method.begin();
        it != allow_method.end(); ++it) {
     os << (it->second ? it->first + " " : "");
   }
-  os << "\ncgiPath: ";
+  os << "\n cgiPath: ";
   if (obj.GetCgiPath().size() == 0)
     os << "no set";
   else {
@@ -152,18 +124,19 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
          it != obj.GetCgiPath().end(); ++it)
       os << *it << " ";
   }
-  os << "\ncgiExtention: ";
-  if (obj.GetCgiExtention().size() == 0)
+  os << "\n cgiExtension: ";
+  if (obj.GetCgiExtension().size() == 0)
     os << "no set";
   else {
     for (std::vector<std::string>::const_iterator it =
-             obj.GetCgiExtention().begin();
-         it != obj.GetCgiExtention().end(); ++it)
+             obj.GetCgiExtension().begin();
+         it != obj.GetCgiExtension().end(); ++it)
       os << *it << " ";
   }
-  os << "\nautoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
-  os << "\nreturn: " << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
-  os << "\nalias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
-  os << "\nlimit client body: " << obj.GetLimitClientBody();
+  os << "\n autoindex: " << (obj.GetCanAutoIndex() == true ? "on" : "off");
+  os << "\n return: "
+     << (!obj.GetReturn().empty() ? obj.GetReturn() : "no set");
+  os << "\n alias: " << (!obj.GetAlias().empty() ? obj.GetAlias() : "no set");
+  os << "\n limit client body: " << obj.GetLimitClientBody();
   return os;
 }

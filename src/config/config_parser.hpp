@@ -17,6 +17,8 @@ class Config;
 class ConfigParser {
  public:
   static Config Parse(const std::string &file);
+  static bool ParseErrorPage(const std::string &line, Config &config);
+  static void RemoveSemicolon(std::string &line);
   static const std::string default_file_;
 };
 

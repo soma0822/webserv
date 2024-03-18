@@ -22,11 +22,16 @@ int main(int ac, char **av) {
   Logger::Info() << "Reading " << config_file << std::endl;
   try {
     const Config config = ConfigParser::Parse(config_file);
-    // std::vector<ServerContext> m = config.GetServer();
-    // for (std::vector<ServerContext>::const_iterator it = m.begin();
-    //      it != m.end(); ++it) {
-    //   std::cout << *it << std::endl;
-    // }
+    const std::map<std::string, std::string> &v = config.GetErrorPage();
+    for (std::map<std::string, std::string>::const_iterator it = v.begin();
+         it != v.end(); ++it) {
+      Logger::Info() << it->first << " : " << it->second << std::endl;
+    }
+    const std::vector<ServerContext> &m = config.GetServer();
+    for (std::vector<ServerContext>::const_iterator it = m.begin();
+         it != m.end(); ++it) {
+      Logger::Info() << *it << std::endl;
+    }
     Server::Run(config);
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;

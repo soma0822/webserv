@@ -67,7 +67,6 @@ std::string ServerParser::MakeLocationKey(
 
 void ServerParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   func["host"] = &ServerParser::ParseIp;
-  func["error_page"] = &ServerParser::ParseErrorPage;
   func["index"] = &ServerParser::ParseIndex;
   func["root"] = &ServerParser::ParseRoot;
   func["server_name"] = &ServerParser::ParseServer_name;
@@ -98,15 +97,6 @@ bool ServerParser::UniqueListen() {
 }
 
 // パーサー
-bool ServerParser::ParseErrorPage(const std::vector<std::string> &value,
-                                  ServerContext &server) {
-  if (value.size() < 2) return false;
-  for (unsigned int i = 0; i < value.size() - 1; ++i) {
-    if (validation::IsNumber(value.at(i)) == false) return false;
-    server.AddErrorPage(value.at(i), *(value.end() - 1));
-  }
-  return true;
-}
 bool ServerParser::ParseIndex(const std::vector<std::string> &value,
                               ServerContext &server) {
   if (parsed_index_ == true) throw std::invalid_argument("indexが複数あります");

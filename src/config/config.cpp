@@ -15,7 +15,18 @@ void Config::AddServer(const ServerContext &server) {
   server_.push_back(server);
 }
 
+void Config::AddErrorPage(const std::string &key, const std::string &value) {
+  std::map<std::string, std::string>::iterator it = error_page_.find(key);
+  if (it != error_page_.end())
+    throw std::invalid_argument("error_pageで同じものが複数指定されています");
+  error_page_[key] = value;
+}
+
 const std::vector<ServerContext> &Config::GetServer() const { return server_; }
+
+const std::map<std::string, std::string> &Config::GetErrorPage() const {
+  return error_page_;
+}
 
 const IServerContext &Config::SearchServer(
     const std::string &port, const std::string &ip,

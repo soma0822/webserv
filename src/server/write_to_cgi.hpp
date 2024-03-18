@@ -22,7 +22,7 @@ class WriteToCGI : public AIOTask {
 
  private:
   std::string body_;
-  unsigned int writed_;
+  unsigned int wrote_size_;
 };
 
 #endif
