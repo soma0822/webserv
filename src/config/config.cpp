@@ -25,6 +25,10 @@ void Config::AddErrorPage(const std::string &key,
 
 const std::vector<ServerContext> &Config::GetServer() const { return server_; }
 
+const std::map<std::string, std::string> &Config::GetErrorPage() const {
+  return error_page_;
+}
+
 const IServerContext &Config::SearchServer(
     const std::string &port, const std::string &ip,
     const std::string &server_name) const {
