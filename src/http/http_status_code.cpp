@@ -1,5 +1,7 @@
 #include "http_status_code.hpp"
 
+#include <sstream>
+
 namespace http {
 std::string GetStatusMessage(StatusCode status_code) {
   switch (status_code) {
@@ -95,4 +97,18 @@ std::string GetStatusMessage(StatusCode status_code) {
       return "";
   }
 }
+
+std::string GetErrorPage(StatusCode status_code) {
+  std::stringstream ss;
+  ss << "<html>\r\n";
+  ss << "<head><title>" << status_code << " " << GetStatusMessage(status_code)
+     << "</title></head>\r\n";
+  ss << "<body>\r\n";
+  ss << "<center><h1>" << status_code << " " << GetStatusMessage(status_code)
+     << "</h1></center>\r\n";
+  ss << "<hr><center>webserver</center>\r\n";
+  ss << "</body>\r\n";
+  return ss.str();
+}
+
 }  // namespace http
