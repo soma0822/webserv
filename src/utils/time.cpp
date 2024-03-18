@@ -14,7 +14,8 @@ bool time_utils::TimeOut(const struct timespec &start, int timeout_s) {
   return timeout < now;
 }
 
-bool time_utils::operator<(const struct timespec &lhs, const struct timespec &rhs) {
+bool time_utils::operator<(const struct timespec &lhs,
+                           const struct timespec &rhs) {
   if (lhs.tv_sec < rhs.tv_sec) {
     return true;
   }

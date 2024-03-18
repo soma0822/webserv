@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include "time.hpp"
+
+#include <gtest/gtest.h>
 #include <unistd.h>
 
 TEST(TIME, GetCurrentTime) {
