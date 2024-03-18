@@ -13,7 +13,7 @@ for key in form:
     print('<p>%s: %s</p>' % (key, value))
 
 print('<p>')
-for i in range(100000):
+for i in range(1000000):
     print('a', end='')
 print('</p>')
 print("</body></html>")
