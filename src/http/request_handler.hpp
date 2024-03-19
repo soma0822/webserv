@@ -21,6 +21,8 @@ class RequestHandler {
   RequestHandler(const RequestHandler &other);
   RequestHandler &operator=(const RequestHandler &other);
   ~RequestHandler();
+
+  static const int kMaxUriLength = 2048;
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_
