@@ -17,6 +17,10 @@ Result<int, std::string> ReadFromCGI::Execute() {
   char buf[buf_size_ + 1];
   int status;
   int len = read(fd_, buf, buf_size_);
+  if (len == -1) {
+    Logger::Error() << "read エラー" << std::endl;
+    return Ok(kFdDelete);
+  }
   buf[len] = '\0';
   buf_.append(buf);
   int result = waitpid(pid_, &status, WNOHANG);

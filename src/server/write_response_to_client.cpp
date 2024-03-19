@@ -10,8 +10,11 @@ WriteResponseToClient::~WriteResponseToClient() { delete response_; }
 
 Result<int, std::string> WriteResponseToClient::Execute() {
   std::string response_str = response_->ToString();
-  unsigned int bytes_written =
-      write(fd_, response_str.c_str(), response_str.size());
+  int bytes_written = write(fd_, response_str.c_str(), response_str.size());
+  if (bytes_written == -1) {
+    Logger::Error() << "write エラー" << std::endl;
+    return Ok(kFdDelete);
+  }
   if ((wrote_size_ += bytes_written) == response_str.size())
     return Ok(kTaskDelete);
   return Ok(kContinue);
