@@ -44,7 +44,7 @@ class AParser {
 
   int SetRequestLine();
   int SetRequestHeaders();
-  int SetHeader();
+  virtual int SetHeader();
   int CheckHeader();
   int SetRequestBody();
   int SetChunkedBody();

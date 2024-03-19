@@ -15,8 +15,9 @@ TEST(HTTPRequestParser, kEndParse) {
   EXPECT_EQ(req.UnwrapErr(), HTTPRequestParser::kEndParse);
 }
 
-// GETリクエストのパース(余計なスペースがある場合)
+// GETリクエストのパース(ちょっと特殊なタイプ）
 TEST(HTTPRequestParser, ParseRequestGET) {
+  // valueの後ろに無駄に空白とか
   std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080    \r\n\r\n";
   HTTPRequestParser parser;
   const Result<HTTPRequest *, int> req = parser.Parser(request);
@@ -27,6 +28,11 @@ TEST(HTTPRequestParser, ParseRequestGET) {
   EXPECT_EQ(req.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req.Unwrap()->GetBody(), "");
   delete req.Unwrap();
+  // Hostの中身がない
+  request = "GET / HTTP/1.1\r\nHost:\r\n\r\n";
+  Result<HTTPRequest *, int> req9 = parser.Parser(request);
+  EXPECT_EQ(req9.Unwrap()->GetMethod(), "GET");
+  delete req9.Unwrap();
 }
 
 // GETリクエストのパース(ヘッダがバラバラに送られてくる場合）
@@ -91,10 +97,11 @@ TEST(HTTPRequestParser, ParseRequestGET_Header_BadRequest) {
   request = "GET / HTTP/1.1\r\n: localhost:8080\r\n\r\n";
   Result<HTTPRequest *, int> req8 = parser.Parser(request);
   EXPECT_EQ(req8.UnwrapErr(), HTTPRequestParser::kBadRequest);
-  // Hostの中身がない
-  request = "GET / HTTP/1.1\r\nHost:\r\n\r\n";
-  Result<HTTPRequest *, int> req9 = parser.Parser(request);
-  EXPECT_EQ(req9.UnwrapErr(), HTTPRequestParser::kBadRequest);
+  // Hostヘッダが2つある
+  request =
+      "GET / HTTP/1.1\r\nHost: localhost:8080\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req5 = parser.Parser(request);
+  EXPECT_EQ(req5.UnwrapErr(), HTTPRequestParser::kBadRequest);
   // Hostがない
   request =
       "GET / HTTP/1.1\r\nIf-Modified-Since: Thu, "
@@ -145,6 +152,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Contentlength_twice) {
   EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
   delete req2.Unwrap();
+  request = "";
   Result<HTTPRequest *, int> req3 = parser.Parser(request);
   EXPECT_EQ(req3.Unwrap()->GetMethod(), "POST");
   EXPECT_EQ(req3.Unwrap()->GetUri(), "/");
@@ -156,6 +164,9 @@ TEST(HTTPRequestParser, ParseRequestPOST_Contentlength_twice) {
   request = "";
   Result<HTTPRequest *, int> req4 = parser.Parser(request);
   EXPECT_EQ(req4.UnwrapErr(), HTTPRequestParser::kEndParse);
+  request = "";
+  Result<HTTPRequest *, int> req6 = parser.Parser(request);
+  EXPECT_EQ(req6.UnwrapErr(), HTTPRequestParser::kEndParse);
 }
 
 // Transfer-Encodingのパース

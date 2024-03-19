@@ -10,6 +10,7 @@ class HTTPRequestParser : public AParser {
   ~HTTPRequestParser();
 
   const Result<HTTPRequest *, int> Parser(std::string request_line);
+  int SetHeader();
 };
 
 #endif  // WEBSERVE_SRC_HTTP_HTTP_REQUEST_PARSER_HPP

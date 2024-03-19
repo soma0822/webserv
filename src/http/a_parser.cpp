@@ -93,9 +93,7 @@ int AParser::SetHeader() {
 
 int AParser::CheckHeader() {
   // Hostがあるか右辺が空白じゃないか確認
-  if (request_->GetHeaders().count("HOST") == 0 ||
-      request_->GetHeaders().find("HOST")->second == "")
-    return kBadRequest;
+  if (request_->GetHeaders().count("HOST") == 0) return kBadRequest;
   request_->SetHostHeader(request_->GetHeaders().find("HOST")->second);
   return kOk;
 }
