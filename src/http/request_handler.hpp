@@ -21,6 +21,10 @@ class RequestHandler {
   RequestHandler(const RequestHandler &other);
   RequestHandler &operator=(const RequestHandler &other);
   ~RequestHandler();
+
+  static HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
+                                             const HTTPRequest *request,
+                                             const std::string &abs_path);
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_
