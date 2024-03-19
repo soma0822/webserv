@@ -43,4 +43,11 @@ std::string SkipSpace(std::string s) {
   size_t pos_last = s.find_last_not_of(whitespace);
   return s.substr(pos_first, pos_last - pos_first + 1);
 }
+
+std::string StrToUpper(std::string s) {
+  for (size_t i = 0; i < s.length(); ++i) {
+    s[i] = std::toupper(s[i]);
+  }
+  return s;
+}
 }  // namespace string_utils

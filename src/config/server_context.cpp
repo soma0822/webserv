@@ -44,13 +44,15 @@ Result<LocationContext, std::string> ServerContext::SearchLocation(
   std::map<std::string, LocationContext>::const_iterator ret = location_.end();
   long unsigned int ret_len = 0;
   for (; it != location_.end(); ++it) {
-    if (it->first[0] == '=' && it->first.substr(2) == path) {
+    if (it->first[0] == '=' &&
+        string_utils::StrToUpper(it->first.substr(2)) == path) {
       return Ok(it->second);
     } else {
-      if (path.find(it->first) == 0 && ret_len < it->first.length() &&
-          (path.length() == it->first.length() ||
-           path[it->first.length()] == '/')) {
-        ret_len = it->first.length();
+      std::string loc_path = string_utils::StrToUpper(it->first);
+      if (path.find(loc_path) == 0 && ret_len < loc_path.length() &&
+          (path.length() == loc_path.length() ||
+           path[loc_path.length()] == '/')) {
+        ret_len = loc_path.length();
         ret = it;
       }
     }

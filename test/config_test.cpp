@@ -299,9 +299,9 @@ TEST(SerchLocation, DefaultTest) {
   const IServerContext &tmp =
       config.SearchServer("8002", "127.0.0.1", "localhost");
   ASSERT_EQ("/", tmp.SearchLocation("/").Unwrap().GetPath());
-  ASSERT_EQ("/red", tmp.SearchLocation("/red/bin").Unwrap().GetPath());
-  ASSERT_EQ("= /red", tmp.SearchLocation("/red").Unwrap().GetPath());
-  ASSERT_EQ("/tours", tmp.SearchLocation("/tours/usrs").Unwrap().GetPath());
+  ASSERT_EQ("/red", tmp.SearchLocation("/RED/BIN").Unwrap().GetPath());
+  ASSERT_EQ("= /red", tmp.SearchLocation("/RED").Unwrap().GetPath());
+  ASSERT_EQ("/tours", tmp.SearchLocation("/TOURS/USRS").Unwrap().GetPath());
   ASSERT_EQ("/tours/usr",
-            tmp.SearchLocation("/tours/usr/sina").Unwrap().GetPath());
+            tmp.SearchLocation("/TOURS/USR/SINA").Unwrap().GetPath());
 }
