@@ -210,11 +210,13 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
   dirent *dp;
   std::string body =
       "<html><head><title>AutoIndex</title></head><body><h1>AutoIndex</h1><ul>";
+  errno = 0;
   while ((dp = readdir(dir)) != NULL) {
     body += "<li><a href=\"" + request->GetUri() + "/" + dp->d_name + "\">" +
             dp->d_name + "</a></li>";
   }
   if (errno != 0) {
+    closedir(dir);
     return GenerateErrorResponse(http::kInternalServerError, config);
   }
   body += "</ul></body></html>";
