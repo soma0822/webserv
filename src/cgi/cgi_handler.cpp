@@ -20,16 +20,18 @@ void CgiHandler::Handle(HTTPRequest *req, int client_fd, const IConfig &config,
     Logger::Error() << "fcntl エラー" << std::endl;
     return;
   }
-   if (pipe(fd2) == -1) {
-    Logger::Error() << "pipe エラー" << std::endl;
-    return;
-  } 
-  if (fcntl(fd2[1], F_SETFL, O_NONBLOCK) == -1) {
-    Logger::Error() << "fcntl エラー" << std::endl;
-    return;
+  if (env_map["REQUEST_METHOD"] == "POST"){
+    if (pipe(fd2) == -1) {
+      Logger::Error() << "pipe エラー" << std::endl;
+      return;
+    } 
+    if (fcntl(fd2[1], F_SETFL, O_NONBLOCK) == -1) {
+      Logger::Error() << "fcntl エラー" << std::endl;
+      return;
+    }
+    IOTaskManager::AddTask(new WriteToCGI(fd2[1], body));
+    Logger::Info() << "WriteToCGIを追加" << std::endl;
   }
-  IOTaskManager::AddTask(new WriteToCGI(fd2[1], body));
-  Logger::Info() << "WriteToCGIを追加" << std::endl;
   pid = fork();
   if (pid == -1) {
     Logger::Error() << "fork エラー" << std::endl;
@@ -37,15 +39,21 @@ void CgiHandler::Handle(HTTPRequest *req, int client_fd, const IConfig &config,
   }
   if (pid == 0) {
     close(fd[0]);
-    close(fd2[1]);
     dup2(fd[1], 1);
-    dup2(fd2[0], 0);
+    if (env_map["REQUEST_METHOD"] == "POST"){
+      close(fd2[1]);
+     dup2(fd2[0], 0);
+    }
     std::stringstream ss;
     ss << "Content-length=" << body.size();
     std::string content_length = ss.str();
     char cwd[1024];
     getcwd(cwd, 1024);
-    std::string cgi_file = cwd + std::string("/cgi-bin/default.py");
+    std::string cgi_file;
+    if (env_map["REQUEST_METHOD"] == "POST")
+      cgi_file = cwd + std::string("/cgi-bin/default.py");
+    else
+      cgi_file = cwd + std::string("/cgi-bin/get.py");
     const char *argv[] = {"/usr/bin/python3",
                           cgi_file.c_str(),
                           NULL};
@@ -53,7 +61,8 @@ void CgiHandler::Handle(HTTPRequest *req, int client_fd, const IConfig &config,
     execve("/usr/bin/python3", const_cast<char *const *>(argv), env);
   }
   close(fd[1]);
-  close(fd2[0]);
+  if (env_map["REQUEST_METHOD"] == "POST")
+    close(fd2[0]);
   for (unsigned int i = 0; i < env_map.size(); ++i) {
     delete[] env[i];
   }
@@ -85,9 +94,10 @@ std::map<std::string, std::string> CgiHandler::GetEnv(HTTPRequest *req, const IC
     env_map["CONTENT_TYPE"] = "";
   env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
   //uriからpath_infoを取得
-  env_map["PATH_INFO"] = req->GetUri();
+  // env_map["PATH_INFO"] = req->GetUri();
   //TODO: 絶対パスの取得
-  env_map["PATH_TRANSLATED"] = req->GetUri();
+  // env_map["PATH_TRANSLATED"] = req->GetUri();
+  env_map["QUERY_STRING"] = req->GetUri().substr(req->GetUri().find("?") + 1);
   //TODO: 
   // env_map["REMOTE_ADDR"] = client_addr.sin_addr.s_addr;
   //REMOTE_HOSTは使用可能関数ではわからない
@@ -98,7 +108,7 @@ std::map<std::string, std::string> CgiHandler::GetEnv(HTTPRequest *req, const IC
   else
     env_map["REMOTE_USER"] = "user";
   //TODO: スクリプト名の取得
-  env_map["SCRIPT_NAME"] = req->GetUri();
+  // env_map["SCRIPT_NAME"] = req->GetUri();
   //TODO: URIからサーバ名の取得
   env_map["SERVER_NAME"] = "localhost";
   env_map["SERVER_PORT"] = port;

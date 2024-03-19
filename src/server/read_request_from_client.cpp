@@ -36,7 +36,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
                    << "リクエストをパースしました : " << buf << len
                    << std::endl;
     // TODO: CGIへの投げ方要相談
-    if (result.Unwrap()->GetMethod() == "POST") {
+    if (result.Unwrap()->GetMethod() == "POST" || result.Unwrap()->GetUri().find("?") != std::string::npos){
       CgiHandler cgi_handler;
       cgi_handler.Handle(result.Unwrap(), fd_, config_, port_, ip_);
       delete result.Unwrap();
@@ -49,7 +49,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     response->SetBody(
         "<html><head><title>サーバーテスト</title><meta "
         "http-equiv=\"content-type\" charset=\"utf-8\"></head><body><form "
-        "action=\"/cgi-bin/cgi_test.py\" method=\"POST\"><div><label "
+        "action=\"/cgi-bin/cgi_test.py\" method=\"GET\"><div><label "
         "for=\"name\">好きな食べ物</label><input type=\"text\" name=\"food\" "
         "value=\"りんご\"><label for=\"season\">好きな季節</label><input "
         "type=\"text\" name=\"season\" "

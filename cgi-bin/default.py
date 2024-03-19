@@ -10,7 +10,6 @@ body = sys.stdin.buffer.read().decode('utf-8')
 form_data = urllib.parse.parse_qs(body)
 
 # Content-Type ヘッダーを出力
-print()
 
 print("<meta Content-Type: text/html; charset=UTF-8>")
 # フォームデータを出力
