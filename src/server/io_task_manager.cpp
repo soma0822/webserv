@@ -1,7 +1,6 @@
 #include "io_task_manager.hpp"
 
 std::vector<Tasks> IOTaskManager::tasks_array_;
-std::vector<Tasks> IOTaskManager::tasks_array_;
 std::vector<struct pollfd> IOTaskManager::fds_;
 
 IOTaskManager::IOTaskManager() {}
@@ -20,13 +19,6 @@ const std::vector<struct pollfd> &IOTaskManager::GetFds() { return fds_; }
 void IOTaskManager::AddTask(AIOTask *task) {
   for (unsigned int i = 0; i < fds_.size(); ++i) {
     if (fds_.at(i).fd == task->GetFd()) {
-      for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); ++j) {
-        if (tasks_array_.at(i).tasks.at(j) == NULL) {
-          tasks_array_.at(i).tasks.at(j) = task;
-          return;
-        }
-      }
-      tasks_array_.at(i).tasks.push_back(task);
       for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); ++j) {
         if (tasks_array_.at(i).tasks.at(j) == NULL) {
           tasks_array_.at(i).tasks.at(j) = task;
@@ -55,8 +47,6 @@ void IOTaskManager::RemoveFd(AIOTask *task) {
     if (fds_.at(i).fd == task->GetFd()) {
       for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); ++j) {
         delete tasks_array_.at(i).tasks.at(j);
-      for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); ++j) {
-        delete tasks_array_.at(i).tasks.at(j);
       }
       close(fds_.at(i).fd);
       tasks_array_.at(i).tasks.clear();
@@ -72,12 +62,8 @@ void IOTaskManager::DeleteTasks() {
   for (unsigned int i = 0; i < tasks_array_.size(); i++) {
     for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); j++) {
       delete tasks_array_.at(i).tasks.at(j);
-  for (unsigned int i = 0; i < tasks_array_.size(); i++) {
-    for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); j++) {
-      delete tasks_array_.at(i).tasks.at(j);
     }
   }
-  tasks_array_.clear();
   tasks_array_.clear();
   fds_.clear();
 }
@@ -92,6 +78,7 @@ void IOTaskManager::ExecuteTasks() {
     for (unsigned int i = 0; i < fds_.size(); ++i) {
       if (fds_.at(i).fd == -1) continue;
       struct Tasks &fd_tasks = tasks_array_.at(i);
+      fd_tasks.index >= fd_tasks.tasks.size() ? fd_tasks.index = 0 : 0;
       while (fd_tasks.tasks.at(fd_tasks.index) == NULL ||
              !(fd_tasks.tasks.at(fd_tasks.index)->GetEvent() &
                fds_.at(i).revents)) {

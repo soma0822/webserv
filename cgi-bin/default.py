@@ -1,16 +1,24 @@
 #!/usr/bin/env python
 
-import cgi
-import cgitb
-cgitb.enable()
+import sys
+import urllib.parse
 
-print("<meta charset=\"UTF-8\">")
+# リクエストボディを文字列としてデコード
+body = sys.stdin.buffer.read().decode('utf-8')
+
+# フォームデータとして解析
+form_data = urllib.parse.parse_qs(body)
+
+# Content-Type ヘッダーを出力
+print()
+
+print("<meta Content-Type: text/html; charset=UTF-8>")
+# フォームデータを出力
 print("<html><body>")
-form = cgi.FieldStorage()
+for key, value in form_data.items():
+    print(f"<p>{key}: {value[0]}</p>")
+print("</body></html>")
 
-for key in form:
-    value = form[key].value
-    print('<p>%s: %s</p>' % (key, value))
 
 print('<p>')
 for i in range(1000000):
