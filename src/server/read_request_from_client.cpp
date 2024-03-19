@@ -2,10 +2,12 @@
 
 ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
                                              const std::string &ip,
+                                             struct sockaddr_in client_addr,
                                              const IConfig &config)
     : AIOTask(fd, POLLIN),
       port_(port),
       ip_(ip),
+      client_addr_(client_addr),
       config_(config),
       parser_(HTTPRequestParser()) {}
 
