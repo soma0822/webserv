@@ -43,4 +43,13 @@ std::string SkipSpace(std::string s) {
   size_t pos_last = s.find_last_not_of(whitespace);
   return s.substr(pos_first, pos_last - pos_first + 1);
 }
+
+std::string StrToLower(std::string s) {
+  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+  return s;
+}
+
+std::string CapitalizeWords(std::string s) {
+  return s;
+}
 }  // namespace string_utils
