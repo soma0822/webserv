@@ -22,6 +22,8 @@ class RequestHandler {
   RequestHandler &operator=(const RequestHandler &other);
   ~RequestHandler();
 
+  static const int kMaxUriLength = 2048;
+
   static HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
                                              const HTTPRequest *request,
                                              const std::string &abs_path);

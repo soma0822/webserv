@@ -16,10 +16,19 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config,
         .SetStatusCode(http::kInternalServerError)
         .Build();
   }
-  (void)config;
-  (void)port;
-  (void)ip;
-  return new HTTPResponse();
+  if (request->GetUri().length() >= kMaxUriLength) {
+    return GenerateErrorResponse(http::kUriTooLong, config);
+  }
+  if (request->GetMethod() == "GET") {
+    return Get(config, request, port, ip);
+  }
+  if (request->GetMethod() == "POST") {
+    return Post(config, request, port, ip);
+  }
+  if (request->GetMethod() == "DELETE") {
+    return Delete(config, request, port, ip);
+  }
+  return GenerateErrorResponse(http::kNotImplemented, config);
 }
 
 HTTPResponse *RequestHandler::Get(const IConfig &config,
