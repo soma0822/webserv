@@ -1,5 +1,6 @@
 #include "request_handler.hpp"
 
+#include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -65,6 +66,7 @@ HTTPResponse *RequestHandler::Get(const IConfig &config,
     }
   }
 
+  bool need_autoindex = false;
   if (file_utils::IsDirectory(request_file_path)) {
     // リクエストターゲットのディレクトリが/で終わっていない場合には301を返す
     if (request_file_path.at(request_file_path.size() - 1) != '/') {
@@ -76,7 +78,8 @@ HTTPResponse *RequestHandler::Get(const IConfig &config,
     // AutoIndexが有効な場合にはディレクトリの中身を表示する
     if (location_ctx_result.IsOk() &&
         location_ctx_result.Unwrap().GetCanAutoIndex()) {
-      // TODO: AutoIndex
+      // パーミッションを確認してからAutoIndexを表示する
+      need_autoindex = true;
     }
   }
 
@@ -88,6 +91,10 @@ HTTPResponse *RequestHandler::Get(const IConfig &config,
   // パーミッションがない場合には403を返す
   if (!(file_stat.st_mode & S_IRUSR)) {
     return HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build();
+  }
+
+  if (need_autoindex) {
+    return GenerateAutoIndexPage(config, request, request_file_path);
   }
 
   return HTTPResponse::Builder()
@@ -199,6 +206,32 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   }
 
   return HTTPResponse::Builder().SetStatusCode(http::kOk).Build();
+}
+
+HTTPResponse *RequestHandler::GenerateAutoIndexPage(
+    const IConfig &config, const HTTPRequest *request,
+    const std::string &abs_path) {
+  DIR *dir = opendir(abs_path.c_str());
+  if (!dir) {
+    return GenerateErrorResponse(http::kInternalServerError, config);
+  }
+
+  dirent *dp;
+  std::string body =
+      "<html><head><title>AutoIndex</title></head><body><h1>AutoIndex</h1><ul>";
+  errno = 0;
+  while ((dp = readdir(dir)) != NULL) {
+    body += "<li><a href=\"" + request->GetUri() + "/" + dp->d_name + "\">" +
+            dp->d_name + "</a></li>";
+  }
+  if (errno != 0) {
+    closedir(dir);
+    return GenerateErrorResponse(http::kInternalServerError, config);
+  }
+  body += "</ul></body></html>";
+  closedir(dir);
+
+  return HTTPResponse::Builder().SetStatusCode(http::kOk).SetBody(body).Build();
 }
 
 RequestHandler::RequestHandler() {}

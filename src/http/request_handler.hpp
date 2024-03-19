@@ -23,6 +23,10 @@ class RequestHandler {
   ~RequestHandler();
 
   static const int kMaxUriLength = 2048;
+
+  static HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
+                                             const HTTPRequest *request,
+                                             const std::string &abs_path);
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_
