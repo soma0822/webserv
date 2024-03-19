@@ -53,16 +53,12 @@ int HTTPRequestParser::SetHeader() {
   size_t value_pos = 0;
 
   while (1) {
-//	pos = request_line.find("\r\n");
-//	if (pos == std::string::npos) return kNotEnough;
-//	headline = request_line.substr(0, pos);
-
-    key_pos = headline.find(":");
+    key_pos = request_line.find(":");
     if (key_pos == std::string::npos) break;  // 最後まで見てしまった時
     pos = request_line.find("\r\n");
-    if (pos == std::string::npos) break;  // 改行がない時
+    if (pos == std::string::npos) break;    // 改行がない時
     if (pos < key_pos) return kBadRequest;  // 改行が先にある時
-    if (key_pos == 0) return kBadRequest;  //左辺が何もない
+    if (key_pos == 0) return kBadRequest;   // 左辺が何もない
     key = request_line.substr(0, key_pos);
     if (pos == key_pos + 1) {
       value_pos = 0;
