@@ -17,7 +17,7 @@ TEST(HTTPRequestParser, kEndParse) {
 
 // GETリクエストのパース(ちょっと特殊なタイプ）
 TEST(HTTPRequestParser, ParseRequestGET) {
-  //valueの後ろに無駄に空白とか
+  // valueの後ろに無駄に空白とか
   std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080    \r\n\r\n";
   HTTPRequestParser parser;
   const Result<HTTPRequest *, int> req = parser.Parser(request);
