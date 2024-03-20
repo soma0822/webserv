@@ -48,10 +48,10 @@ int AParser::SetRequestLine() {
   }
   version = request_line.substr(0, pos);
   row_line_ = request_line.substr(pos + 2);
-  request_->SetMethod(string_utils::StrToUpper(method));
-  request_->SetUri(string_utils::StrToUpper(uri));
-  request_->SetProtocol(string_utils::StrToUpper(protocol));
-  request_->SetVersion(string_utils::StrToUpper(version));
+  request_->SetMethod(StrToUpper(method));
+  request_->SetUri(StrToUpper(uri));
+  request_->SetProtocol(StrToUpper(protocol));
+  request_->SetVersion(StrToUpper(version));
   return kOk;
 }
 
@@ -81,8 +81,7 @@ int AParser::SetHeader() {
     value =
         string_utils::SkipSpace(request_line.substr(key_pos + 1, value_pos));
     request_line = request_line.substr(key_pos + value_pos + 3);
-    request_->AddHeader(string_utils::StrToUpper(key),
-                        string_utils::StrToUpper(value));
+    request_->AddHeader(StrToUpper(key), StrToUpper(value));
   }
   // headerの終わりの確認
   row_line_ = request_line;
@@ -162,6 +161,14 @@ int AParser::SetChunkedBody() {
 int AParser::SetBody() {
   request_->AddBody(row_line_);
   return kOk;
+}
+
+// utils
+std::string AParser::StrToUpper(std::string s) {
+  for (size_t i = 0; i < s.length(); ++i) {
+    s[i] = std::toupper(s[i]);
+  }
+  return s;
 }
 
 const Result<HTTPRequest *, int> AParser::BadRequest() {
