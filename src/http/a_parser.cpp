@@ -49,7 +49,7 @@ int AParser::SetRequestLine() {
   version = request_line.substr(0, pos);
   row_line_ = request_line.substr(pos + 2);
   request_->SetMethod(StrToUpper(method));
-  request_->SetUri(StrToUpper(uri));
+  request_->SetUri(uri);
   request_->SetProtocol(StrToUpper(protocol));
   request_->SetVersion(StrToUpper(version));
   return kOk;
