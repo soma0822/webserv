@@ -7,10 +7,8 @@
 #include "config.hpp"
 #include "file_utils.hpp"
 
-HTTPResponse *RequestHandler::Handle(const IConfig &config,
-                                     const HTTPRequest *request,
-                                     const std::string &port,
-                                     const std::string &ip) {
+HTTPResponse *RequestHandler::Handle(const IConfig &config, RequestContext req_ctx) {
+  HTTPRequest *request = req_ctx.request;
   if (!request) {
     return HTTPResponse::Builder()
         .SetStatusCode(http::kInternalServerError)
@@ -20,23 +18,21 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config,
     return GenerateErrorResponse(http::kUriTooLong, config);
   }
   if (request->GetMethod() == "GET") {
-    return Get(config, request, port, ip);
+    return Get(config, req_ctx);
   }
   if (request->GetMethod() == "POST") {
-    return Post(config, request, port, ip);
+    return Post(config, req_ctx);
   }
   if (request->GetMethod() == "DELETE") {
-    return Delete(config, request, port, ip);
+    return Delete(config, req_ctx);
   }
   return GenerateErrorResponse(http::kNotImplemented, config);
 }
 
-HTTPResponse *RequestHandler::Get(const IConfig &config,
-                                  const HTTPRequest *request,
-                                  const std::string &port,
-                                  const std::string &ip) {
+HTTPResponse *RequestHandler::Get(const IConfig &config, RequestContext req_ctx) {
+  const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
-      config.SearchServer(port, ip, request->GetHostHeader());
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
   const Result<LocationContext, std::string> location_ctx_result =
       server_ctx.SearchLocation(uri);
@@ -103,12 +99,10 @@ HTTPResponse *RequestHandler::Get(const IConfig &config,
       .Build();
 }
 
-HTTPResponse *RequestHandler::Post(const IConfig &config,
-                                   const HTTPRequest *request,
-                                   const std::string &port,
-                                   const std::string &ip) {
+HTTPResponse *RequestHandler::Post(const IConfig &config, RequestContext req_ctx) {
+  const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
-      config.SearchServer(port, ip, request->GetHostHeader());
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
   const Result<LocationContext, std::string> location_ctx_result =
       server_ctx.SearchLocation(uri);
@@ -158,12 +152,10 @@ HTTPResponse *RequestHandler::Post(const IConfig &config,
       .Build();
 }
 
-HTTPResponse *RequestHandler::Delete(const IConfig &config,
-                                     const HTTPRequest *request,
-                                     const std::string &port,
-                                     const std::string &ip) {
+HTTPResponse *RequestHandler::Delete(const IConfig &config, RequestContext req_ctx) {
+  const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
-      config.SearchServer(port, ip, request->GetHostHeader());
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
   const Result<LocationContext, std::string> location_ctx_result =
       server_ctx.SearchLocation(uri);

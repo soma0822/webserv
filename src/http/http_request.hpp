@@ -36,4 +36,12 @@ class HTTPRequest {
   std::string body_;
 };
 
+struct RequestContext {
+  HTTPRequest *request;
+  std::string port;
+  std::string ip;
+  int fd;
+  int count;
+};
+
 #endif  // WEBSERV_SRC_HTTP_HTTP_REQUEST_HPP
