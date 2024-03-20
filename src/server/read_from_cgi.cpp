@@ -1,6 +1,7 @@
 #include "read_from_cgi.hpp"
 
-ReadFromCGI::ReadFromCGI(int pid, int fd, int client_fd, RequestContext req_ctx, const IConfig &config)
+ReadFromCGI::ReadFromCGI(int pid, int fd, int client_fd, RequestContext req_ctx,
+                         const IConfig &config)
     : AIOTask(fd, POLLIN),
       client_fd_(client_fd),
       req_ctx_(req_ctx),
@@ -34,8 +35,9 @@ Result<int, std::string> ReadFromCGI::Execute() {
   if (len == 0) {
     // Result<HTTPRequest *, int> result = parser_.Parser(buf);
     // TODO: CGIのようのHandlerを作る
-    // HTTPResponse *response = RequestHandler::Handle(config_, result.Unwrap(), port_, ip_);
-    // IOTaskManager::AddTask(new WriteResponseToClient(client_fd_, response));
+    // HTTPResponse *response = RequestHandler::Handle(config_, result.Unwrap(),
+    // port_, ip_); IOTaskManager::AddTask(new WriteResponseToClient(client_fd_,
+    // response));
     return Ok(kFdDelete);
   }
   return Ok(0);

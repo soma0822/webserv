@@ -13,7 +13,7 @@
 
 class WriteResponseToClient : public AIOTask {
  public:
-  WriteResponseToClient(int fd, HTTPResponse *response);
+  WriteResponseToClient(int fd, HTTPResponse *response, HTTPRequest *request);
   virtual ~WriteResponseToClient();
   virtual Result<int, std::string> Execute();
 
@@ -21,6 +21,7 @@ class WriteResponseToClient : public AIOTask {
   WriteResponseToClient();
   WriteResponseToClient(const WriteResponseToClient &other);
   HTTPResponse *response_;
+  HTTPRequest *request_;
   unsigned int wrote_size_;
 };
 
