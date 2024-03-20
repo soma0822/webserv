@@ -7,7 +7,8 @@
 #include "config.hpp"
 #include "file_utils.hpp"
 
-HTTPResponse *RequestHandler::Handle(const IConfig &config, RequestContext req_ctx) {
+HTTPResponse *RequestHandler::Handle(const IConfig &config,
+                                     RequestContext req_ctx) {
   HTTPRequest *request = req_ctx.request;
   if (!request) {
     return HTTPResponse::Builder()
@@ -29,7 +30,8 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config, RequestContext req_c
   return GenerateErrorResponse(http::kNotImplemented, config);
 }
 
-HTTPResponse *RequestHandler::Get(const IConfig &config, RequestContext req_ctx) {
+HTTPResponse *RequestHandler::Get(const IConfig &config,
+                                  RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
@@ -99,7 +101,8 @@ HTTPResponse *RequestHandler::Get(const IConfig &config, RequestContext req_ctx)
       .Build();
 }
 
-HTTPResponse *RequestHandler::Post(const IConfig &config, RequestContext req_ctx) {
+HTTPResponse *RequestHandler::Post(const IConfig &config,
+                                   RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
@@ -152,7 +155,8 @@ HTTPResponse *RequestHandler::Post(const IConfig &config, RequestContext req_ctx
       .Build();
 }
 
-HTTPResponse *RequestHandler::Delete(const IConfig &config, RequestContext req_ctx) {
+HTTPResponse *RequestHandler::Delete(const IConfig &config,
+                                     RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
