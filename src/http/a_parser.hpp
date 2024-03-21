@@ -37,7 +37,7 @@ class AParser {
 
   std::pair<std::string, int> ParsePart(std::string &str,
                                         const std::string &delimiter,
-                                        int errorCode);
+                                        int errorcode);
 
   bool IsFillRequestLine();
   bool IsFillHeaders();

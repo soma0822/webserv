@@ -53,10 +53,10 @@ int AParser::SetRequestLine() {
 
 std::pair<std::string, int> AParser::ParsePart(std::string &str,
                                                const std::string &delimiter,
-                                               int errorCode) {
+                                               int errorcode) {
   size_t pos = str.find(delimiter);
   if (pos == std::string::npos || pos == 0)
-    return std::make_pair("", errorCode);
+    return std::make_pair("", errorcode);
   std::string part = str.substr(0, pos);
   str = str.substr(pos + delimiter.size());
   return std::make_pair(part, kOk);
