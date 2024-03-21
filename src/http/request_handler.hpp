@@ -8,14 +8,10 @@
 
 class RequestHandler {
  public:
-  static HTTPResponse *Handle(const IConfig &config, const HTTPRequest *request,
-                              const std::string &port, const std::string &ip);
-  static HTTPResponse *Get(const IConfig &config, const HTTPRequest *request,
-                           const std::string &port, const std::string &ip);
-  static HTTPResponse *Post(const IConfig &config, const HTTPRequest *request,
-                            const std::string &port, const std::string &ip);
-  static HTTPResponse *Delete(const IConfig &config, const HTTPRequest *request,
-                              const std::string &port, const std::string &ip);
+  static HTTPResponse *Handle(const IConfig &config, RequestContext req_ctx);
+  static HTTPResponse *Get(const IConfig &config, RequestContext req_ctx);
+  static HTTPResponse *Post(const IConfig &config, RequestContext req_ctx);
+  static HTTPResponse *Delete(const IConfig &config, RequestContext req_ctx);
   static http::StatusCode CGIHandler(const IConfig &config,
                                      RequestContext req_ctx, const std::string &path);
 
