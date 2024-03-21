@@ -1,6 +1,8 @@
 #ifndef WEBSERV_SRC_HTTP_HTTP_REQUEST_HPP
 #define WEBSERV_SRC_HTTP_HTTP_REQUEST_HPP
 
+#include <arpa/inet.h>
+
 #include <map>
 #include <string>
 
@@ -34,6 +36,15 @@ class HTTPRequest {
   std::string host_header_;
   std::map<std::string, std::string> headers_;
   std::string body_;
+};
+
+struct RequestContext {
+  HTTPRequest *request;
+  std::string port;
+  std::string ip;
+  struct sockaddr_in client_addr;
+  int fd;
+  int count;
 };
 
 #endif  // WEBSERV_SRC_HTTP_HTTP_REQUEST_HPP
