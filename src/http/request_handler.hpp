@@ -12,7 +12,7 @@ class RequestHandler {
   static HTTPResponse *Get(const IConfig &config, RequestContext req_ctx);
   static HTTPResponse *Post(const IConfig &config, RequestContext req_ctx);
   static HTTPResponse *Delete(const IConfig &config, RequestContext req_ctx);
-  static http::StatusCode CGIHandler(const IConfig &config,
+  static http::StatusCode CGIExe(const IConfig &config,
                                      RequestContext req_ctx, const std::string &path);
 
  private:

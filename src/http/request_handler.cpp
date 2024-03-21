@@ -230,7 +230,7 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
   return HTTPResponse::Builder().SetStatusCode(http::kOk).SetBody(body).Build();
 }
 
-http::StatusCode RequestHandler::CGIHandler(const IConfig &config,
+http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                             RequestContext req_ctx,
                                             const std::string &path) {
   // TODO:　Locationでallow_methodがあることがあるので呼び出しもとでこのチェックはしたい

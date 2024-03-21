@@ -37,9 +37,8 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     Logger::Info() << port_ << " : "
                    << "リクエストをパースしました : " << buf << len
                    << std::endl;
-    RequesetContext req_ctx = {result.Unwrap(), client_addr_, port_, ip_, fd_, 0};
-    // HTTPResponse *response = 
-    // RequestHandler::Handle(config_, req_ctx);
+    RequestContext req_ctx = {result.Unwrap(), port_, ip_, client_addr_, fd_, 0};
+    HTTPResponse *response = RequestHandler::Handle(config_, req_ctx);
     IOTaskManager::AddTask(new WriteResponseToClient(fd_, response, result.Unwrap()));
     // }
   }
