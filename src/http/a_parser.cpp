@@ -15,7 +15,7 @@ AParser &AParser::operator=(const AParser &other) {
   return *this;
 }
 
-//request_lineのパース
+// request_lineのパース
 int AParser::SetRequestLine() {
   size_t pos = row_line_.find("\r\n");
   if (pos == std::string::npos) return kNotEnough;
@@ -30,8 +30,7 @@ int AParser::SetRequestLine() {
 
   // uri
   result = ParsePart(request_line, "?", kBadRequest);
-  if (result.second == kOk) 
-    request_->SetQuery(result.first);
+  if (result.second == kOk) request_->SetQuery(result.first);
   result = ParsePart(request_line, " ", kBadRequest);
   if (result.second != kOk) return result.second;
   request_->SetUri(result.first);
@@ -48,7 +47,9 @@ int AParser::SetRequestLine() {
   return kOk;
 }
 
-std::pair<std::string, int> AParser::ParsePart(std::string& str, const std::string& delimiter, int errorCode) {
+std::pair<std::string, int> AParser::ParsePart(std::string &str,
+                                               const std::string &delimiter,
+                                               int errorCode) {
   size_t pos = str.find(delimiter);
   if (pos == std::string::npos || pos == 0)
     return std::make_pair("", errorCode);
