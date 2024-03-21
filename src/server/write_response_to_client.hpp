@@ -10,6 +10,7 @@
 #include "io_task.hpp"
 #include "logger.hpp"
 #include "result.hpp"
+#include "http_request.hpp"
 
 class WriteResponseToClient : public AIOTask {
  public:

@@ -229,10 +229,10 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
 
   return HTTPResponse::Builder().SetStatusCode(http::kOk).SetBody(body).Build();
 }
-
+// ex.) program_path = /usr/bin/python3 script_name = /cgi-bin/default.py
 http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                             RequestContext req_ctx,
-                                            const std::string &path) {
+                                            const std::string &program_path, const std::string &script_name) {
   // TODO:　Locationでallow_methodがあることがあるので呼び出しもとでこのチェックはしたい
   if (req_ctx.request->GetMethod() != "GET" &&
       req_ctx.request->GetMethod() != "POST") {
@@ -241,7 +241,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   int redirect_fd[2], cgi_fd[2];
   pid_t pid;
   std::map<std::string, std::string> env_map =
-      GetEnv(req_ctx.req, config, req_ctx.port, req_ctx.ip);
+      GetEnv(config, req_ctx);
   char **env = DupEnv(env_map);
   if (env == NULL) {
     return http::kInternalServerError;
@@ -275,7 +275,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       close(redirect_fd[1]);
       return http::kInternalServerError;
     }
-    IOTaskManager::AddTask(new WriteToCGI(redirect_fd[1], body));
+    IOTaskManager::AddTask(new WriteToCGI(redirect_fd[1], req_ctx.request->GetBody()));
     Logger::Info() << "WriteToCGIを追加" << std::endl;
   }
   pid = fork();
@@ -297,9 +297,9 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       close(redirect_fd[1]);
       dup2(redirect_fd[0], 0);
     }
-    const char *argv[] = {path.c_str(), cgi_file.c_str(), NULL};
+    const char *argv[] = {program_path.c_str(), script_name.c_str(), NULL};
     Logger::Info() << "CGI実行" << std::endl;
-    execve(path.c_str(), const_cast<char *const *>(argv), env);
+    execve(program_path.c_str(), const_cast<char *const *>(argv), env);
   }
   close(cgi_fd[1]);
   if (env_map["REQUEST_METHOD"] == "POST") close(redirect_fd[0]);
@@ -309,11 +309,13 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   delete[] env;
   IOTaskManager::AddTask(new ReadFromCGI(pid, cgi_fd[0], req_ctx, config));
   Logger::Info() << "ReadFromCGIを追加" << std::endl;
+  return 
 }
 
 std::map<std::string, std::string> RequestHandler::GetEnv(const IConfig &config, const RequestContext &req_ctx) {
   std::map<std::string, std::string> env_map;
   (void)config;
+  const HTTPRequest *req = req_ctx.request;
   const std::map<std::string, std::string> &headers = req->GetHeaders();
   env_map["REQUEST_METHOD"] = req->GetMethod();
   if (headers.find("Authorization") != headers.end())

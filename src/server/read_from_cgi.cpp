@@ -1,9 +1,8 @@
 #include "read_from_cgi.hpp"
 
-ReadFromCGI::ReadFromCGI(int pid, int fd, int client_fd, RequestContext req_ctx,
+ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
                          const IConfig &config)
     : AIOTask(fd, POLLIN),
-      client_fd_(client_fd),
       req_ctx_(req_ctx),
       config_(config),
       parser_(HTTPRequestParser()),
@@ -12,6 +11,7 @@ ReadFromCGI::ReadFromCGI(int pid, int fd, int client_fd, RequestContext req_ctx,
 ReadFromCGI::~ReadFromCGI() {}
 
 Result<int, std::string> ReadFromCGI::Execute() {
+  (void)config_;
   char buf[buf_size_ + 1];
   int status;
   int len = read(fd_, buf, buf_size_);
