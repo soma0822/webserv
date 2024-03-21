@@ -17,7 +17,7 @@ class RequestHandler {
   static HTTPResponse *Delete(const IConfig &config, const HTTPRequest *request,
                               const std::string &port, const std::string &ip);
   static http::StatusCode CGIHandler(const IConfig &config,
-                                     RequestContext req_ctx);
+                                     RequestContext req_ctx, const std::string &path);
 
  private:
   RequestHandler();
@@ -30,10 +30,7 @@ class RequestHandler {
   static HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
                                              const HTTPRequest *request,
                                              const std::string &abs_path);
-  static std::map<std::string, std::string> GetEnv(HTTPRequest *req,
-                                                   const IConfig &config,
-                                                   const std::string &port,
-                                                   const std::string &ip);
+  static std::map<std::string, std::string> GetEnv(const IConfig &config, const RequestContext &req_ctx);
   static char **DupEnv(const std::map<std::string, std::string> &env_map);
   static void DeleteEnv(char **env);
 };

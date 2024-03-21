@@ -236,7 +236,7 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
 
 http::StatusCode RequestHandler::CGIHandler(const IConfig &config,
                                             RequestContext req_ctx,
-                                            std::string path) {
+                                            const std::string &path) {
   // TODO:　Locationでallow_methodがあることがあるので呼び出しもとでこのチェックはしたい
   if (req_ctx.request->GetMethod() != "GET" &&
       req_ctx.request->GetMethod() != "POST") {
@@ -315,12 +315,9 @@ http::StatusCode RequestHandler::CGIHandler(const IConfig &config,
   Logger::Info() << "ReadFromCGIを追加" << std::endl;
 }
 
-std::map<std::string, std::string> RequestHandler::GetEnv(
-    HTTPRequest *req, const IConfig &config, const std::string &port,
-    const std::string &ip) {
+std::map<std::string, std::string> RequestHandler::GetEnv(const IConfig &config, const RequestContext &req_ctx) {
   std::map<std::string, std::string> env_map;
   (void)config;
-  (void)ip;
   const std::map<std::string, std::string> &headers = req->GetHeaders();
   env_map["REQUEST_METHOD"] = req->GetMethod();
   if (headers.find("Authorization") != headers.end())
@@ -344,7 +341,7 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   //  env_map["PATH_TRANSLATED"] = req->GetUri();
   env_map["QUERY_STRING"] = req->GetUri().substr(req->GetUri().find("?") + 1);
   // TODO:
-  //  env_map["REMOTE_ADDR"] = client_addr.sin_addr.s_addr;
+  //  env_map["REMOTE_ADDR"] = req_ctx.client_addr.sin_addr.s_addr;
   // REMOTE_HOSTは使用可能関数ではわからない
   env_map["REMOTE_HOST"] = "";
   // TODO: userの取得
@@ -356,7 +353,7 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   //  env_map["SCRIPT_NAME"] = req->GetUri();
   // TODO: URIからサーバ名の取得
   env_map["SERVER_NAME"] = "localhost";
-  env_map["SERVER_PORT"] = port;
+  env_map["SERVER_PORT"] = req_ctx.port;
   env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
   env_map["SERVER_SOFTWARE"] = "webserv";
   return env_map;
