@@ -10,6 +10,7 @@ ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
 
 ReadFromCGI::~ReadFromCGI() {}
 
+// TODO: ここのエラーはクライアントにInternal Server Errorを返す
 Result<int, std::string> ReadFromCGI::Execute() {
   (void)config_;
   char buf[buf_size_ + 1];
