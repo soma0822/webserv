@@ -33,13 +33,15 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     // TODO: badrequestの処理
     //  IOTaskManager::AddTask(new WriteResponseToClient write_response(fd_,
     //  badrequest_response));
-  } else if (result.IsOk()){
+  } else if (result.IsOk()) {
     Logger::Info() << port_ << " : "
                    << "リクエストをパースしました : " << buf << len
                    << std::endl;
-    RequestContext req_ctx = {result.Unwrap(), port_, ip_, client_addr_, fd_, 0};
+    RequestContext req_ctx = {result.Unwrap(), port_, ip_,
+                              client_addr_,    fd_,   0};
     HTTPResponse *response = RequestHandler::Handle(config_, req_ctx);
-    IOTaskManager::AddTask(new WriteResponseToClient(fd_, response, result.Unwrap()));
+    IOTaskManager::AddTask(
+        new WriteResponseToClient(fd_, response, result.Unwrap()));
     // }
   }
   Logger::Info() << port_ << " : "

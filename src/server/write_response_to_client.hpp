@@ -6,11 +6,11 @@
 
 #include <string>
 
+#include "http_request.hpp"
 #include "http_response.hpp"
 #include "io_task.hpp"
 #include "logger.hpp"
 #include "result.hpp"
-#include "http_request.hpp"
 
 class WriteResponseToClient : public AIOTask {
  public:

@@ -231,8 +231,9 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
 }
 // ex.) program_path = /usr/bin/python3 script_name = /cgi-bin/default.py
 http::StatusCode RequestHandler::CGIExe(const IConfig &config,
-                                            RequestContext req_ctx,
-                                            const std::string &program_path, const std::string &script_name) {
+                                        RequestContext req_ctx,
+                                        const std::string &program_path,
+                                        const std::string &script_name) {
   // TODO:　Locationでallow_methodがあることがあるので呼び出しもとでこのチェックはしたい
   if (req_ctx.request->GetMethod() != "GET" &&
       req_ctx.request->GetMethod() != "POST") {
@@ -240,8 +241,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   }
   int redirect_fd[2], cgi_fd[2];
   pid_t pid;
-  std::map<std::string, std::string> env_map =
-      GetEnv(config, req_ctx);
+  std::map<std::string, std::string> env_map = GetEnv(config, req_ctx);
   char **env = DupEnv(env_map);
   if (env == NULL) {
     return http::kInternalServerError;
@@ -275,7 +275,8 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       close(redirect_fd[1]);
       return http::kInternalServerError;
     }
-    IOTaskManager::AddTask(new WriteToCGI(redirect_fd[1], req_ctx.request->GetBody()));
+    IOTaskManager::AddTask(
+        new WriteToCGI(redirect_fd[1], req_ctx.request->GetBody()));
     Logger::Info() << "WriteToCGIを追加" << std::endl;
   }
   pid = fork();
@@ -309,10 +310,11 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   delete[] env;
   IOTaskManager::AddTask(new ReadFromCGI(pid, cgi_fd[0], req_ctx, config));
   Logger::Info() << "ReadFromCGIを追加" << std::endl;
-  return 
+  return http::kOk;
 }
 
-std::map<std::string, std::string> RequestHandler::GetEnv(const IConfig &config, const RequestContext &req_ctx) {
+std::map<std::string, std::string> RequestHandler::GetEnv(
+    const IConfig &config, const RequestContext &req_ctx) {
   std::map<std::string, std::string> env_map;
   (void)config;
   const HTTPRequest *req = req_ctx.request;

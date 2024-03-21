@@ -16,8 +16,7 @@
 
 class ReadFromCGI : public AIOTask {
  public:
-  ReadFromCGI(int pid, int fd, RequestContext req_ctx,
-              const IConfig &config);
+  ReadFromCGI(int pid, int fd, RequestContext req_ctx, const IConfig &config);
   ~ReadFromCGI();
   Result<int, std::string> Execute();
 
