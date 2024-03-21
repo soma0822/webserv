@@ -15,7 +15,7 @@ TEST(IOTaskManager, DefaultTest) {
   IOTaskManager::AddTask(req);
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
   ASSERT_EQ(2, IOTaskManager::GetFds().size());
-  WriteResponseToClient *res = new WriteResponseToClient(4, new HTTPResponse);
+  WriteResponseToClient *res = new WriteResponseToClient(4, new HTTPResponse, new HTTPRequest);
   IOTaskManager::AddTask(res);
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
   ASSERT_EQ(2, IOTaskManager::GetTasks().at(1).tasks.size());
@@ -30,7 +30,7 @@ TEST(IOTaskManager, DefaultTest) {
   IOTaskManager::AddTask(req);
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
   ASSERT_EQ(2, IOTaskManager::GetFds().size());
-  res = new WriteResponseToClient(5, new HTTPResponse);
+  res = new WriteResponseToClient(5, new HTTPResponse, new HTTPRequest);;
   IOTaskManager::AddTask(res);
   ASSERT_EQ(2, IOTaskManager::GetTasks().size());
   ASSERT_EQ(2, IOTaskManager::GetTasks().at(1).tasks.size());
