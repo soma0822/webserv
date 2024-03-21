@@ -15,44 +15,46 @@ AParser &AParser::operator=(const AParser &other) {
   return *this;
 }
 
-//  リクエストの1行目、もう少し綺麗に描きたい。
+//request_lineのパース
 int AParser::SetRequestLine() {
-  std::string request_line = row_line_;
-  std::string method, uri, protocol, version;
-  size_t pos = 0;
+  size_t pos = row_line_.find("\r\n");
+  if (pos == std::string::npos) return kNotEnough;
+  std::string request_line = row_line_.substr(0, pos);
+  row_line_ = row_line_.substr(pos + 2);
+  std::pair<std::string, int> result;
+
   // method
-  pos = request_line.find(" ");
-  if (pos == std::string::npos || pos == 0) {
-    return kBadRequest;
-  }
-  method = request_line.substr(0, pos);
-  request_line = request_line.substr(pos + 1);
+  result = ParsePart(request_line, " ", kBadRequest);
+  if (result.second != kOk) return result.second;
+  request_->SetMethod(StrToUpper(result.first));
+
   // uri
-  pos = request_line.find(" ");
-  if (pos == std::string::npos || pos == 0) {
-    return kBadRequest;
-  }
-  uri = request_line.substr(0, pos);
-  request_line = request_line.substr(pos + 1);
+  result = ParsePart(request_line, "?", kBadRequest);
+  if (result.second == kOk) 
+    request_->SetQuery(result.first);
+  result = ParsePart(request_line, " ", kBadRequest);
+  if (result.second != kOk) return result.second;
+  request_->SetUri(result.first);
+
   // protocol
-  pos = request_line.find("/");
-  if (pos == std::string::npos || pos == 0) {
-    return kBadRequest;
-  }
-  protocol = request_line.substr(0, pos);
-  request_line = request_line.substr(pos + 1);
+  result = ParsePart(request_line, "/", kBadRequest);
+  if (result.second != kOk) return result.second;
+  request_->SetProtocol(result.first);
+
   // version
-  pos = request_line.find("\r\n");
-  if (pos == std::string::npos || pos == 0) {
-    return kBadRequest;
-  }
-  version = request_line.substr(0, pos);
-  row_line_ = request_line.substr(pos + 2);
-  request_->SetMethod(StrToUpper(method));
-  request_->SetUri(uri);
-  request_->SetProtocol(StrToUpper(protocol));
-  request_->SetVersion(StrToUpper(version));
+  if (request_line == "") return kBadRequest;
+  request_->SetVersion(request_line);
+
   return kOk;
+}
+
+std::pair<std::string, int> AParser::ParsePart(std::string& str, const std::string& delimiter, int errorCode) {
+  size_t pos = str.find(delimiter);
+  if (pos == std::string::npos || pos == 0)
+    return std::make_pair("", errorCode);
+  std::string part = str.substr(0, pos);
+  str = str.substr(pos + delimiter.size());
+  return std::make_pair(part, kOk);
 }
 
 // headerのパース
