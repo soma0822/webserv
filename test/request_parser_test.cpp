@@ -28,6 +28,17 @@ TEST(HTTPRequestParser, ParseRequestGET) {
   EXPECT_EQ(req.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
   EXPECT_EQ(req.Unwrap()->GetBody(), "");
   delete req.Unwrap();
+  // queryがある時
+  request = "GET /aaaaa?bbbbb HTTP/1.1\r\nHost: localhost:8080    \r\n\r\n";
+  const Result<HTTPRequest *, int> req1 = parser.Parser(request);
+  EXPECT_EQ(req1.Unwrap()->GetMethod(), "GET");
+  EXPECT_EQ(req1.Unwrap()->GetUri(), "/aaaaa");
+  EXPECT_EQ(req1.Unwrap()->GetQuery(), "bbbbb");
+  EXPECT_EQ(req1.Unwrap()->GetProtocol(), "HTTP");
+  EXPECT_EQ(req1.Unwrap()->GetVersion(), "1.1");
+  EXPECT_EQ(req1.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req1.Unwrap()->GetBody(), "");
+  delete req.Unwrap();
   // Hostの中身がない
   request = "GET / HTTP/1.1\r\nHost:\r\n\r\n";
   Result<HTTPRequest *, int> req9 = parser.Parser(request);

@@ -29,16 +29,20 @@ int AParser::SetRequestLine() {
   request_->SetMethod(StrToUpper(result.first));
 
   // uri
-  result = ParsePart(request_line, "?", kBadRequest);
-  if (result.second == kOk) request_->SetQuery(result.first);
   result = ParsePart(request_line, " ", kBadRequest);
   if (result.second != kOk) return result.second;
-  request_->SetUri(result.first);
+  pos = result.first.find("?");
+  if (pos != std::string::npos) {
+    request_->SetUri(result.first.substr(0, pos));
+    request_->SetQuery(result.first.substr(pos + 1));
+  } else {
+    request_->SetUri(result.first);
+  }
 
   // protocol
   result = ParsePart(request_line, "/", kBadRequest);
   if (result.second != kOk) return result.second;
-  request_->SetProtocol(result.first);
+  request_->SetProtocol(StrToUpper(result.first));
 
   // version
   if (request_line == "") return kBadRequest;
