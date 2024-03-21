@@ -204,6 +204,14 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   return HTTPResponse::Builder().SetStatusCode(http::kOk).Build();
 }
 
+std::string RequestHandler::SearchForCGIScript(const IConfig &config,
+                                                 const HTTPRequest *request) {
+}
+
+std::string RequestHandler::SearchForPathSegment(const IConfig &config,
+                                                   const HTTPRequest *request) {
+}
+
 HTTPResponse *RequestHandler::GenerateAutoIndexPage(
     const IConfig &config, const HTTPRequest *request,
     const std::string &abs_path) {
