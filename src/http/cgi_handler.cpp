@@ -6,9 +6,9 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
   if (cgi_req->GetHeaders().count("LOCATION") == 1 &&
       cgi_req->GetHeaders().at("LOCATION").at(0) == '/') {
     if (req_ctx.count >= 10)
-      return (Some(HTTPResponse::Builder()
+      return (HTTPResponse::Builder()
                        .SetStatusCode(http::kInternalServerError)
-                       .Build()));
+                       .Build());
     req_ctx.count++;
     std::string location = cgi_req->GetHeaders().at("LOCATION");
     req_ctx.request->SetUri(location);
@@ -28,5 +28,5 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
       res_builder.AddHeader(it->first, it->second);
     }
   }
-  return (Some(res_builder.SetBody(cgi_req->GetBody()).Build()));
+  return res_builder.SetBody(cgi_req->GetBody()).Build();
 }

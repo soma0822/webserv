@@ -35,7 +35,7 @@ Option<HTTPResponse *> HTTPResponse::Builder::Build() {
   response_->SetHTTPVersion(kHTTPVersion);
   if (response_->GetStatusCode() == http::kNone) {
     delete response_;
-    return Some(NULL);
+    return Some((HTTPResponse *)NULL);
   }
   return Some(response_);
 }

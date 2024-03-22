@@ -6,6 +6,7 @@
 
 #include "config.hpp"
 #include "http_status_code.hpp"
+#include "option.hpp"
 
 class HTTPResponse {
  public:
@@ -50,7 +51,7 @@ class HTTPResponse {
   std::string body_;
 };
 
-HTTPResponse *GenerateErrorResponse(http::StatusCode status_code,
+Option<HTTPResponse *> GenerateErrorResponse(http::StatusCode status_code,
                                     const IConfig &config);
 
 #endif  // WEBSERV_SRC_HTTP_HTTP_RESPONSE_HPP_
