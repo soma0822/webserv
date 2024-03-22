@@ -48,6 +48,12 @@ int AParser::SetRequestLine() {
   if (request_line == "") return kBadRequest;
   request_->SetVersion(request_line);
 
+  return CheckProtocol();
+}
+
+int AParser::CheckProtocol() {
+  if (request_->GetProtocol() != "HTTP") return kBadRequest;
+  if (request_->GetVersion() != "1.1") return kHttpVersionNotSupported;
   return kOk;
 }
 
@@ -176,6 +182,14 @@ std::string AParser::StrToUpper(std::string s) {
     s[i] = std::toupper(s[i]);
   }
   return s;
+}
+
+const Result<HTTPRequest *, int> AParser::HttpVersionNotSupported() {
+  parser_state_ = kBeforeProcess;
+  row_line_ = "";  // 一旦リセット
+  delete request_;
+  request_ = NULL;
+  return Err(kHttpVersionNotSupported);
 }
 
 const Result<HTTPRequest *, int> AParser::BadRequest() {
