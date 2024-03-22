@@ -17,12 +17,14 @@ TEST(HTTPRequestParser, kEndParse) {
 
 // GETリクエストのパース(ちょっと特殊なタイプ）
 TEST(HTTPRequestParser, ParseRequestGET) {
-  // valueの後ろに無駄に空白とか
-  std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080    \r\n\r\n";
+  // 無駄にいろんなところに空白
+  std::string request =
+      "GET  /a?b    HTTP/1.1    \r\nHost: localhost:8080    \r\n\r\n";
   HTTPRequestParser parser;
   const Result<HTTPRequest *, int> req = parser.Parser(request);
   EXPECT_EQ(req.Unwrap()->GetMethod(), "GET");
-  EXPECT_EQ(req.Unwrap()->GetUri(), "/");
+  EXPECT_EQ(req.Unwrap()->GetUri(), "/a");
+  EXPECT_EQ(req.Unwrap()->GetQuery(), "b");
   EXPECT_EQ(req.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req.Unwrap()->GetVersion(), "1.1");
   EXPECT_EQ(req.Unwrap()->GetHostHeader(), "localhost:8080");
