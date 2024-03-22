@@ -230,6 +230,7 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
   return HTTPResponse::Builder().SetStatusCode(http::kOk).SetBody(body).Build();
 }
 // ex.) program_path = /usr/bin/python3 script_name = /cgi-bin/default.py
+//TODO: 実行権限の確認
 http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
                                         const std::string &program_path,
@@ -301,6 +302,8 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
     const char *argv[] = {program_path.c_str(), script_name.c_str(), NULL};
     Logger::Info() << "CGI実行" << std::endl;
     execve(program_path.c_str(), const_cast<char *const *>(argv), env);
+    Logger::Error() << "execve エラー" << std::endl;
+    std::exit(1);
   }
   close(cgi_fd[1]);
   if (env_map["REQUEST_METHOD"] == "POST") close(redirect_fd[0]);
@@ -367,11 +370,6 @@ char **RequestHandler::DupEnv(
   for (unsigned int i = 0; it != env_map.end(); ++it, ++i) {
     std::string tmp = it->first + "=" + it->second;
     env[i] = new char[tmp.size() + 1];
-    if (env[i] == NULL) {
-      for (unsigned int j = 0; j < i; ++j) delete[] env[j];
-      delete[] env;
-      return NULL;
-    }
     std::strcpy(env[i], tmp.c_str());
     Logger::Info() << env[i] << std::endl;
   }
@@ -379,6 +377,7 @@ char **RequestHandler::DupEnv(
 }
 
 void RequestHandler::DeleteEnv(char **env) {
+  if (env == NULL) return;
   for (unsigned int i = 0; env[i] != NULL; ++i) {
     delete[] env[i];
   }
