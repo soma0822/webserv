@@ -295,9 +295,11 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   if (pid == 0) {
     close(cgi_fd[0]);
     dup2(cgi_fd[1], 1);
+    close(cgi_fd[1]);
     if (env_map["REQUEST_METHOD"] == "POST") {
       close(redirect_fd[1]);
       dup2(redirect_fd[0], 0);
+      close(redirect_fd[0]);
     }
     const char *argv[] = {program_path.c_str(), script_name.c_str(), NULL};
     Logger::Info() << "CGI実行" << std::endl;
