@@ -8,7 +8,7 @@
 
 class CGIHandler {
  public:
-  static Result<HTTPResponse *, int> CGIHandler::Handle(const IConfig &config, HTTPRequest *cgi_req, RequestContext req_ctx);
+  static Result<HTTPResponse *, int> Handle(const IConfig &config, HTTPRequest *cgi_req, RequestContext req_ctx);
 
   private:
   CGIHandler();
