@@ -8,7 +8,7 @@
 #include "file_utils.hpp"
 
 Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
-                                     RequestContext req_ctx) {
+                                              RequestContext req_ctx) {
   HTTPRequest *request = req_ctx.request;
   if (!request) {
     return HTTPResponse::Builder()
@@ -31,7 +31,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
 }
 
 Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
-                                  RequestContext req_ctx) {
+                                           RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
@@ -102,7 +102,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
 }
 
 Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
-                                   RequestContext req_ctx) {
+                                            RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
@@ -156,7 +156,7 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
 }
 
 Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
-                                     RequestContext req_ctx) {
+                                              RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());

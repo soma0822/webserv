@@ -51,6 +51,6 @@ class HTTPResponse {
 };
 
 Option<HTTPResponse *> GenerateErrorResponse(http::StatusCode status_code,
-                                    const IConfig &config);
+                                             const IConfig &config);
 
 #endif  // WEBSERV_SRC_HTTP_HTTP_RESPONSE_HPP_

@@ -84,7 +84,6 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
                            (std::istreambuf_iterator<char>()));
 
   ASSERT_STRCASEEQ(body.c_str(), created_body.c_str());
-  s
 }
 
 TEST_F(RequestHandlerTest, PostMethodDirectoryRequest) {

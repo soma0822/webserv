@@ -7,7 +7,7 @@ template <typename T>
 class Option {
  public:
   Option(T value, bool has_value) : value_(value), has_value_(has_value) {}
-  Option(const Option &obj): value_(obj.value_), has_value_(obj.has_value_) {}
+  Option(const Option &obj) : value_(obj.value_), has_value_(obj.has_value_) {}
   virtual ~Option() {}
   Option &operator=(const Option &obj) {
     if (this == &obj) {
