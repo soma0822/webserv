@@ -5,10 +5,11 @@
 #include "result.hpp"
 #include "request_handler.hpp"
 #include "http_request.hpp"
+#include "option.hpp"
 
 class CGIHandler {
  public:
-  static Result<HTTPResponse *, int> Handle(const IConfig &config, HTTPRequest *cgi_req, RequestContext req_ctx);
+  static Option<HTTPResponse *> Handle(const IConfig &config, HTTPRequest *cgi_req, RequestContext req_ctx);
 
   private:
   CGIHandler();
