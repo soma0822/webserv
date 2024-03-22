@@ -71,7 +71,7 @@ int HTTPRequestParser::SetHeader() {
     if (StrToUpper(key) == "HOST" && request_->GetHeaders().count("HOST") > 0)
       return kBadRequest;
     request_line = request_line.substr(key_pos + value_pos + 3);
-    request_->AddHeader(StrToUpper(key), StrToUpper(value));
+    request_->AddHeader(StrToUpper(key), value);
   }
   // headerの終わりの確認
   row_line_ = request_line;

@@ -35,6 +35,10 @@ class AParser {
 
   AParser &operator=(const AParser &other);
 
+  std::pair<std::string, int> ParsePart(std::string &str,
+                                        const std::string &delimiter,
+                                        int errorcode);
+
   bool IsFillRequestLine();
   bool IsFillHeaders();
   bool IsFillBody();
