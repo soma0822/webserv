@@ -230,7 +230,7 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
   return HTTPResponse::Builder().SetStatusCode(http::kOk).SetBody(body).Build();
 }
 // ex.) program_path = /usr/bin/python3 script_name = /cgi-bin/default.py
-//TODO: 実行権限の確認
+// TODO: 実行権限の確認
 http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
                                         const std::string &program_path,
