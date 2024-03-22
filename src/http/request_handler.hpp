@@ -4,13 +4,14 @@
 #include "config.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
+#include "option.hpp"
 
 class RequestHandler {
  public:
-  static HTTPResponse *Handle(const IConfig &config, RequestContext req_ctx);
-  static HTTPResponse *Get(const IConfig &config, RequestContext req_ctx);
-  static HTTPResponse *Post(const IConfig &config, RequestContext req_ctx);
-  static HTTPResponse *Delete(const IConfig &config, RequestContext req_ctx);
+  static Option<HTTPResponse *> Handle(const IConfig &config, RequestContext req_ctx);
+  static Option<HTTPResponse *> Get(const IConfig &config, RequestContext req_ctx);
+  static Option<HTTPResponse *> Post(const IConfig &config, RequestContext req_ctx);
+  static Option<HTTPResponse *> Delete(const IConfig &config, RequestContext req_ctx);
 
  private:
   RequestHandler();
@@ -20,7 +21,7 @@ class RequestHandler {
 
   static const int kMaxUriLength = 2048;
 
-  static HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
+  static Option<HTTPResponse *> GenerateAutoIndexPage(const IConfig &config,
                                              const HTTPRequest *request,
                                              const std::string &abs_path);
 };

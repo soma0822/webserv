@@ -7,7 +7,7 @@
 #include "config.hpp"
 #include "file_utils.hpp"
 
-HTTPResponse *RequestHandler::Handle(const IConfig &config,
+Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
                                      RequestContext req_ctx) {
   HTTPRequest *request = req_ctx.request;
   if (!request) {
@@ -30,7 +30,7 @@ HTTPResponse *RequestHandler::Handle(const IConfig &config,
   return GenerateErrorResponse(http::kNotImplemented, config);
 }
 
-HTTPResponse *RequestHandler::Get(const IConfig &config,
+Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
                                   RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
@@ -101,7 +101,7 @@ HTTPResponse *RequestHandler::Get(const IConfig &config,
       .Build();
 }
 
-HTTPResponse *RequestHandler::Post(const IConfig &config,
+Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
                                    RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
@@ -155,7 +155,7 @@ HTTPResponse *RequestHandler::Post(const IConfig &config,
       .Build();
 }
 
-HTTPResponse *RequestHandler::Delete(const IConfig &config,
+Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
                                      RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
@@ -204,7 +204,7 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   return HTTPResponse::Builder().SetStatusCode(http::kOk).Build();
 }
 
-HTTPResponse *RequestHandler::GenerateAutoIndexPage(
+Option<HTTPResponse *> RequestHandler::GenerateAutoIndexPage(
     const IConfig &config, const HTTPRequest *request,
     const std::string &abs_path) {
   DIR *dir = opendir(abs_path.c_str());
