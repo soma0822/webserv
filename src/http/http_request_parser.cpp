@@ -18,9 +18,13 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   if (request_ == NULL) request_ = new HTTPRequest();
   // requestlineの内容を確認
   if (parser_state_ == kBeforeProcess) {
-    if (SetRequestLine() == kBadRequest) {
+    return_state = SetRequestLine();
+    if (return_state == kBadRequest)
       return BadRequest();
-    }
+    else if (return_state == kNotEnough)
+      return Err(kNotEnough);
+    else if (return_state == kHttpVersionNotSupported)
+      return HttpVersionNotSupported();
     parser_state_ = kNeedHeader;
   }
   // Headerの内容を確認

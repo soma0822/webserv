@@ -93,7 +93,15 @@ TEST(HTTPRequestParser, ParseRequestGET_Requestline_BadRequest) {
   //\r\nがない
   request = "GET / HTTP/1.1Host: localhost:8080\r\n\r\n";
   Result<HTTPRequest *, int> req6 = parser.Parser(request);
-  EXPECT_EQ(req6.UnwrapErr(), HTTPRequestParser::kBadRequest);
+  EXPECT_EQ(req6.UnwrapErr(), HTTPRequestParser::kHttpVersionNotSupported);
+  // versionが違う
+  request = "GET / HTTP/1.0\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req8 = parser.Parser(request);
+  EXPECT_EQ(req8.UnwrapErr(), HTTPRequestParser::kHttpVersionNotSupported);
+  // protocolが違う
+  request = "GET / HTTPS/1.0\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req9 = parser.Parser(request);
+  EXPECT_EQ(req9.UnwrapErr(), HTTPRequestParser::kBadRequest);
 }
 
 // headerエラーケース
