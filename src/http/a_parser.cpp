@@ -29,6 +29,7 @@ int AParser::SetRequestLine() {
   request_->SetMethod(StrToUpper(result.first));
 
   // uri
+  request_line = string_utils::SkipSpace(request_line);
   result = ParsePart(request_line, " ", kBadRequest);
   if (result.second != kOk) return result.second;
   pos = result.first.find("?");
@@ -40,6 +41,7 @@ int AParser::SetRequestLine() {
   }
 
   // protocol
+  request_line = string_utils::SkipSpace(request_line);
   result = ParsePart(request_line, "/", kBadRequest);
   if (result.second != kOk) return result.second;
   request_->SetProtocol(StrToUpper(result.first));
