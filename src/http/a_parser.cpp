@@ -15,44 +15,59 @@ AParser &AParser::operator=(const AParser &other) {
   return *this;
 }
 
-//  リクエストの1行目、もう少し綺麗に描きたい。
+// request_lineのパース
 int AParser::SetRequestLine() {
-  std::string request_line = row_line_;
-  std::string method, uri, protocol, version;
-  size_t pos = 0;
+  size_t pos = row_line_.find("\r\n");
+  if (pos == std::string::npos) return kNotEnough;
+  std::string request_line = row_line_.substr(0, pos);
+  row_line_ = row_line_.substr(pos + 2);
+  std::pair<std::string, int> result;
+
   // method
-  pos = request_line.find(" ");
-  if (pos == std::string::npos || pos == 0) {
-    return kBadRequest;
-  }
-  method = request_line.substr(0, pos);
-  request_line = request_line.substr(pos + 1);
+  result = ParsePart(request_line, " ", kBadRequest);
+  if (result.second != kOk) return result.second;
+  request_->SetMethod(StrToUpper(result.first));
+
   // uri
-  pos = request_line.find(" ");
-  if (pos == std::string::npos || pos == 0) {
-    return kBadRequest;
+  request_line = string_utils::SkipSpace(request_line);
+  result = ParsePart(request_line, " ", kBadRequest);
+  if (result.second != kOk) return result.second;
+  pos = result.first.find("?");
+  if (pos != std::string::npos) {
+    request_->SetUri(result.first.substr(0, pos));
+    request_->SetQuery(result.first.substr(pos + 1));
+  } else {
+    request_->SetUri(result.first);
   }
-  uri = request_line.substr(0, pos);
-  request_line = request_line.substr(pos + 1);
+
   // protocol
-  pos = request_line.find("/");
-  if (pos == std::string::npos || pos == 0) {
-    return kBadRequest;
-  }
-  protocol = request_line.substr(0, pos);
-  request_line = request_line.substr(pos + 1);
+  request_line = string_utils::SkipSpace(request_line);
+  result = ParsePart(request_line, "/", kBadRequest);
+  if (result.second != kOk) return result.second;
+  request_->SetProtocol(StrToUpper(result.first));
+
   // version
-  pos = request_line.find("\r\n");
-  if (pos == std::string::npos || pos == 0) {
-    return kBadRequest;
-  }
-  version = request_line.substr(0, pos);
-  row_line_ = request_line.substr(pos + 2);
-  request_->SetMethod(StrToUpper(method));
-  request_->SetUri(uri);
-  request_->SetProtocol(StrToUpper(protocol));
-  request_->SetVersion(StrToUpper(version));
+  if (request_line == "") return kBadRequest;
+  request_->SetVersion(request_line);
+
+  return CheckProtocol();
+}
+
+int AParser::CheckProtocol() {
+  if (request_->GetProtocol() != "HTTP") return kBadRequest;
+  if (request_->GetVersion() != "1.1") return kHttpVersionNotSupported;
   return kOk;
+}
+
+std::pair<std::string, int> AParser::ParsePart(std::string &str,
+                                               const std::string &delimiter,
+                                               int errorcode) {
+  size_t pos = str.find(delimiter);
+  if (pos == std::string::npos || pos == 0)
+    return std::make_pair("", errorcode);
+  std::string part = str.substr(0, pos);
+  str = str.substr(pos + delimiter.size());
+  return std::make_pair(part, kOk);
 }
 
 // headerのパース
@@ -81,7 +96,7 @@ int AParser::SetHeader() {
     value =
         string_utils::SkipSpace(request_line.substr(key_pos + 1, value_pos));
     request_line = request_line.substr(key_pos + value_pos + 3);
-    request_->AddHeader(StrToUpper(key), StrToUpper(value));
+    request_->AddHeader(StrToUpper(key), value);
   }
   // headerの終わりの確認
   row_line_ = request_line;
@@ -171,6 +186,14 @@ std::string AParser::StrToUpper(std::string s) {
   return s;
 }
 
+const Result<HTTPRequest *, int> AParser::HttpVersionNotSupported() {
+  parser_state_ = kBeforeProcess;
+  row_line_ = "";  // 一旦リセット
+  delete request_;
+  request_ = NULL;
+  return Err(kHttpVersionNotSupported);
+}
+
 const Result<HTTPRequest *, int> AParser::BadRequest() {
   parser_state_ = kBeforeProcess;
   row_line_ = "";  // 一旦リセット
@@ -194,7 +217,8 @@ int AParser::BadChunkedBody(int &chunked_state, size_t &chunked_size) {
 
 bool AParser::IsChunked() {
   if ((request_->GetHeaders().count("TRANSFER-ENCODING") > 0) &&
-      (request_->GetHeaders().find("TRANSFER-ENCODING")->second == "CHUNKED"))
+      (StrToUpper(request_->GetHeaders().find("TRANSFER-ENCODING")->second) ==
+       "CHUNKED"))
     return true;
   return false;
 }

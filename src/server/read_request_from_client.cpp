@@ -33,7 +33,12 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     // TODO: badrequestの処理
     //  IOTaskManager::AddTask(new WriteResponseToClient write_response(fd_,
     //  badrequest_response));
-  } else if (result.IsOk()) {
+  } else if (result.IsErr() &&
+             result.UnwrapErr() ==
+                 HTTPRequestParser::kHttpVersionNotSupported) {
+    std::cout << "HttpVersion Not Supported" << std::endl;
+    // TODO: HttpVersionNotSupportedの処理
+  } else {
     Logger::Info() << port_ << " : "
                    << "リクエストをパースしました : " << buf << len
                    << std::endl;

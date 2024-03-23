@@ -17,16 +17,29 @@ TEST(HTTPRequestParser, kEndParse) {
 
 // GETリクエストのパース(ちょっと特殊なタイプ）
 TEST(HTTPRequestParser, ParseRequestGET) {
-  // valueの後ろに無駄に空白とか
-  std::string request = "GET / HTTP/1.1\r\nHost: localhost:8080    \r\n\r\n";
+  // 無駄にいろんなところに空白
+  std::string request =
+      "GET  /a?b    HTTP/1.1    \r\nHost: localhost:8080    \r\n\r\n";
   HTTPRequestParser parser;
   const Result<HTTPRequest *, int> req = parser.Parser(request);
   EXPECT_EQ(req.Unwrap()->GetMethod(), "GET");
-  EXPECT_EQ(req.Unwrap()->GetUri(), "/");
+  EXPECT_EQ(req.Unwrap()->GetUri(), "/a");
+  EXPECT_EQ(req.Unwrap()->GetQuery(), "b");
   EXPECT_EQ(req.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req.Unwrap()->GetBody(), "");
+  delete req.Unwrap();
+  // queryがある時
+  request = "GET /aaaaa?bbbbb HTTP/1.1\r\nHost: localhost:8080    \r\n\r\n";
+  const Result<HTTPRequest *, int> req1 = parser.Parser(request);
+  EXPECT_EQ(req1.Unwrap()->GetMethod(), "GET");
+  EXPECT_EQ(req1.Unwrap()->GetUri(), "/aaaaa");
+  EXPECT_EQ(req1.Unwrap()->GetQuery(), "bbbbb");
+  EXPECT_EQ(req1.Unwrap()->GetProtocol(), "HTTP");
+  EXPECT_EQ(req1.Unwrap()->GetVersion(), "1.1");
+  EXPECT_EQ(req1.Unwrap()->GetHostHeader(), "localhost:8080");
+  EXPECT_EQ(req1.Unwrap()->GetBody(), "");
   delete req.Unwrap();
   // Hostの中身がない
   request = "GET / HTTP/1.1\r\nHost:\r\n\r\n";
@@ -50,7 +63,7 @@ TEST(HTTPRequestParser, ParseRequestGET_Header_kNotEnough) {
   EXPECT_EQ(req1.Unwrap()->GetUri(), "/");
   EXPECT_EQ(req1.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req1.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req1.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req1.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req1.Unwrap()->GetBody(), "");
   delete req1.Unwrap();
 }
@@ -82,7 +95,15 @@ TEST(HTTPRequestParser, ParseRequestGET_Requestline_BadRequest) {
   //\r\nがない
   request = "GET / HTTP/1.1Host: localhost:8080\r\n\r\n";
   Result<HTTPRequest *, int> req6 = parser.Parser(request);
-  EXPECT_EQ(req6.UnwrapErr(), HTTPRequestParser::kBadRequest);
+  EXPECT_EQ(req6.UnwrapErr(), HTTPRequestParser::kHttpVersionNotSupported);
+  // versionが違う
+  request = "GET / HTTP/1.0\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req8 = parser.Parser(request);
+  EXPECT_EQ(req8.UnwrapErr(), HTTPRequestParser::kHttpVersionNotSupported);
+  // protocolが違う
+  request = "GET / HTTPS/1.0\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req9 = parser.Parser(request);
+  EXPECT_EQ(req9.UnwrapErr(), HTTPRequestParser::kBadRequest);
 }
 
 // headerエラーケース
@@ -126,7 +147,7 @@ TEST(HTTPRequestParser, ParseRequestPOST) {
   EXPECT_EQ(req2.Unwrap()->GetUri(), "/");
   EXPECT_EQ(req2.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
   delete req2.Unwrap();
 }
@@ -149,7 +170,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Contentlength_twice) {
   EXPECT_EQ(req2.Unwrap()->GetUri(), "/");
   EXPECT_EQ(req2.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
   delete req2.Unwrap();
   request = "";
@@ -158,7 +179,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Contentlength_twice) {
   EXPECT_EQ(req3.Unwrap()->GetUri(), "/");
   EXPECT_EQ(req3.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req3.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req3.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req3.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req3.Unwrap()->GetBody(), "hello");
   delete req3.Unwrap();
   request = "";
@@ -192,7 +213,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked) {
   EXPECT_EQ(req2.Unwrap()->GetUri(), "/");
   EXPECT_EQ(req2.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
   delete req2.Unwrap();
 }
@@ -220,7 +241,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked_Hex) {
   EXPECT_EQ(req2.Unwrap()->GetUri(), "/");
   EXPECT_EQ(req2.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hellohello");
   delete req2.Unwrap();
 }
@@ -235,7 +256,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked2) {
   EXPECT_EQ(req2.Unwrap()->GetUri(), "/");
   EXPECT_EQ(req2.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
   delete req2.Unwrap();
   request =
@@ -246,7 +267,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked2) {
   EXPECT_EQ(req3.Unwrap()->GetUri(), "/");
   EXPECT_EQ(req3.Unwrap()->GetProtocol(), "HTTP");
   EXPECT_EQ(req3.Unwrap()->GetVersion(), "1.1");
-  EXPECT_EQ(req3.Unwrap()->GetHostHeader(), "LOCALHOST:8080");
+  EXPECT_EQ(req3.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req3.Unwrap()->GetBody(), "hello");
   delete req3.Unwrap();
 }
