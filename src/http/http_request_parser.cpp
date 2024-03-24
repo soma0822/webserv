@@ -65,9 +65,11 @@ int HTTPRequestParser::SetHeader() {
       return kBadRequest;  // :がない、もしくは左辺が何もない
     key = request_line.substr(0, key_pos);
     value = request_line.substr(key_pos + 1);
-    if (StrToUpper(key) == "HOST" && request_->GetHeaders().count("HOST") > 0)
+    if (string_utils::StrToUpper(key) == "HOST" &&
+        request_->GetHeaders().count("HOST") > 0)
       return kBadRequest;  // Hostが複数ある時
-    request_->AddHeader(StrToUpper(key), string_utils::SkipSpace(value));
+    request_->AddHeader(string_utils::StrToUpper(key),
+                        string_utils::SkipSpace(value));
   }
   return kOk;
 }
