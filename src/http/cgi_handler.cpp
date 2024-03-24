@@ -22,8 +22,13 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
            cgi_req->GetHeaders().begin();
        it != cgi_req->GetHeaders().end(); it++) {
     if (it->first == "STATUS") {
+      Result<int, std::string> result = string_utils::StrToI(it->second);
+      if (result.IsErr()) {
+        delete res_builder.Build().Unwrap();
+        return GenerateErrorResponse(http::kInternalServerError, config);
+      }
       res_builder.SetStatusCode(
-          static_cast<http::StatusCode>(std::stoi(it->second)));
+          static_cast<http::StatusCode>(result.Unwrap()));
     } else {
       res_builder.AddHeader(it->first, it->second);
     }
