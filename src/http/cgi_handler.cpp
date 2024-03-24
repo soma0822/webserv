@@ -27,8 +27,7 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
         delete res;
         return GenerateErrorResponse(http::kInternalServerError, config);
       }
-      res->SetStatusCode(
-          static_cast<http::StatusCode>(result.Unwrap()));
+      res->SetStatusCode(static_cast<http::StatusCode>(result.Unwrap()));
     } else {
       res->AddHeader(it->first, it->second);
     }

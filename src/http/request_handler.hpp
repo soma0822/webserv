@@ -5,9 +5,9 @@
 #include "http_request.hpp"
 #include "http_response.hpp"
 #include "io_task_manager.hpp"
+#include "option.hpp"
 #include "read_from_cgi.hpp"
 #include "write_to_cgi.hpp"
-#include "option.hpp"
 
 class RequestHandler {
  public:
