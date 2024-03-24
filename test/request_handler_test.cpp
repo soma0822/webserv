@@ -172,3 +172,103 @@ TEST_F(RequestHandlerTest, DeleteMethodDirectoryTarget) {
   const std::filesystem::path path(test_file_path);
   ASSERT_TRUE(std::filesystem::exists(path));
 }
+
+TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithMultiplePathSegments) {
+  const std::string root = "/var/www/html";
+  const std::string uri = "/cgi-bin/cgi.py/foo/bar";
+
+  LocationContext ctx;
+  ctx.SetCanAutoIndex(true);
+  // server context mock
+  Mock<IServerContext> server_ctx_mock;
+  When(Method(server_ctx_mock, SearchLocation))
+      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+
+  // config mock
+  Mock<IConfig> config_mock;
+  When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+
+  HTTPRequest request;
+  request.SetUri(uri);
+  RequestContext req_ctx = {&request, "80", "", 0, 0};
+  ASSERT_EQ(
+      RequestHandler::GetAbsoluteCGIScriptPath(config_mock.get(), req_ctx),
+      "/var/www/html/cgi-bin/cgi.py");
+}
+
+TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithoutPathSegment) {
+  const std::string root = "/var/www/html";
+  const std::string uri = "/cgi-bin/cgi.py";
+
+  LocationContext ctx;
+  ctx.SetCanAutoIndex(true);
+  // server context mock
+  Mock<IServerContext> server_ctx_mock;
+  When(Method(server_ctx_mock, SearchLocation))
+      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+
+  // config mock
+  Mock<IConfig> config_mock;
+  When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+
+  HTTPRequest request;
+  request.SetUri(uri);
+  RequestContext req_ctx = {&request, "80", "", 0, 0};
+  ASSERT_EQ(
+      RequestHandler::GetAbsoluteCGIScriptPath(config_mock.get(), req_ctx),
+      "/var/www/html/cgi-bin/cgi.py");
+}
+
+TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegment) {
+  const std::string root = "/var/www/html";
+  const std::string uri = "/cgi-bin/cgi.py/foo/bar";
+
+  LocationContext ctx;
+  ctx.SetCanAutoIndex(true);
+  // server context mock
+  Mock<IServerContext> server_ctx_mock;
+  When(Method(server_ctx_mock, SearchLocation))
+      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+
+  // config mock
+  Mock<IConfig> config_mock;
+  When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+
+  HTTPRequest request;
+  request.SetUri(uri);
+  RequestContext req_ctx = {&request, "80", "", 0, 0};
+  ASSERT_EQ(
+      RequestHandler::GetAbsolutePathForPathSegment(config_mock.get(), req_ctx),
+      "/var/www/html/foo/bar");
+}
+
+TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegmentWithoutPathSegment) {
+  const std::string root = "/var/www/html";
+  const std::string uri = "/cgi-bin/cgi.py";
+
+  LocationContext ctx;
+  ctx.SetCanAutoIndex(true);
+  // server context mock
+  Mock<IServerContext> server_ctx_mock;
+  When(Method(server_ctx_mock, SearchLocation))
+      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+
+  // config mock
+  Mock<IConfig> config_mock;
+  When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+
+  HTTPRequest request;
+  request.SetUri(uri);
+  RequestContext req_ctx = {&request, "80", "", 0, 0};
+  ASSERT_EQ(
+      RequestHandler::GetAbsolutePathForPathSegment(config_mock.get(), req_ctx),
+      "");
+}
