@@ -1,5 +1,7 @@
 #include "string_utils.hpp"
 
+#include <algorithm>
+
 #include "validation.hpp"
 
 namespace string_utils {
