@@ -42,15 +42,16 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     Logger::Info() << port_ << " : "
                    << "リクエストをパースしました : " << buf << len
                    << std::endl;
-    RequestContext req_ctx = {result.Unwrap(), port_, ip_,
+    RequestContext req_ctx = {result.Unwrap(), port_, ip_, 
                               client_addr_,    fd_,   0};
-    HTTPResponse *response = RequestHandler::Handle(config_, req_ctx);
-    IOTaskManager::AddTask(
-        new WriteResponseToClient(fd_, response, result.Unwrap()));
-    // }
+    Option<HTTPResponse *> option = RequestHandler::Handle(config_, req_ctx);
+    if (option.IsSome()) {
+      IOTaskManager::AddTask(
+          new WriteResponseToClient(fd_, option.Unwrap(), result.Unwrap()));
+          Logger::Info() << port_ << " : "
+                        << "レスポンスのタスクを追加しました" << std::endl;
+    }
   }
-  Logger::Info() << port_ << " : "
-                 << "レスポンスのタスクを追加しました" << std::endl;
   return Ok(0);
 }
 

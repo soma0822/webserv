@@ -14,9 +14,9 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
     req_ctx.request->SetUri(location);
     return RequestHandler::Handle(config, req_ctx);
   }
-  HTTPResponse::Builder res_builder = HTTPResponse::Builder();
+  HTTPResponse *res = new HTTPResponse;
   if (cgi_req->GetHeaders().count("STATUS") == 0) {
-    res_builder.SetStatusCode(http::kOk);
+    res->SetStatusCode(http::kOk);
   }
   for (std::map<std::string, std::string>::const_iterator it =
            cgi_req->GetHeaders().begin();
@@ -24,14 +24,16 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
     if (it->first == "STATUS") {
       Result<int, std::string> result = string_utils::StrToI(it->second);
       if (result.IsErr()) {
-        delete res_builder.Build().Unwrap();
+        delete res;
         return GenerateErrorResponse(http::kInternalServerError, config);
       }
-      res_builder.SetStatusCode(
+      res->SetStatusCode(
           static_cast<http::StatusCode>(result.Unwrap()));
     } else {
-      res_builder.AddHeader(it->first, it->second);
+      res->AddHeader(it->first, it->second);
     }
   }
-  return res_builder.SetBody(cgi_req->GetBody()).Build();
+  res->SetHTTPVersion("HTTP/1.1");
+  res->SetBody(cgi_req->GetBody());
+  return Some(res);
 }
