@@ -6,6 +6,7 @@
 
 #include "config.hpp"
 #include "http_status_code.hpp"
+#include "option.hpp"
 
 class HTTPResponse {
  public:
