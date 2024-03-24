@@ -7,14 +7,14 @@ template <typename T>
 class Option {
  public:
   Option(T value, bool has_value) : value_(value), has_value_(has_value) {}
-  Option(const Option &obj) : value_(obj.value_), has_value_(obj.has_value_) {}
+
+  Option(const Option &other)
+      : value_(other.value_), has_value_(other.has_value_) {}
+
   virtual ~Option() {}
-  Option &operator=(const Option &obj) {
-    if (this == &obj) {
-      return *this;
-    }
-    value_ = obj.value_;
-    has_value_ = obj.has_value_;
+  Option &operator=(const Option &other) {
+    other.value_ = value_;
+    other.has_value_ = has_value_;
     return *this;
   }
 

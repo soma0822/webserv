@@ -16,21 +16,14 @@
 
 class ReadFromCGI : public AIOTask {
  public:
-  ReadFromCGI(int pid, int fd, int client_fd, const std::string &port,
-              const std::string &ip, const IConfig &config);
+  ReadFromCGI(int pid, int fd, RequestContext req_ctx, const IConfig &config);
   ~ReadFromCGI();
   Result<int, std::string> Execute();
 
-  const std::string &GetPort() const;
-  const std::string &GetIp() const;
-
  private:
-  int client_fd_;
-  const std::string port_;
-  const std::string ip_;
+  RequestContext req_ctx_;
   const IConfig &config_;
   HTTPRequestParser parser_;
-  int event_;
   static const int buf_size_ = 1024;
   std::string buf_;
   int pid_;
