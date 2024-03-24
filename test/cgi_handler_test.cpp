@@ -49,3 +49,16 @@ TEST(CGIHandler, CGIStatusInvalid) {
   delete res;
   delete req;
 }
+
+TEST(CGIHandler, CGIStatusOk) {
+  Config config;
+  std::string str =
+      "Status: 200 Ok\r\nContent-Type: text/html\r\ncharset: UTF-8\r\n\r\n<html>";
+  CGIParser parser;
+  HTTPRequest* req = parser.Parser(str).Unwrap();
+  RequestContext req_ctx;
+  HTTPResponse* res = CGIHandler::Handle(config, req, req_ctx).Unwrap();
+  ASSERT_EQ(http::kOk, res->GetStatusCode());
+  delete res;
+  delete req;
+}

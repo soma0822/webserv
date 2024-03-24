@@ -20,7 +20,10 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
            cgi_req->GetHeaders().begin();
        it != cgi_req->GetHeaders().end(); ++it) {
     if (it->first == "STATUS") {
-      Result<int, std::string> result = string_utils::StrToI(it->second);
+      std::stringstream ss(it->second);
+      std::string status_code;
+      ss >> status_code;
+      Result<int, std::string> result = string_utils::StrToI(status_code);
       if (result.IsErr()) {
         delete res;
         return Some(GenerateErrorResponse(http::kInternalServerError, config));
