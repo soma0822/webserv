@@ -18,12 +18,13 @@ class HTTPResponse {
     Builder &AddHeader(const std::string &key, const std::string &value);
     Builder &SetBody(const std::string &body);
     Option<HTTPResponse *> Build();
-    const Builder &operator=(const Builder &other);
-    Builder(const Builder &other);
 
    private:
     static const std::string kHTTPVersion;
     HTTPResponse *response_;
+
+    Builder(const Builder &other);
+    const Builder &operator=(const Builder &other);
   };
 
   HTTPResponse();
