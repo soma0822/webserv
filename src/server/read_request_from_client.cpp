@@ -33,35 +33,20 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     // TODO: badrequestの処理
     //  IOTaskManager::AddTask(new WriteResponseToClient write_response(fd_,
     //  badrequest_response));
+  } else if (result.IsErr() &&
+             result.UnwrapErr() ==
+                 HTTPRequestParser::kHttpVersionNotSupported) {
+    std::cout << "HttpVersion Not Supported" << std::endl;
+    // TODO: HttpVersionNotSupportedの処理
   } else {
     Logger::Info() << port_ << " : "
                    << "リクエストをパースしました : " << buf << len
                    << std::endl;
-    // TODO: CGIへの投げ方要相談
-    // if (result.Unwrap()->GetMethod() == "POST") {
-    //   CgiHandler cgi_handler;
-    //   cgi_handler.Handle(result.Unwrap(), fd_, config_, port_, ip_);
-    //   delete result.Unwrap();
-    // } else {
-    // ひとまずかーくんのCGIのhtmlが帰ってる
-    HTTPResponse *response = new HTTPResponse();
-    response->SetHTTPVersion("HTTP/1.1");
-    response->SetStatusCode(http::kOk);
-    response->AddHeader("Content-Type", "text/html");
-    response->SetBody(
-        "<html><head><title>サーバーテスト</title><meta "
-        "http-equiv=\"content-type\" charset=\"utf-8\"></head><body><form "
-        "action=\"/cgi-bin/cgi_test.py\" method=\"POST\"><div><label "
-        "for=\"name\">好きな食べ物</label><input type=\"text\" name=\"food\" "
-        "value=\"りんご\"><label for=\"season\">好きな季節</label><input "
-        "type=\"text\" name=\"season\" "
-        "value=\"冬\"><button>送信</button></div> </form></body></html>");
-    std::stringstream ss;
-    ss << response->GetBody().size();
-    response->AddHeader("Content-Length", ss.str());
-    // RequestHandler::Handle(config_, result.Unwrap(), port_, ip_);
-    IOTaskManager::AddTask(new WriteResponseToClient(fd_, response));
-    delete result.Unwrap();
+    RequestContext req_ctx = {result.Unwrap(), port_, ip_,
+                              client_addr_,    fd_,   0};
+    HTTPResponse *response = RequestHandler::Handle(config_, req_ctx);
+    IOTaskManager::AddTask(
+        new WriteResponseToClient(fd_, response, result.Unwrap()));
     // }
   }
   Logger::Info() << port_ << " : "

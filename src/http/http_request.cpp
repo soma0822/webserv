@@ -26,6 +26,7 @@ HTTPRequest::~HTTPRequest() {}
 // request line setters
 void HTTPRequest::SetMethod(const std::string &method) { method_ = method; }
 void HTTPRequest::SetUri(const std::string &uri) { uri_ = uri; }
+void HTTPRequest::SetQuery(const std::string &query) { query_ = query; }
 void HTTPRequest::SetProtocol(const std::string &protocol) {
   protocol_ = protocol;
 }
@@ -45,6 +46,7 @@ void HTTPRequest::AddBody(const std::string &body) { body_ = body_ + body; }
 // request line getters
 const std::string &HTTPRequest::GetMethod() const { return method_; }
 const std::string &HTTPRequest::GetUri() const { return uri_; }
+const std::string &HTTPRequest::GetQuery() const { return query_; }
 const std::string &HTTPRequest::GetProtocol() const { return protocol_; }
 const std::string &HTTPRequest::GetVersion() const { return version_; }
 
