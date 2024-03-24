@@ -216,10 +216,7 @@ int AParser::BadChunkedBody(int &chunked_state, size_t &chunked_size) {
 }
 
 bool AParser::IsChunked() {
-  if ((request_->GetHeaders().count("TRANSFER-ENCODING") > 0) &&
-      (StrToUpper(request_->GetHeaders().find("TRANSFER-ENCODING")->second) ==
-       "CHUNKED"))
-    return true;
+  if (request_->GetHeaders().count("TRANSFER-ENCODING") > 0) return true;
   return false;
 }
 

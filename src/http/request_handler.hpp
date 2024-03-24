@@ -5,15 +5,20 @@
 #include "http_request.hpp"
 #include "http_response.hpp"
 #include "io_task_manager.hpp"
+#include "option.hpp"
 #include "read_from_cgi.hpp"
 #include "write_to_cgi.hpp"
 
 class RequestHandler {
  public:
-  static HTTPResponse *Handle(const IConfig &config, RequestContext req_ctx);
-  static HTTPResponse *Get(const IConfig &config, RequestContext req_ctx);
-  static HTTPResponse *Post(const IConfig &config, RequestContext req_ctx);
-  static HTTPResponse *Delete(const IConfig &config, RequestContext req_ctx);
+  static Option<HTTPResponse *> Handle(const IConfig &config,
+                                       RequestContext req_ctx);
+  static Option<HTTPResponse *> Get(const IConfig &config,
+                                    RequestContext req_ctx);
+  static Option<HTTPResponse *> Post(const IConfig &config,
+                                     RequestContext req_ctx);
+  static Option<HTTPResponse *> Delete(const IConfig &config,
+                                       RequestContext req_ctx);
   static http::StatusCode CGIExe(const IConfig &config, RequestContext req_ctx,
                                  const std::string &program_path,
                                  const std::string &script_name);

@@ -59,8 +59,8 @@ void IOTaskManager::RemoveFd(AIOTask *task) {
 }
 
 void IOTaskManager::DeleteTasks() {
-  for (unsigned int i = 0; i < tasks_array_.size(); i++) {
-    for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); j++) {
+  for (unsigned int i = 0; i < tasks_array_.size(); ++i) {
+    for (unsigned int j = 0; j < tasks_array_.at(i).tasks.size(); ++j) {
       delete tasks_array_.at(i).tasks.at(j);
     }
   }

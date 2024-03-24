@@ -44,7 +44,7 @@ TEST_F(RequestHandlerTest, GetMethodNormal) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  response = RequestHandler::Get(config_mock.get(), req_ctx);
+  response = RequestHandler::Get(config_mock.get(), req_ctx).Unwrap();
 
   ASSERT_EQ(response->GetStatusCode(), http::kOk);
   ASSERT_EQ(response->GetBody(), "Hello, world!\n");
@@ -73,7 +73,7 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
   request.SetUri(uri);
   request.AddBody(body);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  response = RequestHandler::Post(config_mock.get(), req_ctx);
+  response = RequestHandler::Post(config_mock.get(), req_ctx).Unwrap();
 
   ASSERT_EQ(response->GetStatusCode(), http::kCreated);
   ASSERT_EQ(response->GetHeaders().at("Location"), uri);
@@ -106,7 +106,7 @@ TEST_F(RequestHandlerTest, PostMethodDirectoryRequest) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  response = RequestHandler::Post(config_mock.get(), req_ctx);
+  response = RequestHandler::Post(config_mock.get(), req_ctx).Unwrap();
 
   ASSERT_EQ(response->GetStatusCode(), http::kBadRequest);
 }
@@ -135,7 +135,7 @@ TEST_F(RequestHandlerTest, DeleteMethodNormalTest) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  response = RequestHandler::Delete(config_mock.get(), req_ctx);
+  response = RequestHandler::Delete(config_mock.get(), req_ctx).Unwrap();
 
   ASSERT_EQ(response->GetStatusCode(), http::kOk);
   const std::filesystem::path path(test_file_path);
@@ -166,7 +166,7 @@ TEST_F(RequestHandlerTest, DeleteMethodDirectoryTarget) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  response = RequestHandler::Delete(config_mock.get(), req_ctx);
+  response = RequestHandler::Delete(config_mock.get(), req_ctx).Unwrap();
 
   ASSERT_EQ(response->GetStatusCode(), http::kBadRequest);
   const std::filesystem::path path(test_file_path);
