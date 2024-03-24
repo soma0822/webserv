@@ -38,18 +38,9 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   const Result<LocationContext, std::string> location_ctx_result =
       server_ctx.SearchLocation(request->GetUri());
 
-  // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
-  std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
-  if (file_utils::IsDirectory(request_file_path)) {
-    if (location_ctx_result.IsOk() &&
-        !location_ctx_result.Unwrap().GetIndex().empty()) {
-      request_file_path += location_ctx_result.Unwrap().GetIndex();
-    } else if (!server_ctx.GetIndex().empty()) {
-      request_file_path += server_ctx.GetIndex();
-    }
-  }
-
   bool need_autoindex = false;
+
+  std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   if (file_utils::IsDirectory(request_file_path)) {
     // リクエストターゲットのディレクトリが/で終わっていない場合には301を返す
     if (request_file_path.at(request_file_path.size() - 1) != '/') {
@@ -66,6 +57,29 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
     }
   }
 
+  if (need_autoindex) {
+    struct stat file_stat;
+    // ファイルが存在しない場合には404を返す
+    if (stat(request_file_path.c_str(), &file_stat) == -1) {
+      return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+    }
+    // パーミッションがない場合には403を返す
+    if (!(file_stat.st_mode & S_IRUSR)) {
+      return Some(
+          HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
+    }
+    return Some(GenerateAutoIndexPage(config, request, request_file_path));
+  }
+
+  // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
+  if (file_utils::IsDirectory(request_file_path)) {
+    if (location_ctx_result.IsOk() &&
+        !location_ctx_result.Unwrap().GetIndex().empty()) {
+      request_file_path += location_ctx_result.Unwrap().GetIndex();
+    } else if (!server_ctx.GetIndex().empty()) {
+      request_file_path += server_ctx.GetIndex();
+    }
+  }
   struct stat file_stat;
   // ファイルが存在しない場合には404を返す
   if (stat(request_file_path.c_str(), &file_stat) == -1) {
@@ -75,10 +89,6 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   if (!(file_stat.st_mode & S_IRUSR)) {
     return Some(
         HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
-  }
-
-  if (need_autoindex) {
-    return Some(GenerateAutoIndexPage(config, request, request_file_path));
   }
 
   return Some(HTTPResponse::Builder()
