@@ -63,5 +63,6 @@ TEST(Capitalize, OneWord) {
 
 TEST(Capitalize, TwoWords) {
   std::string target = "hello-there";
-  ASSERT_EQ("Hello-There", string_utils::CapitalizeHyphenSeparatedWords(target));
+  ASSERT_EQ("Hello-There",
+            string_utils::CapitalizeHyphenSeparatedWords(target));
 }
