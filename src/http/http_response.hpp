@@ -17,7 +17,7 @@ class HTTPResponse {
     Builder &SetStatusCode(http::StatusCode status_code);
     Builder &AddHeader(const std::string &key, const std::string &value);
     Builder &SetBody(const std::string &body);
-    Option<HTTPResponse *> Build();
+    HTTPResponse *Build();
 
    private:
     static const std::string kHTTPVersion;
@@ -51,7 +51,7 @@ class HTTPResponse {
   std::string body_;
 };
 
-Option<HTTPResponse *> GenerateErrorResponse(http::StatusCode status_code,
+HTTPResponse *GenerateErrorResponse(http::StatusCode status_code,
                                              const IConfig &config);
 
 #endif  // WEBSERV_SRC_HTTP_HTTP_RESPONSE_HPP_

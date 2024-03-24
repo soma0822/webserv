@@ -31,13 +31,13 @@ HTTPResponse::Builder &HTTPResponse::Builder::SetBody(const std::string &body) {
   return *this;
 }
 
-Option<HTTPResponse *> HTTPResponse::Builder::Build() {
+HTTPResponse *HTTPResponse::Builder::Build() {
   response_->SetHTTPVersion(kHTTPVersion);
   if (response_->GetStatusCode() == http::kNone) {
     delete response_;
-    return Some((HTTPResponse *)NULL);
+    return Builder().SetStatusCode(http::kInternalServerError).Build();
   }
-  return Some(response_);
+  return response_;
 }
 
 // copy constructor
@@ -120,7 +120,7 @@ std::string HTTPResponse::ToString() {
   return ss.str();
 }
 
-Option<HTTPResponse *> GenerateErrorResponse(const http::StatusCode status_code,
+HTTPResponse *GenerateErrorResponse(const http::StatusCode status_code,
                                              const IConfig &config) {
   const std::map<std::string, std::string> &error_pages = config.GetErrorPage();
   std::stringstream ss;

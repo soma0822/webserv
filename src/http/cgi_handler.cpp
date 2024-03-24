@@ -6,7 +6,7 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
   if (cgi_req->GetHeaders().count("LOCATION") == 1 &&
       cgi_req->GetHeaders().at("LOCATION").at(0) == '/') {
     if (req_ctx.count >= 10)
-      return (HTTPResponse::Builder()
+      return Some(HTTPResponse::Builder()
                   .SetStatusCode(http::kInternalServerError)
                   .Build());
     req_ctx.count++;
@@ -25,7 +25,7 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
       Result<int, std::string> result = string_utils::StrToI(it->second);
       if (result.IsErr()) {
         delete res;
-        return GenerateErrorResponse(http::kInternalServerError, config);
+        return Some(GenerateErrorResponse(http::kInternalServerError, config));
       }
       res->SetStatusCode(static_cast<http::StatusCode>(result.Unwrap()));
     } else {
