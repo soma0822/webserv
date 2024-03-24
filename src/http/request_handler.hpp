@@ -33,6 +33,12 @@ class RequestHandler {
       const IConfig &config, const RequestContext &req_ctx);
   static char **DupEnv(const std::map<std::string, std::string> &env_map);
   static void DeleteEnv(char **env);
+  static std::string ResolveRequestTargetPath(const IConfig &config,
+                                              const RequestContext req_ctx);
+  static std::string SearchForCGIScript(const IConfig &config,
+                                        const HTTPRequest *request);
+  static std::string SearchForPathSegment(const IConfig &config,
+                                          const HTTPRequest *request);
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_

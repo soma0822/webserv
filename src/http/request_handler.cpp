@@ -35,26 +35,11 @@ HTTPResponse *RequestHandler::Get(const IConfig &config,
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
-  const std::string &uri = request->GetUri();
   const Result<LocationContext, std::string> location_ctx_result =
-      server_ctx.SearchLocation(uri);
-
-  // rootを取得する
-  std::string root = server_ctx.GetRoot();
-  if (location_ctx_result.IsOk() &&
-      !location_ctx_result.Unwrap().GetRoot().empty()) {
-    root = location_ctx_result.Unwrap().GetRoot();
-  }
-
-  // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
-  // origin-form = absolute-path [ "?" query ]
-  // rootが/で終わっている場合には/が重複してしまうので削除する
-  if (root.at(root.size() - 1) == '/') {
-    root.erase(root.size() - 1, 1);
-  }
+      server_ctx.SearchLocation(request->GetUri());
 
   // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
-  std::string request_file_path = root + uri;
+  std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   if (file_utils::IsDirectory(request_file_path)) {
     if (location_ctx_result.IsOk() &&
         !location_ctx_result.Unwrap().GetIndex().empty()) {
@@ -110,19 +95,8 @@ HTTPResponse *RequestHandler::Post(const IConfig &config,
   const Result<LocationContext, std::string> location_ctx_result =
       server_ctx.SearchLocation(uri);
 
-  // rootを取得する
-  std::string root = server_ctx.GetRoot();
-  if (location_ctx_result.IsOk() &&
-      !location_ctx_result.Unwrap().GetRoot().empty()) {
-    root = location_ctx_result.Unwrap().GetRoot();
-  }
-
-  // rootが/で終わっている場合には/が重複してしまうので削除する
-  if (root.at(root.size() - 1) == '/') {
-    root.erase(root.size() - 1, 1);
-  }
-
-  const std::string request_file_path = root + uri;
+  const std::string request_file_path =
+      ResolveRequestTargetPath(config, req_ctx);
   // リクエストターゲットがディレクトリの場合には400を返す
   if (request_file_path.at(request_file_path.size() - 1) == '/') {
     return HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build();
@@ -164,22 +138,12 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   const Result<LocationContext, std::string> location_ctx_result =
       server_ctx.SearchLocation(uri);
 
-  // rootを取得する
-  std::string root = server_ctx.GetRoot();
-  if (location_ctx_result.IsOk() &&
-      !location_ctx_result.Unwrap().GetRoot().empty()) {
-    root = location_ctx_result.Unwrap().GetRoot();
-  }
-
-  // rootが/で終わっている場合には/が重複してしまうので削除する
-  if (root.at(root.size() - 1) == '/') {
-    root.erase(root.size() - 1, 1);
-  }
-
-  const std::string request_file_path = root + uri;
+  const std::string request_file_path =
+      ResolveRequestTargetPath(config, req_ctx);
 
   // リクエストターゲットがディレクトリの場合には400を返す
-  if (uri.at(uri.size() - 1) == '/' || file_utils::IsDirectory(root + uri)) {
+  if (uri.at(uri.size() - 1) == '/' ||
+      file_utils::IsDirectory(request_file_path)) {
     return HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build();
   }
 
@@ -204,13 +168,36 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   return HTTPResponse::Builder().SetStatusCode(http::kOk).Build();
 }
 
-std::string RequestHandler::SearchForCGIScript(const IConfig &config,
-                                                 const HTTPRequest *request) {
+std::string RequestHandler::ResolveRequestTargetPath(
+    const IConfig &config, const RequestContext req_ctx) {
+  const HTTPRequest *request = req_ctx.request;
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const std::string &uri = request->GetUri();
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
+
+  // rootを取得する
+  std::string root = server_ctx.GetRoot();
+  if (location_ctx_result.IsOk() &&
+      !location_ctx_result.Unwrap().GetRoot().empty()) {
+    root = location_ctx_result.Unwrap().GetRoot();
+  }
+
+  // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
+  // origin-form = absolute-path [ "?" query ]
+  // rootが/で終わっている場合には/が重複してしまうので削除する
+  if (root.at(root.size() - 1) == '/') {
+    root.erase(root.size() - 1, 1);
+  }
+  return root + uri;
 }
 
+std::string RequestHandler::SearchForCGIScript(const IConfig &config,
+                                               const HTTPRequest *request) {}
+
 std::string RequestHandler::SearchForPathSegment(const IConfig &config,
-                                                   const HTTPRequest *request) {
-}
+                                                 const HTTPRequest *request) {}
 
 HTTPResponse *RequestHandler::GenerateAutoIndexPage(
     const IConfig &config, const HTTPRequest *request,
