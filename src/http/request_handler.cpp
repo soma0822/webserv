@@ -61,7 +61,8 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
     struct stat file_stat;
     // ファイルが存在しない場合には404を返す
     if (stat(request_file_path.c_str(), &file_stat) == -1) {
-      return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+      return Some(
+          HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
     }
     // パーミッションがない場合には403を返す
     if (!(file_stat.st_mode & S_IRUSR)) {
