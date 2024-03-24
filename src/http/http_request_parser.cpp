@@ -52,7 +52,7 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
 int HTTPRequestParser::SetHeader() {
   std::string request_line;
   std::string headline, key, value;
-  size_t pos, key_pos = 0;
+  size_t pos = 0, key_pos = 0;
 
   while (1) {
     pos = row_line_.find("\r\n");
