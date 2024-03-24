@@ -18,7 +18,7 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
   }
   for (std::map<std::string, std::string>::const_iterator it =
            cgi_req->GetHeaders().begin();
-       it != cgi_req->GetHeaders().end(); it++) {
+       it != cgi_req->GetHeaders().end(); ++it) {
     if (it->first == "STATUS") {
       Result<int, std::string> result = string_utils::StrToI(it->second);
       if (result.IsErr()) {
