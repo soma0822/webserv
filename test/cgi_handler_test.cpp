@@ -53,7 +53,8 @@ TEST(CGIHandler, CGIStatusInvalid) {
 TEST(CGIHandler, CGIStatusOk) {
   Config config;
   std::string str =
-      "Status: 200 Ok\r\nContent-Type: text/html\r\ncharset: UTF-8\r\n\r\n<html>";
+      "Status: 200 Ok\r\nContent-Type: text/html\r\ncharset: "
+      "UTF-8\r\n\r\n<html>";
   CGIParser parser;
   HTTPRequest* req = parser.Parser(str).Unwrap();
   RequestContext req_ctx;
