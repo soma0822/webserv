@@ -7,7 +7,7 @@ Option<HTTPResponse *> CGIHandler::Handle(const IConfig &config,
       cgi_req->GetHeaders().at("LOCATION").at(0) == '/') {
     if (req_ctx.count >= 10)
       return Some(GenerateErrorResponse(http::kInternalServerError, config));
-    req_ctx.count++;
+    ++req_ctx.count;
     std::string location = cgi_req->GetHeaders().at("LOCATION");
     req_ctx.request->SetUri(location);
     return RequestHandler::Handle(config, req_ctx);
