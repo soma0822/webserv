@@ -168,8 +168,8 @@ HTTPResponse *RequestHandler::Delete(const IConfig &config,
   return HTTPResponse::Builder().SetStatusCode(http::kOk).Build();
 }
 
-std::string RequestHandler::ResolveRequestTargetPath(
-    const IConfig &config, const RequestContext req_ctx) {
+std::string RequestHandler::ResolveAbsoluteRootPath(const IConfig &config,
+                                                    RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
@@ -177,12 +177,19 @@ std::string RequestHandler::ResolveRequestTargetPath(
   const Result<LocationContext, std::string> location_ctx_result =
       server_ctx.SearchLocation(uri);
 
-  // rootを取得する
   std::string root = server_ctx.GetRoot();
   if (location_ctx_result.IsOk() &&
       !location_ctx_result.Unwrap().GetRoot().empty()) {
     root = location_ctx_result.Unwrap().GetRoot();
   }
+
+  return root;
+}
+
+std::string RequestHandler::ResolveRequestTargetPath(
+    const IConfig &config, const RequestContext req_ctx) {
+  // rootを取得する
+  std::string root = ResolveAbsoluteRootPath(config, req_ctx);
 
   // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
   // origin-form = absolute-path [ "?" query ]
@@ -190,11 +197,12 @@ std::string RequestHandler::ResolveRequestTargetPath(
   if (root.at(root.size() - 1) == '/') {
     root.erase(root.size() - 1, 1);
   }
-  return root + uri;
+  return root + req_ctx.request->GetUri();
 }
 
-std::string RequestHandler::GetAbsoluteCGIScriptPath(
-    const std::string &request_file_path) {
+std::string RequestHandler::GetAbsoluteCGIScriptPath(const IConfig &config,
+                                                     RequestContext req_ctx) {
+  std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   // 拡張子以降のパスセグメントは除外する
   size_t pos_period = request_file_path.find('.');
   size_t pos_separator = request_file_path.substr(pos_period).find('/');
@@ -205,8 +213,18 @@ std::string RequestHandler::GetAbsoluteCGIScriptPath(
   return request_file_path.substr(0, pos_period + pos_separator);
 }
 
-std::string RequestHandler::SearchForPathSegment(
-    const std::string &request_file_path) {
+// 存在しない場合は空文字を返す
+std::string RequestHandler::GetAbsolutePathForPathSegment(
+    const IConfig &config, RequestContext req_ctx) {
+  std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
+
+  // CGIスクリプトの絶対パス以降がパスセグメントになる
+  std::string path_segment = request_file_path.substr(
+      GetAbsoluteCGIScriptPath(config, req_ctx).size());
+  if (path_segment.empty()) {
+    return "";
+  }
+  return ResolveAbsoluteRootPath(config, req_ctx) + path_segment;
 }
 
 HTTPResponse *RequestHandler::GenerateAutoIndexPage(
