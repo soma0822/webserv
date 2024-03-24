@@ -108,10 +108,11 @@ std::string HTTPResponse::ToString() {
   // ヘッダ
   for (std::map<std::string, std::string>::iterator it = headers_.begin();
        it != headers_.end(); ++it) {
-    // ss << string_utils::Capitalize(it->first) << ": " << it->second << "\r\n";
+    ss << string_utils::CapitalizeHyphenSeparatedWords(it->first) << ": " << it->second
+       << "\r\n";
   }
 
-  if (headers_.count("Content-Length") == 0) {
+  if (headers_.count("content-length") == 0) {
     ss << "Content-Length: " << body_.size() << "\r\n";
   }
 

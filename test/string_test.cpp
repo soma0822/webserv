@@ -58,5 +58,10 @@ TEST(STRINGSTOHEX, INTMAXPlus1) {
 
 TEST(Capitalize, OneWord) {
   std::string target = "hello";
-  ASSERT_EQ("Hello", string_utils::CapitalizeWords(target));
+  ASSERT_EQ("Hello", string_utils::CapitalizeHyphenSeparatedWords(target));
+}
+
+TEST(Capitalize, TwoWords) {
+  std::string target = "hello-there";
+  ASSERT_EQ("Hello-There", string_utils::CapitalizeHyphenSeparatedWords(target));
 }
