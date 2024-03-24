@@ -19,7 +19,9 @@ Result<int, std::string> WriteResponseToClient::Execute() {
     Logger::Error() << "write エラー" << std::endl;
     return Ok(kFdDelete);
   }
-  if ((wrote_size_ += bytes_written) == response_str.size())
+  if ((wrote_size_ += bytes_written) == response_str.size()) {
+    if (response_->GetStatusCode() == http::kBadRequest) return Ok(kFdDelete);
     return Ok(kTaskDelete);
+  }
   return Ok(kContinue);
 }
