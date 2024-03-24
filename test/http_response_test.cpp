@@ -7,11 +7,11 @@
 using namespace fakeit;
 
 TEST(HTTPResponseBuilderTest, BuildResponse) {
-  HTTPResponse *res= HTTPResponse::Builder()
-                                   .SetStatusCode(http::kOk)
-                                   .AddHeader("Content-Type", "text/plain")
-                                   .SetBody("Hello, World!")
-                                   .Build();
+  HTTPResponse *res = HTTPResponse::Builder()
+                          .SetStatusCode(http::kOk)
+                          .AddHeader("Content-Type", "text/plain")
+                          .SetBody("Hello, World!")
+                          .Build();
   std::string expected =
       "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, World!";
   ASSERT_EQ(res->ToString(), expected);
@@ -19,10 +19,10 @@ TEST(HTTPResponseBuilderTest, BuildResponse) {
 }
 
 TEST(HTTPResponseBuilderTest, BuildResponseWithoutStatus) {
-  HTTPResponse *res= HTTPResponse::Builder()
-                                   .AddHeader("Content-Type", "text/plain")
-                                   .SetBody("Hello, World!")
-                                   .Build();
+  HTTPResponse *res = HTTPResponse::Builder()
+                          .AddHeader("Content-Type", "text/plain")
+                          .SetBody("Hello, World!")
+                          .Build();
   ASSERT_EQ(res->GetStatusCode(), http::kInternalServerError);
 }
 
@@ -31,8 +31,7 @@ TEST(GenerateErrorResponse, DefaultNotFound) {
   When(Method(mock, GetErrorPage))
       .AlwaysReturn(std::map<std::string, std::string>{});
 
-  HTTPResponse *res=
-      GenerateErrorResponse(http::kNotFound, mock.get());
+  HTTPResponse *res = GenerateErrorResponse(http::kNotFound, mock.get());
   const std::string expected =
       "<html>\r\n<head><title>404 Not "
       "Found</title></head>\r\n<body>\r\n<center><h1>404 Not "
@@ -47,8 +46,7 @@ TEST(GenerateErrorResponse, ProvidedNotFound) {
       {"404", "test/error_page/404.html"}};
   When(Method(mock, GetErrorPage)).AlwaysReturn(error_pages);
 
-  HTTPResponse *res=
-      GenerateErrorResponse(http::kNotFound, mock.get());
+  HTTPResponse *res = GenerateErrorResponse(http::kNotFound, mock.get());
   const std::string expected = "<h1>404 Not Found</h1>";
   ASSERT_EQ(res->GetBody(), expected);
   delete res;
@@ -60,8 +58,7 @@ TEST(GenerateErrorResponse, ProvidedInvalidErrorPage) {
       {"404", "test/error_page/invalid.html"}};
   When(Method(mock, GetErrorPage)).AlwaysReturn(error_pages);
 
-  HTTPResponse *res=
-      GenerateErrorResponse(http::kNotFound, mock.get());
+  HTTPResponse *res = GenerateErrorResponse(http::kNotFound, mock.get());
   const std::string expected =
       "<html>\r\n<head><title>404 Not "
       "Found</title></head>\r\n<body>\r\n<center><h1>404 Not "
@@ -76,8 +73,7 @@ TEST(GenerateErrorResponse, ProvidedValidButDirectoryErrorPage) {
       {"404", "test/error_page/"}};
   When(Method(mock, GetErrorPage)).AlwaysReturn(error_pages);
 
-  HTTPResponse *res=
-      GenerateErrorResponse(http::kNotFound, mock.get());
+  HTTPResponse *res = GenerateErrorResponse(http::kNotFound, mock.get());
   const std::string expected =
       "<html>\r\n<head><title>404 Not "
       "Found</title></head>\r\n<body>\r\n<center><h1>404 Not "

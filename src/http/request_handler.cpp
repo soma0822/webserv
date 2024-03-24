@@ -12,8 +12,8 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   HTTPRequest *request = req_ctx.request;
   if (!request) {
     return Some(HTTPResponse::Builder()
-        .SetStatusCode(http::kInternalServerError)
-        .Build());
+                    .SetStatusCode(http::kInternalServerError)
+                    .Build());
   }
   if (request->GetUri().length() >= kMaxUriLength) {
     return Some(GenerateErrorResponse(http::kUriTooLong, config));
@@ -69,9 +69,9 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
     // リクエストターゲットのディレクトリが/で終わっていない場合には301を返す
     if (request_file_path.at(request_file_path.size() - 1) != '/') {
       return Some(HTTPResponse::Builder()
-          .SetStatusCode(http::kMovedPermanently)
-          .AddHeader("Location", request->GetUri() + "/")
-          .Build());
+                      .SetStatusCode(http::kMovedPermanently)
+                      .AddHeader("Location", request->GetUri() + "/")
+                      .Build());
     }
     // AutoIndexが有効な場合にはディレクトリの中身を表示する
     if (location_ctx_result.IsOk() &&
@@ -88,7 +88,8 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   }
   // パーミッションがない場合には403を返す
   if (!(file_stat.st_mode & S_IRUSR)) {
-    return Some(HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
+    return Some(
+        HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
 
   if (need_autoindex) {
@@ -96,9 +97,9 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   }
 
   return Some(HTTPResponse::Builder()
-      .SetStatusCode(http::kOk)
-      .SetBody(file_utils::ReadFile(request_file_path))
-      .Build());
+                  .SetStatusCode(http::kOk)
+                  .SetBody(file_utils::ReadFile(request_file_path))
+                  .Build());
 }
 
 Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
@@ -125,7 +126,8 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   const std::string request_file_path = root + uri;
   // リクエストターゲットがディレクトリの場合には400を返す
   if (request_file_path.at(request_file_path.size() - 1) == '/') {
-    return Some(HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build());
+    return Some(
+        HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build());
   }
 
   const std::string parent_dir =
@@ -137,22 +139,23 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
   if (!(parent_dir_stat.st_mode & S_IWUSR)) {
-    return Some(HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
+    return Some(
+        HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
 
   std::ofstream ofs(request_file_path.c_str());
   if (!ofs) {
     return Some(HTTPResponse::Builder()
-        .SetStatusCode(http::kInternalServerError)
-        .Build());
+                    .SetStatusCode(http::kInternalServerError)
+                    .Build());
   }
   ofs << request->GetBody();
   ofs.close();
 
   return Some(HTTPResponse::Builder()
-      .SetStatusCode(http::kCreated)
-      .AddHeader("Location", uri)
-      .Build());
+                  .SetStatusCode(http::kCreated)
+                  .AddHeader("Location", uri)
+                  .Build());
 }
 
 Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
@@ -180,7 +183,8 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
 
   // リクエストターゲットがディレクトリの場合には400を返す
   if (uri.at(uri.size() - 1) == '/' || file_utils::IsDirectory(root + uri)) {
-    return Some(HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build());
+    return Some(
+        HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build());
   }
 
   // ファイルが存在しない場合には404を返す
@@ -191,14 +195,15 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
 
   // パーミッションがない場合には403を返す
   if (!(file_stat.st_mode & S_IWUSR) && !(file_stat.st_mode & S_IXUSR)) {
-    return Some(HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
+    return Some(
+        HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
 
   // ファイルを削除する
   if (unlink(request_file_path.c_str()) == -1) {
     return Some(HTTPResponse::Builder()
-        .SetStatusCode(http::kInternalServerError)
-        .Build());
+                    .SetStatusCode(http::kInternalServerError)
+                    .Build());
   }
 
   return Some(HTTPResponse::Builder().SetStatusCode(http::kOk).Build());

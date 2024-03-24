@@ -121,7 +121,7 @@ std::string HTTPResponse::ToString() {
 }
 
 HTTPResponse *GenerateErrorResponse(const http::StatusCode status_code,
-                                             const IConfig &config) {
+                                    const IConfig &config) {
   const std::map<std::string, std::string> &error_pages = config.GetErrorPage();
   std::stringstream ss;
   ss << status_code;

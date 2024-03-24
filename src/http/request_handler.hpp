@@ -31,9 +31,9 @@ class RequestHandler {
 
   static const int kMaxUriLength = 2048;
 
-  static HTTPResponse *GenerateAutoIndexPage(
-      const IConfig &config, const HTTPRequest *request,
-      const std::string &abs_path);
+  static HTTPResponse *GenerateAutoIndexPage(const IConfig &config,
+                                             const HTTPRequest *request,
+                                             const std::string &abs_path);
   static std::map<std::string, std::string> GetEnv(
       const IConfig &config, const RequestContext &req_ctx);
   static char **DupEnv(const std::map<std::string, std::string> &env_map);
