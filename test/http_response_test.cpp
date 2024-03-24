@@ -15,7 +15,7 @@ TEST(HTTPResponseBuilderTest, BuildResponse) {
   std::string expected =
       "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: "
       "13\r\n\r\nHello, World!";
-  ASSERT_EQ(response->ToString(), expected);
+  ASSERT_EQ(res->ToString(), expected);
   delete res;
 }
 
