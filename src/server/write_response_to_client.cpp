@@ -20,6 +20,9 @@ Result<int, std::string> WriteResponseToClient::Execute() {
     return Ok(kFdDelete);
   }
   if ((wrote_size_ += bytes_written) == response_str.size())
+  {
+    Logger::Info() << "レスポンスを書き込みました: " << response_str << std::endl;
     return Ok(kTaskDelete);
+  }
   return Ok(kContinue);
 }
