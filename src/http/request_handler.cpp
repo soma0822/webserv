@@ -193,11 +193,21 @@ std::string RequestHandler::ResolveRequestTargetPath(
   return root + uri;
 }
 
-std::string RequestHandler::SearchForCGIScript(const IConfig &config,
-                                               const HTTPRequest *request) {}
+std::string RequestHandler::GetAbsoluteCGIScriptPath(
+    const std::string &request_file_path) {
+  // 拡張子以降のパスセグメントは除外する
+  size_t pos_period = request_file_path.find('.');
+  size_t pos_separator = request_file_path.substr(pos_period).find('/');
+  // '/'が見つからない場合には拡張子以降のパスセグメントがないのでそのまま返す
+  if (pos_separator == std::string::npos) {
+    return request_file_path;
+  }
+  return request_file_path.substr(0, pos_period + pos_separator);
+}
 
-std::string RequestHandler::SearchForPathSegment(const IConfig &config,
-                                                 const HTTPRequest *request) {}
+std::string RequestHandler::SearchForPathSegment(
+    const std::string &request_file_path) {
+}
 
 HTTPResponse *RequestHandler::GenerateAutoIndexPage(
     const IConfig &config, const HTTPRequest *request,

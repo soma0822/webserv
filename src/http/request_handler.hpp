@@ -17,6 +17,8 @@ class RequestHandler {
   static http::StatusCode CGIExe(const IConfig &config, RequestContext req_ctx,
                                  const std::string &program_path,
                                  const std::string &script_name);
+  static std::string GetAbsoluteCGIScriptPath(const std::string &request_file_path);
+  static std::string SearchForPathSegment(const std::string &request_file_path);
 
  private:
   RequestHandler();
@@ -35,10 +37,6 @@ class RequestHandler {
   static void DeleteEnv(char **env);
   static std::string ResolveRequestTargetPath(const IConfig &config,
                                               const RequestContext req_ctx);
-  static std::string SearchForCGIScript(const IConfig &config,
-                                        const HTTPRequest *request);
-  static std::string SearchForPathSegment(const IConfig &config,
-                                          const HTTPRequest *request);
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_

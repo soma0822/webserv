@@ -172,3 +172,15 @@ TEST_F(RequestHandlerTest, DeleteMethodDirectoryTarget) {
   const std::filesystem::path path(test_file_path);
   ASSERT_TRUE(std::filesystem::exists(path));
 }
+
+TEST_F(RequestHandlerTest, SearchForCGIScriptWithPathSegment) {
+  ASSERT_EQ(RequestHandler::GetAbsoluteCGIScriptPath(
+                "/var/www/html/cgi-bin/cgi.py/foo/bar"),
+            "/var/www/html/cgi-bin/cgi.py");
+}
+
+TEST_F(RequestHandlerTest, SearchForCGIScriptWithoutPathSegment) {
+  ASSERT_EQ(
+      RequestHandler::GetAbsoluteCGIScriptPath("/var/www/html/cgi-bin/cgi.py"),
+      "/var/www/html/cgi-bin/cgi.py");
+}
