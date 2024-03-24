@@ -43,6 +43,8 @@ std::string SkipSpace(std::string s) {
   const std::string whitespace = " \t\f\v\n\r";
   size_t pos_first = s.find_first_not_of(whitespace);
   size_t pos_last = s.find_last_not_of(whitespace);
+  if (pos_first == std::string::npos || pos_last == std::string::npos)
+    return "";
   return s.substr(pos_first, pos_last - pos_first + 1);
 }
 

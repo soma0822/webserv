@@ -50,38 +50,24 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
 }
 
 int HTTPRequestParser::SetHeader() {
-  std::string request_line = row_line_;
+  std::string request_line;
   std::string headline, key, value;
-  size_t pos = 0;
-  size_t key_pos = 0;
-  size_t value_pos = 0;
+  size_t pos = 0, key_pos = 0;
 
   while (1) {
+    pos = row_line_.find("\r\n");
+    if (pos == std::string::npos) return kNotEnough;  // 改行がない時
+    request_line = row_line_.substr(0, pos);
+    row_line_ = row_line_.substr(pos + 2);
+    if (request_line == "") break;  // Headerの最終の空行の処理
     key_pos = request_line.find(":");
-    if (key_pos == std::string::npos) break;  // 最後まで見てしまった時
-    pos = request_line.find("\r\n");
-    if (pos == std::string::npos) break;    // 改行がない時
-    if (pos < key_pos) return kBadRequest;  // 改行が先にある時
-    if (key_pos == 0) return kBadRequest;   // 左辺が何もない
+    if (key_pos == std::string::npos || key_pos == 0)
+      return kBadRequest;  // :がない、もしくは左辺が何もない
     key = request_line.substr(0, key_pos);
-    if (pos == key_pos + 1) {
-      value_pos = 0;
-      value = "";
-    } else {
-      value_pos = pos - key_pos - 1;
-      value =
-          string_utils::SkipSpace(request_line.substr(key_pos + 1, value_pos));
-    }
-    if (string_utils::StrToUpper(key) == "HOST" &&
-        request_->GetHeaders().count("HOST") > 0)
-      return kBadRequest;
-    request_line = request_line.substr(key_pos + value_pos + 3);
-    request_->AddHeader(string_utils::StrToUpper(key), value);
+    value = request_line.substr(key_pos + 1);
+    if (StrToUpper(key) == "HOST" && request_->GetHeaders().count("HOST") > 0)
+      return kBadRequest;  // Hostが複数ある時
+    request_->AddHeader(StrToUpper(key), string_utils::SkipSpace(value));
   }
-  // headerの終わりの確認
-  row_line_ = request_line;
-  // まだheaderが続いている場合
-  if (request_line.find("\r\n") != 0) return kNotEnough;
-  row_line_ = request_line.substr(2);
   return kOk;
 }

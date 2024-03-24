@@ -218,6 +218,34 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked) {
   delete req2.Unwrap();
 }
 
+// Transfer-Encodingのパース時にchunkedが書かれていない
+TEST(HTTPRequestParser, ParseRequestPOST_Transfer_Non_chunked) {
+  HTTPRequestParser parser;
+  std::string request =
+      "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
+      "   \r\n\r\n";
+  Result<HTTPRequest *, int> req = parser.Parser(request);
+  EXPECT_EQ(req.UnwrapErr(), HTTPRequestParser::kNotEnough);
+  request = "5\r\n";
+  Result<HTTPRequest *, int> req1 = parser.Parser(request);
+  EXPECT_EQ(req1.UnwrapErr(), HTTPRequestParser::kNotEnough);
+  request = "hello\r\n";
+  Result<HTTPRequest *, int> req3 = parser.Parser(request);
+  EXPECT_EQ(req3.UnwrapErr(), HTTPRequestParser::kNotEnough);
+  request = "0\r\n";
+  Result<HTTPRequest *, int> req4 = parser.Parser(request);
+  EXPECT_EQ(req4.UnwrapErr(), HTTPRequestParser::kNotEnough);
+  request = "\r\n";
+  Result<HTTPRequest *, int> req2 = parser.Parser(request);
+  EXPECT_EQ(req2.Unwrap()->GetMethod(), "POST");
+  EXPECT_EQ(req2.Unwrap()->GetUri(), "/");
+  EXPECT_EQ(req2.Unwrap()->GetProtocol(), "HTTP");
+  EXPECT_EQ(req2.Unwrap()->GetVersion(), "1.1");
+  EXPECT_EQ(req2.Unwrap()->GetHostHeader(), "localhost:8080");
+  EXPECT_EQ(req2.Unwrap()->GetBody(), "hello");
+  delete req2.Unwrap();
+}
+
 // Transfer-Encodingのパース(16進数の場合)
 TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked_Hex) {
   HTTPRequestParser parser;
