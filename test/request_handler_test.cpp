@@ -76,7 +76,7 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
   response = RequestHandler::Post(config_mock.get(), req_ctx);
 
   ASSERT_EQ(response->GetStatusCode(), http::kCreated);
-  ASSERT_EQ(response->GetHeaders().at("location"), uri);
+  ASSERT_EQ(response->GetHeaders().at("LOCATION"), uri);
 
   std::ifstream ifs(test_file_path);
   // read all data from file

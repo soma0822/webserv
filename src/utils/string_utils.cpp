@@ -51,11 +51,18 @@ std::string StrToLower(std::string s) {
   return s;
 }
 
+std::string StrToUpper(std::string s) {
+  std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+  return s;
+}
+
 std::string CapitalizeHyphenSeparatedWords(std::string s) {
   // e.g. "content-length" -> "Content-Length"
   for (size_t i = 0; i < s.size(); ++i) {
     if (i == 0 || s[i - 1] == '-') {
       s[i] = toupper(s[i]);
+    } else {
+      s[i] = tolower(s[i]);
     }
   }
   return s;

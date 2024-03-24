@@ -72,10 +72,11 @@ int HTTPRequestParser::SetHeader() {
       value =
           string_utils::SkipSpace(request_line.substr(key_pos + 1, value_pos));
     }
-    if (StrToUpper(key) == "HOST" && request_->GetHeaders().count("HOST") > 0)
+    if (string_utils::StrToUpper(key) == "HOST" &&
+        request_->GetHeaders().count("HOST") > 0)
       return kBadRequest;
     request_line = request_line.substr(key_pos + value_pos + 3);
-    request_->AddHeader(StrToUpper(key), value);
+    request_->AddHeader(string_utils::StrToUpper(key), value);
   }
   // headerの終わりの確認
   row_line_ = request_line;

@@ -89,7 +89,7 @@ http::StatusCode HTTPResponse::GetStatusCode() const { return status_code_; }
 const std::string &HTTPResponse::GetBody() const { return body_; }
 
 void HTTPResponse::AddHeader(const std::string &key, const std::string &value) {
-  headers_[string_utils::StrToLower(key)] = value;
+  headers_[string_utils::StrToUpper(key)] = value;
 }
 
 const std::map<std::string, std::string> &HTTPResponse::GetHeaders() const {
