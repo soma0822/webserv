@@ -1,6 +1,8 @@
 #ifndef WEBSERV_SRC_HTTP_HTTP_REQUEST_HPP
 #define WEBSERV_SRC_HTTP_HTTP_REQUEST_HPP
 
+#include <arpa/inet.h>
+
 #include <map>
 #include <string>
 
@@ -13,6 +15,7 @@ class HTTPRequest {
 
   void SetMethod(const std::string &method);
   void SetUri(const std::string &uri);
+  void SetQuery(const std::string &query);
   void SetProtocol(const std::string &protocol);
   void SetVersion(const std::string &version);
   void SetHostHeader(const std::string &host_header);
@@ -20,6 +23,7 @@ class HTTPRequest {
   void AddBody(const std::string &body);
   const std::string &GetMethod() const;
   const std::string &GetUri() const;
+  const std::string &GetQuery() const;
   const std::string &GetProtocol() const;
   const std::string &GetVersion() const;
   const std::string &GetHostHeader() const;
@@ -29,11 +33,21 @@ class HTTPRequest {
  private:
   std::string method_;
   std::string uri_;
+  std::string query_;
   std::string protocol_;
   std::string version_;
   std::string host_header_;
   std::map<std::string, std::string> headers_;
   std::string body_;
+};
+
+struct RequestContext {
+  HTTPRequest *request;
+  std::string port;
+  std::string ip;
+  struct sockaddr_in client_addr;
+  int fd;
+  int count;
 };
 
 #endif  // WEBSERV_SRC_HTTP_HTTP_REQUEST_HPP

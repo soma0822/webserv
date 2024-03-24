@@ -6,16 +6,18 @@
 #include <string>
 
 #include "http_request.hpp"
+#include "http_status_code.hpp"
 #include "result.hpp"
 #include "string_utils.hpp"
 
 class AParser {
  public:
   enum ReturnStatus {
-    kBadRequest = 0,
+    kOk = 0,
     kNotEnough = 1,
-    kOk = 2,
-    kEndParse = 3,
+    kEndParse = 2,
+    kBadRequest = http::kBadRequest,
+    kHttpVersionNotSupported = http::kHttpVersionNotSupported
   };
   AParser();
   AParser(const AParser &other);
@@ -35,6 +37,11 @@ class AParser {
 
   AParser &operator=(const AParser &other);
 
+  std::pair<std::string, int> ParsePart(std::string &str,
+                                        const std::string &delimiter,
+                                        int errorcode);
+  int CheckProtocol();
+
   bool IsFillRequestLine();
   bool IsFillHeaders();
   bool IsFillBody();
@@ -44,13 +51,14 @@ class AParser {
 
   int SetRequestLine();
   int SetRequestHeaders();
-  int SetHeader();
+  virtual int SetHeader();
   int CheckHeader();
   int SetRequestBody();
   int SetChunkedBody();
   int BadChunkedBody(int &chunked_state, size_t &chunked_size);
   int SetBody();
 
+  const Result<HTTPRequest *, int> HttpVersionNotSupported();
   const Result<HTTPRequest *, int> BadRequest();
   const Result<HTTPRequest *, int> OkRequest();
 
