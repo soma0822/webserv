@@ -35,7 +35,7 @@ HTTPResponse *HTTPResponse::Builder::Build() {
   response_->SetHTTPVersion(kHTTPVersion);
   if (response_->GetStatusCode() == http::kNone) {
     delete response_;
-    return NULL;
+    return Builder().SetStatusCode(http::kInternalServerError).Build();
   }
   return response_;
 }
