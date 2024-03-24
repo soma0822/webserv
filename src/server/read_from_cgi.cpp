@@ -31,7 +31,9 @@ Result<int, std::string> ReadFromCGI::Execute() {
   }
   if (WIFEXITED(status) == 0 || status != 0) {  // 異常終了
     Logger::Error() << "cgi エラー" << std::endl;
-    IOTaskManager::AddTask(new WriteResponseToClient(req_ctx_.fd,GenerateErrorResponse(http::kInternalServerError, config_), req_ctx_.request));
+    IOTaskManager::AddTask(new WriteResponseToClient(
+        req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
+        req_ctx_.request));
     return Ok(kFdDelete);
   }
   if (len == 0) {
