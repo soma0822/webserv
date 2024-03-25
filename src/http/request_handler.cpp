@@ -30,14 +30,29 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     return Some(GenerateErrorResponse(http::kUriTooLong, config));
   }
 
-  if (request->GetMethod() == "GET") {
+  bool is_cgi_request = IsCGIRequest(config, req_ctx);
+
+  if (!is_cgi_request && request->GetMethod() == "GET") {
     return Get(config, req_ctx);
   }
-  if (request->GetMethod() == "POST") {
+  if (!is_cgi_request && request->GetMethod() == "POST") {
     return Post(config, req_ctx);
   }
-  if (request->GetMethod() == "DELETE") {
+  if (!is_cgi_request && request->GetMethod() == "DELETE") {
     return Delete(config, req_ctx);
+  }
+  // TODO 有効な拡張子であるか、実行権限があるかのチェック
+  if (is_cgi_request) {
+    const std::string cgi_script_abs_path =
+        GetAbsoluteCGIScriptPath(config, req_ctx);
+    const std::string cgi_script_path_segment =
+        GetAbsolutePathForPathSegment(config, req_ctx);
+    // TODO CGIExeの呼び出し
+    http::StatusCode status = http::kOk /* = CGIExe() */;
+    if (status == http::kOk) {
+      return None<HTTPResponse *>();
+    }
+    return Some(GenerateErrorResponse(status, config));
   }
   return Some(GenerateErrorResponse(http::kNotImplemented, config));
 }
@@ -433,6 +448,20 @@ void RequestHandler::DeleteEnv(char **env) {
     delete[] env[i];
   }
   delete[] env;
+}
+
+bool RequestHandler::IsCGIRequest(const IConfig &config,
+                                  RequestContext req_ctx) {
+  const HTTPRequest *request = req_ctx.request;
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const std::string &uri = request->GetUri();
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
+
+  // cgi extensionが0より大きければCGIリクエストである
+  return location_ctx_result.IsOk() &&
+         location_ctx_result.Unwrap().GetCgiExtension().size() > 0;
 }
 
 RequestHandler::RequestHandler() {}
