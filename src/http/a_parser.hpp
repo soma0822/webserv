@@ -9,6 +9,7 @@
 #include "http_status_code.hpp"
 #include "result.hpp"
 #include "string_utils.hpp"
+#include "validation.hpp"
 
 class AParser {
  public:

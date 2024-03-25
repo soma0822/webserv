@@ -121,8 +121,12 @@ int AParser::SetRequestBody() {
     // content-lengthの値を取得
     std::string length = request_->GetHeaders().find("CONTENT-LENGTH")->second;
     Result<int, std::string> result = string_utils::StrToI(length);
-    if (result.IsErr()) return kBadRequest;
-    if (kMaxBodySize < result.Unwrap()) return kPayloadTooLarge;
+    if (result.IsErr() || kMaxBodySize < result.Unwrap()) {
+      if (!validation::IsNumber(length))
+        return kBadRequest;
+      else
+        return kPayloadTooLarge;
+    }
     // request_lineを取得して、長さの確認
     int pos = static_cast<int>(request_line.length());
     if (pos < result.Unwrap()) return kNotEnough;
@@ -149,11 +153,15 @@ int AParser::SetChunkedBody() {
       if (pos == std::string::npos) return kNotEnough;
       Result<int, std::string> result =
           string_utils::StrToHex(row_line_.substr(0, pos));
-      if (result.IsErr()) return ResetChunkedBody(status, kBadRequest);
+      if (result.IsErr() ||
+          kMaxBodySize < result.Unwrap() + status.total_size) {
+        if (!validation::IsHexNumber(row_line_.substr(0, pos)))
+          return ResetChunkedBody(status, kBadRequest);
+        else
+          return ResetChunkedBody(status, kPayloadTooLarge);
+      }
       status.chunked_size = static_cast<size_t>(result.Unwrap());
       status.total_size += status.chunked_size;
-      if (kMaxBodySize < status.total_size)
-        return ResetChunkedBody(status, kPayloadTooLarge);
       row_line_ = row_line_.substr(pos + 2);
       status.chunked_state = kNeedChunkedBody;
     }

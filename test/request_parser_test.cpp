@@ -110,6 +110,12 @@ TEST(HTTPRequestParser, ParseRequestGET_Requestline_BadRequest) {
       "100000001\r\n\r\n";
   Result<HTTPRequest *, int> req10 = parser.Parser(request);
   EXPECT_EQ(req10.UnwrapErr(), HTTPRequestParser::kPayloadTooLarge);
+  // content-lengthがINTMAX
+  request =
+      "GET / HTTP/1.1\r\nHost: localhost:8080\r\nContent-Length: "
+      "10000000000000000000000000000000000000\r\n\r\n";
+  Result<HTTPRequest *, int> req11 = parser.Parser(request);
+  EXPECT_EQ(req11.UnwrapErr(), HTTPRequestParser::kPayloadTooLarge);
 }
 
 // headerエラーケース
@@ -377,6 +383,11 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked_Error4) {
   request = "5F5E100\r\n";
   Result<HTTPRequest *, int> req5 = parser.Parser(request);
   EXPECT_EQ(req5.UnwrapErr(), HTTPRequestParser::kPayloadTooLarge);
+  request = 
+      "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
+      "chunked\r\n\r\n0123456789abcdef\r\n";
+  Result<HTTPRequest *, int> req6 = parser.Parser(request);
+  EXPECT_EQ(req6.UnwrapErr(), HTTPRequestParser::kPayloadTooLarge);
 }
 
 // Transfer-Encodingとcontent-lengthが両方ある場合
