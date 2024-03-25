@@ -33,5 +33,6 @@ int main(int ac, char **av) {
     Server::Run(config);
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
+    std::exit(1);
   }
 }
