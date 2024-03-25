@@ -70,14 +70,13 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   }
 
   if (need_autoindex) {
-    struct stat file_stat;
     // ファイルが存在しない場合には404を返す
-    if (stat(request_file_path.c_str(), &file_stat) == -1) {
+    if (!file_utils::DoesFileExist(request_file_path)) {
       return Some(
           HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
     }
     // パーミッションがない場合には403を返す
-    if (!(file_stat.st_mode & S_IRUSR)) {
+    if (!file_utils::IsReadable(request_file_path)) {
       return Some(
           HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
     }
@@ -93,13 +92,12 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
       request_file_path += server_ctx.GetIndex();
     }
   }
-  struct stat file_stat;
   // ファイルが存在しない場合には404を返す
-  if (stat(request_file_path.c_str(), &file_stat) == -1) {
+  if (!file_utils::DoesFileExist(request_file_path)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
   }
   // パーミッションがない場合には403を返す
-  if (!(file_stat.st_mode & S_IRUSR)) {
+  if (!file_utils::IsReadable(request_file_path)) {
     return Some(
         HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
@@ -129,13 +127,12 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
 
   const std::string parent_dir =
       request_file_path.substr(0, request_file_path.find_last_of('/'));
-  struct stat parent_dir_stat;
   // 親ディレクトリが存在しない場合には404を返す
-  if (stat(parent_dir.c_str(), &parent_dir_stat) == -1) {
+  if (!file_utils::DoesFileExist(parent_dir)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
-  if (!(parent_dir_stat.st_mode & S_IWUSR)) {
+  if (!file_utils::IsWritable(parent_dir)) {
     return Some(
         HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
@@ -175,13 +172,14 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
   }
 
   // ファイルが存在しない場合には404を返す
-  struct stat file_stat;
-  if (stat(request_file_path.c_str(), &file_stat) == -1) {
+  if (!file_utils::DoesFileExist(request_file_path)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
   }
 
-  // パーミッションがない場合には403を返す
-  if (!(file_stat.st_mode & S_IWUSR) && !(file_stat.st_mode & S_IXUSR)) {
+  const std::string parent_dir =
+      request_file_path.substr(0, request_file_path.find_last_of('/'));
+  // 親ディレクトリに書き込み権限がない場合には403を返す
+  if (!file_utils::IsWritable(parent_dir)) {
     return Some(
         HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
