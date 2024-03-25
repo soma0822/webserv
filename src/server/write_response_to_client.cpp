@@ -22,7 +22,7 @@ Result<int, std::string> WriteResponseToClient::Execute() {
   if ((wrote_size_ += bytes_written) == response_str.size()) {
     Logger::Info() << "レスポンスを書き込みました: " << response_str
                    << std::endl;
-    if (response_->GetStatusCode() == http::kBadRequest) return Ok(kFdDelete); {
+    if (response_->GetStatusCode() == http::kBadRequest) return Ok(kFdDelete);
     return Ok(kTaskDelete);
   }
   return Ok(kContinue);
