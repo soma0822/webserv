@@ -485,9 +485,11 @@ const char **RequestHandler::MakeArgv(const std::string &script_name,
     ret = const_cast<const char **>(new char *[3]);
     ret[0] = first_line.c_str();
     ret[1] = script_name.c_str();
+    ret[2] = NULL;
   } else {
     ret = const_cast<const char **>(new char *[2]);
     ret[0] = script_name.c_str();
+    ret[1] = NULL;
   }
   return ret;
 }
