@@ -11,21 +11,48 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
                                               RequestContext req_ctx) {
   HTTPRequest *request = req_ctx.request;
   if (!request) {
-    return Some(HTTPResponse::Builder()
-                    .SetStatusCode(http::kInternalServerError)
-                    .Build());
+    return Some(GenerateErrorResponse(http::kInternalServerError, config));
   }
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(request->GetUri());
+
+  // リクエストボディのサイズが制限を超えている場合には413を返す
+  if (location_ctx_result.IsOk() &&
+      static_cast<int>(request->GetBody().length()) >
+          location_ctx_result.Unwrap().GetLimitClientBody()) {
+    return Some(GenerateErrorResponse(http::kPayloadTooLarge, config));
+  }
+
+  // URIの長さが制限を超えている場合には414を返す
   if (request->GetUri().length() >= kMaxUriLength) {
     return Some(GenerateErrorResponse(http::kUriTooLong, config));
   }
-  if (request->GetMethod() == "GET") {
+
+  bool is_cgi_request = IsCGIRequest(config, req_ctx);
+
+  if (!is_cgi_request && request->GetMethod() == "GET") {
     return Get(config, req_ctx);
   }
-  if (request->GetMethod() == "POST") {
+  if (!is_cgi_request && request->GetMethod() == "POST") {
     return Post(config, req_ctx);
   }
-  if (request->GetMethod() == "DELETE") {
+  if (!is_cgi_request && request->GetMethod() == "DELETE") {
     return Delete(config, req_ctx);
+  }
+  // TODO 有効な拡張子であるか、実行権限があるかのチェック
+  if (is_cgi_request) {
+    const std::string cgi_script_abs_path =
+        GetAbsoluteCGIScriptPath(config, req_ctx);
+    const std::string cgi_script_path_segment =
+        GetAbsolutePathForPathSegment(config, req_ctx);
+    // TODO CGIExeの呼び出し
+    http::StatusCode status = http::kOk /* = CGIExe() */;
+    if (status == http::kOk) {
+      return None<HTTPResponse *>();
+    }
+    return Some(GenerateErrorResponse(status, config));
   }
   return Some(GenerateErrorResponse(http::kNotImplemented, config));
 }
@@ -58,14 +85,13 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   }
 
   if (need_autoindex) {
-    struct stat file_stat;
     // ファイルが存在しない場合には404を返す
-    if (stat(request_file_path.c_str(), &file_stat) == -1) {
+    if (!file_utils::DoesFileExist(request_file_path)) {
       return Some(
           HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
     }
     // パーミッションがない場合には403を返す
-    if (!(file_stat.st_mode & S_IRUSR)) {
+    if (!file_utils::IsReadable(request_file_path)) {
       return Some(
           HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
     }
@@ -81,13 +107,12 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
       request_file_path += server_ctx.GetIndex();
     }
   }
-  struct stat file_stat;
   // ファイルが存在しない場合には404を返す
-  if (stat(request_file_path.c_str(), &file_stat) == -1) {
+  if (!file_utils::DoesFileExist(request_file_path)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
   }
   // パーミッションがない場合には403を返す
-  if (!(file_stat.st_mode & S_IRUSR)) {
+  if (!file_utils::IsReadable(request_file_path)) {
     return Some(
         HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
@@ -117,13 +142,12 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
 
   const std::string parent_dir =
       request_file_path.substr(0, request_file_path.find_last_of('/'));
-  struct stat parent_dir_stat;
   // 親ディレクトリが存在しない場合には404を返す
-  if (stat(parent_dir.c_str(), &parent_dir_stat) == -1) {
+  if (!file_utils::DoesFileExist(parent_dir)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
-  if (!(parent_dir_stat.st_mode & S_IWUSR)) {
+  if (!file_utils::IsWritable(parent_dir)) {
     return Some(
         HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
@@ -163,13 +187,14 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
   }
 
   // ファイルが存在しない場合には404を返す
-  struct stat file_stat;
-  if (stat(request_file_path.c_str(), &file_stat) == -1) {
+  if (!file_utils::DoesFileExist(request_file_path)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
   }
 
-  // パーミッションがない場合には403を返す
-  if (!(file_stat.st_mode & S_IWUSR) && !(file_stat.st_mode & S_IXUSR)) {
+  const std::string parent_dir =
+      request_file_path.substr(0, request_file_path.find_last_of('/'));
+  // 親ディレクトリに書き込み権限がない場合には403を返す
+  if (!file_utils::IsWritable(parent_dir)) {
     return Some(
         HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
@@ -415,6 +440,20 @@ void RequestHandler::DeleteEnv(char **env) {
     delete[] env[i];
   }
   delete[] env;
+}
+
+bool RequestHandler::IsCGIRequest(const IConfig &config,
+                                  RequestContext req_ctx) {
+  const HTTPRequest *request = req_ctx.request;
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const std::string &uri = request->GetUri();
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
+
+  // cgi extensionが0より大きければCGIリクエストである
+  return location_ctx_result.IsOk() &&
+         location_ctx_result.Unwrap().GetCgiExtension().size() > 0;
 }
 
 const char **RequestHandler::MakeArgv(const std::string &script_name,
