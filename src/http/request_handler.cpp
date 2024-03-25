@@ -268,7 +268,8 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
 
   return HTTPResponse::Builder().SetStatusCode(http::kOk).SetBody(body).Build();
 }
-// ex.) script_name = /cgi-bin/default.py path_translated:パスセグメントの絶対パス
+// ex.) script_name = /cgi-bin/default.py
+// path_translated:パスセグメントの絶対パス
 // TODO: 実行権限の確認
 http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
@@ -281,34 +282,25 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   }
   int redirect_fd[2], cgi_fd[2];
   pid_t pid;
-  std::map<std::string, std::string> env_map = GetEnv(config, req_ctx, path_translated);
-  char **env = DupEnv(env_map);
-  if (env == NULL) {
-    return http::kInternalServerError;
-  }
   if (pipe(cgi_fd) == -1) {
     Logger::Error() << "pipe エラー" << std::endl;
-    DeleteEnv(env);
     return http::kInternalServerError;
   }
   if (fcntl(cgi_fd[0], F_SETFL, O_NONBLOCK) == -1) {
     Logger::Error() << "fcntl エラー" << std::endl;
-    DeleteEnv(env);
     close(cgi_fd[0]);
     close(cgi_fd[1]);
     return http::kInternalServerError;
   }
-  if (env_map["REQUEST_METHOD"] == "POST") {
+  if (req_ctx.request->GetMethod() == "POST") {
     if (pipe(redirect_fd) == -1) {
       Logger::Error() << "pipe エラー" << std::endl;
-      DeleteEnv(env);
       close(cgi_fd[0]);
       close(cgi_fd[1]);
       return http::kInternalServerError;
     }
     if (fcntl(redirect_fd[1], F_SETFL, O_NONBLOCK) == -1) {
       Logger::Error() << "fcntl エラー" << std::endl;
-      DeleteEnv(env);
       close(cgi_fd[0]);
       close(cgi_fd[1]);
       close(redirect_fd[0]);
@@ -322,19 +314,21 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   pid = fork();
   if (pid == -1) {
     Logger::Error() << "fork エラー" << std::endl;
-    if (env_map["REQUEST_METHOD"] == "POST") {
+    if (req_ctx.request->GetMethod() == "POST") {
       close(redirect_fd[0]);
       close(redirect_fd[1]);
     }
     close(cgi_fd[0]);
     close(cgi_fd[1]);
-    DeleteEnv(env);
     return http::kInternalServerError;
   }
   if (pid == 0) {
     close(cgi_fd[0]);
     dup2(cgi_fd[1], 1);
     close(cgi_fd[1]);
+    std::map<std::string, std::string> env_map =
+        GetEnv(config, req_ctx, path_translated);
+    char **env = DupEnv(env_map);
     if (env_map["REQUEST_METHOD"] == "POST") {
       close(redirect_fd[1]);
       dup2(redirect_fd[0], 0);
@@ -344,7 +338,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
     std::string program_path;
     inf >> program_path;
     Logger::Info() << "CGI実行" << std::endl;
-    if (program_path[0] == '#' && program_path[1] == '/'){
+    if (program_path[0] == '#' && program_path[1] == '/') {
       program_path.substr(1);
       const char *argv[] = {program_path.c_str(), script_name.c_str(), NULL};
       execve(program_path.c_str(), const_cast<char *const *>(argv), env);
@@ -356,18 +350,15 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
     std::exit(1);
   }
   close(cgi_fd[1]);
-  if (env_map["REQUEST_METHOD"] == "POST") close(redirect_fd[0]);
-  for (unsigned int i = 0; i < env_map.size(); ++i) {
-    delete[] env[i];
-  }
-  delete[] env;
+  if (req_ctx.request->GetMethod() == "POST") close(redirect_fd[0]);
   IOTaskManager::AddTask(new ReadFromCGI(pid, cgi_fd[0], req_ctx, config));
   Logger::Info() << "ReadFromCGIを追加" << std::endl;
   return http::kOk;
 }
 
 std::map<std::string, std::string> RequestHandler::GetEnv(
-    const IConfig &config, const RequestContext &req_ctx, const std::string &script_name, const std::string &path_translated) {
+    const IConfig &config, const RequestContext &req_ctx,
+    const std::string &script_name, const std::string &path_translated) {
   std::map<std::string, std::string> env_map;
   (void)config;
   const HTTPRequest *req = req_ctx.request;
@@ -388,11 +379,11 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   else
     env_map["CONTENT_TYPE"] = "";
   env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
-   env_map["PATH_INFO"] = req->GetUri();
-   env_map["PATH_TRANSLATED"] = path_translated;
+  env_map["PATH_INFO"] = req->GetUri();
+  env_map["PATH_TRANSLATED"] = path_translated;
   env_map["QUERY_STRING"] = req->GetQuery();
-  //TODO: inet_ntoa使用禁止なので自作
-   env_map["REMOTE_ADDR"] = inet_ntoa(req_ctx.client_addr.sin_addr);
+  // TODO: inet_ntoa使用禁止なので自作
+  env_map["REMOTE_ADDR"] = inet_ntoa(req_ctx.client_addr.sin_addr);
   // REMOTE_HOSTは使用可能関数ではわからない
   env_map["REMOTE_HOST"] = "";
   // TODO: userの取得
@@ -400,7 +391,7 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
     env_map["REMOTE_USER"] = "";
   else
     env_map["REMOTE_USER"] = "user";
-   env_map["SCRIPT_NAME"] = script_name;
+  env_map["SCRIPT_NAME"] = script_name;
   // TODO: URIからサーバ名の取得
   env_map["SERVER_NAME"] = "localhost";
   env_map["SERVER_PORT"] = req_ctx.port;

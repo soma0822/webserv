@@ -19,10 +19,9 @@ class RequestHandler {
                                      RequestContext req_ctx);
   static Option<HTTPResponse *> Delete(const IConfig &config,
                                        RequestContext req_ctx);
-  static http::StatusCode CGIExe(const IConfig &config,
-                                        RequestContext req_ctx,
-                                        const std::string &script_name,
-                                        const std::string &path_translated);
+  static http::StatusCode CGIExe(const IConfig &config, RequestContext req_ctx,
+                                 const std::string &script_name,
+                                 const std::string &path_translated);
   static std::string GetAbsoluteCGIScriptPath(const IConfig &config,
                                               RequestContext req_ctx);
   static std::string GetAbsolutePathForPathSegment(const IConfig &config,
@@ -40,7 +39,8 @@ class RequestHandler {
                                              const HTTPRequest *request,
                                              const std::string &abs_path);
   static std::map<std::string, std::string> GetEnv(
-      const IConfig &config, const RequestContext &req_ctx, const std::string &script_name, const std::string &path_translated);
+      const IConfig &config, const RequestContext &req_ctx,
+      const std::string &script_name, const std::string &path_translated);
   static char **DupEnv(const std::map<std::string, std::string> &env_map);
   static void DeleteEnv(char **env);
   static std::string ResolveRequestTargetPath(const IConfig &config,
