@@ -29,7 +29,7 @@ class AParser {
 
  protected:
   enum StatusFlag { kBeforeProcess, kNeedHeader, kEndHeader, kNeedBody };
-  enum chunked_state {
+  enum ChunkedStateFlag {
     kNeedChunkedSize,
     kNeedChunkedBody,
     kMaxBodySize = 100000000
