@@ -179,20 +179,12 @@ int AParser::SetBody() {
   return kOk;
 }
 
-const Result<HTTPRequest *, int> AParser::HttpVersionNotSupported() {
+const Result<HTTPRequest *, int> AParser::ErrRequest(int status_code) {
   parser_state_ = kBeforeProcess;
   row_line_ = "";  // 一旦リセット
   delete request_;
   request_ = NULL;
-  return Err(kHttpVersionNotSupported);
-}
-
-const Result<HTTPRequest *, int> AParser::BadRequest() {
-  parser_state_ = kBeforeProcess;
-  row_line_ = "";  // 一旦リセット
-  delete request_;
-  request_ = NULL;
-  return Err(kBadRequest);
+  return Err(status_code);
 }
 
 const Result<HTTPRequest *, int> AParser::OkRequest() {

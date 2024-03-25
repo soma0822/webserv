@@ -19,23 +19,21 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   // requestlineの内容を確認
   if (parser_state_ == kBeforeProcess) {
     return_state = SetRequestLine();
-    if (return_state == kBadRequest)
-      return BadRequest();
-    else if (return_state == kNotEnough)
+    if (return_state == kNotEnough)
       return Err(kNotEnough);
-    else if (return_state == kHttpVersionNotSupported)
-      return HttpVersionNotSupported();
+    else if (return_state != kOk)
+      return ErrRequest(return_state);
     parser_state_ = kNeedHeader;
   }
   // Headerの内容を確認
   if (parser_state_ == kNeedHeader) {
     return_state = SetRequestHeaders();
-    if (return_state == kBadRequest)
-      return BadRequest();
-    else if (return_state == kNotEnough)
+    if (return_state == kNotEnough)
       return Err(kNotEnough);
+    else if (return_state != kOk)
+      return ErrRequest(return_state);
     else {
-      if (CheckNeedBodyHeader() == false) return BadRequest();
+    if (CheckNeedBodyHeader() == false) return ErrRequest(kBadRequest);
     }
   }
   // bodyの内容を確認
@@ -43,8 +41,8 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
     return_state = SetRequestBody();
     if (return_state == kNotEnough)
       return Err(kNotEnough);
-    else if (return_state == kBadRequest)
-      return BadRequest();
+    else if (return_state != kOk)
+      return ErrRequest(return_state);
   }
   return OkRequest();
 }

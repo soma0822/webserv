@@ -13,8 +13,8 @@ const Result<HTTPRequest *, int> CGIParser::Parser(std::string request_line) {
   int status = SetHeader();
   if (status == kNotEnough)
     return Err(kNotEnough);
-  else if (status == kBadRequest)
-    return BadRequest();
+  else if (status != kOk)
+    return ErrRequest(status);
   // bodyをセット
   SetBody();
   return OkRequest();

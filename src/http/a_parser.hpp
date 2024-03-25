@@ -31,8 +31,8 @@ class AParser {
   enum chunked_state {
     kNeedChunkedSize,
     kNeedChunkedBody,
+	kMaxBodySize = 100000000
   };
-  kMaxBodySize = 100000000;
   HTTPRequest *request_;
   std::string row_line_;
   int parser_state_;
@@ -60,9 +60,8 @@ class AParser {
   int BadChunkedBody(int &chunked_state, size_t &chunked_size);
   int SetBody();
 
-  const Result<HTTPRequest *, int> HttpVersionNotSupported();
-  const Result<HTTPRequest *, int> BadRequest();
   const Result<HTTPRequest *, int> OkRequest();
+  const Result<HTTPRequest *, int> ErrRequest(int status_code);
 };
 
 #endif  // WEBSERVE_SRC_HTTP_A_PARSER_HPP
