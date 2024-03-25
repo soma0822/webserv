@@ -48,7 +48,8 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     const std::string cgi_script_path_segment =
         GetAbsolutePathForPathSegment(config, req_ctx);
     // TODO CGIExeの呼び出し
-    http::StatusCode status = http::kOk /* = CGIExe() */;
+    http::StatusCode status =
+        CGIExe(config, req_ctx, cgi_script_abs_path, cgi_script_path_segment);
     if (status == http::kOk) {
       return None<HTTPResponse *>();
     }
@@ -245,7 +246,7 @@ std::string RequestHandler::GetAbsoluteCGIScriptPath(const IConfig &config,
                                                      RequestContext req_ctx) {
   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   // 拡張子以降のパスセグメントは除外する
-  size_t pos_period = request_file_path.find('.');
+  size_t pos_period = request_file_path.find('.', 1);
   size_t pos_separator = request_file_path.substr(pos_period).find('/');
   // '/'が見つからない場合には拡張子以降のパスセグメントがないのでそのまま返す
   if (pos_separator == std::string::npos) {
@@ -293,12 +294,13 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
 
   return HTTPResponse::Builder().SetStatusCode(http::kOk).SetBody(body).Build();
 }
-// ex.) program_path = /usr/bin/python3 script_name = /cgi-bin/default.py
+// ex.) script_name = /cgi-bin/default.py
+// path_translated:パスセグメントの絶対パス
 // TODO: 実行権限の確認
 http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
-                                        const std::string &program_path,
-                                        const std::string &script_name) {
+                                        const std::string &script_name,
+                                        const std::string &path_translated) {
   // TODO:　Locationでallow_methodがあることがあるので呼び出しもとでこのチェックはしたい
   if (req_ctx.request->GetMethod() != "GET" &&
       req_ctx.request->GetMethod() != "POST") {
@@ -306,34 +308,25 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   }
   int redirect_fd[2], cgi_fd[2];
   pid_t pid;
-  std::map<std::string, std::string> env_map = GetEnv(config, req_ctx);
-  char **env = DupEnv(env_map);
-  if (env == NULL) {
-    return http::kInternalServerError;
-  }
   if (pipe(cgi_fd) == -1) {
     Logger::Error() << "pipe エラー" << std::endl;
-    DeleteEnv(env);
     return http::kInternalServerError;
   }
   if (fcntl(cgi_fd[0], F_SETFL, O_NONBLOCK) == -1) {
     Logger::Error() << "fcntl エラー" << std::endl;
-    DeleteEnv(env);
     close(cgi_fd[0]);
     close(cgi_fd[1]);
     return http::kInternalServerError;
   }
-  if (env_map["REQUEST_METHOD"] == "POST") {
+  if (req_ctx.request->GetMethod() == "POST") {
     if (pipe(redirect_fd) == -1) {
       Logger::Error() << "pipe エラー" << std::endl;
-      DeleteEnv(env);
       close(cgi_fd[0]);
       close(cgi_fd[1]);
       return http::kInternalServerError;
     }
     if (fcntl(redirect_fd[1], F_SETFL, O_NONBLOCK) == -1) {
       Logger::Error() << "fcntl エラー" << std::endl;
-      DeleteEnv(env);
       close(cgi_fd[0]);
       close(cgi_fd[1]);
       close(redirect_fd[0]);
@@ -347,43 +340,46 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   pid = fork();
   if (pid == -1) {
     Logger::Error() << "fork エラー" << std::endl;
-    if (env_map["REQUEST_METHOD"] == "POST") {
+    if (req_ctx.request->GetMethod() == "POST") {
       close(redirect_fd[0]);
       close(redirect_fd[1]);
     }
     close(cgi_fd[0]);
     close(cgi_fd[1]);
-    DeleteEnv(env);
     return http::kInternalServerError;
   }
   if (pid == 0) {
     close(cgi_fd[0]);
     dup2(cgi_fd[1], 1);
     close(cgi_fd[1]);
+    std::map<std::string, std::string> env_map =
+        GetEnv(config, req_ctx, script_name, path_translated);
+    char **env = DupEnv(env_map);
     if (env_map["REQUEST_METHOD"] == "POST") {
       close(redirect_fd[1]);
       dup2(redirect_fd[0], 0);
       close(redirect_fd[0]);
     }
-    const char *argv[] = {program_path.c_str(), script_name.c_str(), NULL};
-    Logger::Info() << "CGI実行" << std::endl;
-    execve(program_path.c_str(), const_cast<char *const *>(argv), env);
+    std::ifstream inf(script_name.c_str());
+    if (inf.is_open() == false) std::exit(1);
+    std::string first_line;
+    std::getline(inf, first_line);
+    const char **argv = MakeArgv(script_name, first_line);
+    Logger::Info() << "CGI実行: " << argv[0] << std::endl;
+    execve(argv[0], const_cast<char *const *>(argv), env);
     Logger::Error() << "execve エラー" << std::endl;
     std::exit(1);
   }
   close(cgi_fd[1]);
-  if (env_map["REQUEST_METHOD"] == "POST") close(redirect_fd[0]);
-  for (unsigned int i = 0; i < env_map.size(); ++i) {
-    delete[] env[i];
-  }
-  delete[] env;
+  if (req_ctx.request->GetMethod() == "POST") close(redirect_fd[0]);
   IOTaskManager::AddTask(new ReadFromCGI(pid, cgi_fd[0], req_ctx, config));
   Logger::Info() << "ReadFromCGIを追加" << std::endl;
   return http::kOk;
 }
 
 std::map<std::string, std::string> RequestHandler::GetEnv(
-    const IConfig &config, const RequestContext &req_ctx) {
+    const IConfig &config, const RequestContext &req_ctx,
+    const std::string &script_name, const std::string &path_translated) {
   std::map<std::string, std::string> env_map;
   (void)config;
   const HTTPRequest *req = req_ctx.request;
@@ -404,13 +400,11 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   else
     env_map["CONTENT_TYPE"] = "";
   env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
-  // uriからpath_infoを取得
-  //  env_map["PATH_INFO"] = req->GetUri();
-  // TODO: 絶対パスの取得
-  //  env_map["PATH_TRANSLATED"] = req->GetUri();
-  env_map["QUERY_STRING"] = req->GetUri().substr(req->GetUri().find("?") + 1);
-  // TODO:
-  //  env_map["REMOTE_ADDR"] = req_ctx.client_addr.sin_addr.s_addr;
+  env_map["PATH_INFO"] = req->GetUri();
+  env_map["PATH_TRANSLATED"] = path_translated;
+  env_map["QUERY_STRING"] = req->GetQuery();
+  // TODO: inet_ntoa使用禁止なので自作
+  env_map["REMOTE_ADDR"] = inet_ntoa(req_ctx.client_addr.sin_addr);
   // REMOTE_HOSTは使用可能関数ではわからない
   env_map["REMOTE_HOST"] = "";
   // TODO: userの取得
@@ -418,8 +412,7 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
     env_map["REMOTE_USER"] = "";
   else
     env_map["REMOTE_USER"] = "user";
-  // TODO: スクリプト名の取得
-  //  env_map["SCRIPT_NAME"] = req->GetUri();
+  env_map["SCRIPT_NAME"] = script_name;
   // TODO: URIからサーバ名の取得
   env_map["SERVER_NAME"] = "localhost";
   env_map["SERVER_PORT"] = req_ctx.port;
@@ -462,6 +455,43 @@ bool RequestHandler::IsCGIRequest(const IConfig &config,
   // cgi extensionが0より大きければCGIリクエストである
   return location_ctx_result.IsOk() &&
          location_ctx_result.Unwrap().GetCgiExtension().size() > 0;
+}
+
+const char **RequestHandler::MakeArgv(const std::string &script_name,
+                                      std::string &first_line) {
+  const char **ret;
+  if (first_line[0] == '#' && first_line[1] == '!') {
+    if (first_line.find("#!/usr/bin/env") == 0) {
+      char *path = getenv("PATH");
+      std::stringstream ss(first_line);
+      std::string exec_filename;
+      ss >> exec_filename;
+      ss >> exec_filename;
+      std::istringstream path_stream(path);
+      std::string dir;
+      std::string program_path;
+      while (std::getline(path_stream, dir, ':')) {
+        std::string tmp = dir + "/" + exec_filename;
+        if (access(tmp.c_str(), X_OK) == 0) {
+          program_path = tmp;
+          break;
+        }
+      }
+      if (program_path.empty()) std::exit(1);
+      first_line = program_path;
+    } else {
+      first_line = first_line.substr(2);
+    }
+    ret = const_cast<const char **>(new char *[3]);
+    ret[0] = first_line.c_str();
+    ret[1] = script_name.c_str();
+    ret[2] = NULL;
+  } else {
+    ret = const_cast<const char **>(new char *[2]);
+    ret[0] = script_name.c_str();
+    ret[1] = NULL;
+  }
+  return ret;
 }
 
 RequestHandler::RequestHandler() {}

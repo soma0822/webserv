@@ -35,7 +35,6 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
   ASSERT_EQ(it2->second.GetIndex(), "");
-  ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtension().size(), 0);
   std::map<std::string, bool>::const_iterator it3 =
       it2->second.GetAllowMethod().begin();
@@ -53,9 +52,6 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "./");
   ASSERT_EQ(it2->second.GetIndex(), "time.py");
-  ASSERT_EQ(it2->second.GetCgiPath().size(), 2);
-  ASSERT_EQ(it2->second.GetCgiPath()[0], "/usr/bin/python3");
-  ASSERT_EQ(it2->second.GetCgiPath()[1], "/bin/bash");
   ASSERT_EQ(it2->second.GetCgiExtension().size(), 2);
   ASSERT_EQ(it2->second.GetCgiExtension()[0], ".py");
   ASSERT_EQ(it2->second.GetCgiExtension()[1], ".sh");
@@ -74,7 +70,6 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
   ASSERT_EQ(it2->second.GetIndex(), "");
-  ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtension().size(), 0);
   std::map<std::string, bool>::const_iterator it6 =
       it2->second.GetAllowMethod().begin();
@@ -91,7 +86,6 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetAlias(), "");
   ASSERT_EQ(it2->second.GetRoot(), "");
   ASSERT_EQ(it2->second.GetIndex(), "tours1.html");
-  ASSERT_EQ(it2->second.GetCgiPath().size(), 0);
   ASSERT_EQ(it2->second.GetCgiExtension().size(), 0);
   std::map<std::string, bool>::const_iterator it7 =
       it2->second.GetAllowMethod().begin();
@@ -239,11 +233,6 @@ TEST(ConfigTest, DoubleLocationRoot) {
 TEST(ConfigTest, DoubleLocationIndex) {
   ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_index.conf"),
                std::invalid_argument);
-}
-TEST(ConfigTest, DoubleLocationCgi_Path) {
-  ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/double_location_cgi_path.conf"),
-      std::invalid_argument);
 }
 TEST(ConfigTest, DoubleLocationCgiExtension) {
   ASSERT_THROW(
