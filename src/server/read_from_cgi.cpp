@@ -5,7 +5,7 @@ ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
     : AIOTask(fd, POLLIN),
       req_ctx_(req_ctx),
       config_(config),
-      parser_(HTTPRequestParser()),
+      parser_(CGIParser()),
       pid_(pid) {}
 
 ReadFromCGI::~ReadFromCGI() {}
@@ -22,6 +22,7 @@ Result<int, std::string> ReadFromCGI::Execute() {
   }
   buf[len] = '\0';
   buf_.append(buf);
+  Logger::Info() << "buf_: " << buf_ << std::endl;
   int result = waitpid(pid_, &status, WNOHANG);
   if (result == -1) {  // エラー
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
@@ -37,12 +38,19 @@ Result<int, std::string> ReadFromCGI::Execute() {
     return Ok(kFdDelete);
   }
   if (len == 0) {
-    // Result<HTTPRequest *, int> result = parser_.Parser(buf);
-    // TODO: CGIのようのHandlerを作る
-    // HTTPResponse *response = RequestHandler::Handle(config_, result.Unwrap(),
-    // port_, ip_); IOTaskManager::AddTask(new WriteResponseToClient(client_fd_,
-    // response));
+    Result<HTTPRequest *, int> result = parser_.Parser(buf_);
+    if (result.IsErr()) {
+      return Ok(kContinue);
+    }
+    Option<HTTPResponse *> option =
+        CGIHandler::Handle(config_, result.Unwrap(), req_ctx_);
+    if (option.IsSome()) {
+      HTTPResponse *response = option.Unwrap();
+      delete result.Unwrap();
+      IOTaskManager::AddTask(
+          new WriteResponseToClient(req_ctx_.fd, response, req_ctx_.request));
+    }
     return Ok(kFdDelete);
   }
-  return Ok(0);
+  return Ok(kContinue);
 }
