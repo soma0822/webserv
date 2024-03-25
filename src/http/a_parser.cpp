@@ -26,7 +26,7 @@ int AParser::SetRequestLine() {
   // method
   result = ParsePart(request_line, " ", kBadRequest);
   if (result.second != kOk) return result.second;
-  request_->SetMethod(StrToUpper(result.first));
+  request_->SetMethod(string_utils::StrToUpper(result.first));
 
   // uri
   request_line = string_utils::SkipSpace(request_line);
@@ -44,7 +44,7 @@ int AParser::SetRequestLine() {
   request_line = string_utils::SkipSpace(request_line);
   result = ParsePart(request_line, "/", kBadRequest);
   if (result.second != kOk) return result.second;
-  request_->SetProtocol(StrToUpper(result.first));
+  request_->SetProtocol(string_utils::StrToUpper(result.first));
 
   // version
   if (request_line == "") return kBadRequest;
@@ -96,7 +96,7 @@ int AParser::SetHeader() {
     value =
         string_utils::SkipSpace(request_line.substr(key_pos + 1, value_pos));
     request_line = request_line.substr(key_pos + value_pos + 3);
-    request_->AddHeader(StrToUpper(key), value);
+    request_->AddHeader(string_utils::StrToUpper(key), value);
   }
   // headerの終わりの確認
   row_line_ = request_line;
@@ -176,14 +176,6 @@ int AParser::SetChunkedBody() {
 int AParser::SetBody() {
   request_->AddBody(row_line_);
   return kOk;
-}
-
-// utils
-std::string AParser::StrToUpper(std::string s) {
-  for (size_t i = 0; i < s.length(); ++i) {
-    s[i] = std::toupper(s[i]);
-  }
-  return s;
 }
 
 const Result<HTTPRequest *, int> AParser::HttpVersionNotSupported() {

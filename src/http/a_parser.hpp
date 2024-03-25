@@ -61,8 +61,6 @@ class AParser {
   const Result<HTTPRequest *, int> HttpVersionNotSupported();
   const Result<HTTPRequest *, int> BadRequest();
   const Result<HTTPRequest *, int> OkRequest();
-
-  std::string StrToUpper(std::string s);
 };
 
 #endif  // WEBSERVE_SRC_HTTP_A_PARSER_HPP

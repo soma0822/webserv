@@ -13,7 +13,8 @@ TEST(HTTPResponseBuilderTest, BuildResponse) {
                           .SetBody("Hello, World!")
                           .Build();
   std::string expected =
-      "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello, World!";
+      "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: "
+      "13\r\n\r\nHello, World!";
   ASSERT_EQ(res->ToString(), expected);
   delete res;
 }
