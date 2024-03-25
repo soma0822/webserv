@@ -48,7 +48,8 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     const std::string cgi_script_path_segment =
         GetAbsolutePathForPathSegment(config, req_ctx);
     // TODO CGIExeの呼び出し
-    http::StatusCode status = CGIExe(config, req_ctx, cgi_script_abs_path, cgi_script_path_segment);
+    http::StatusCode status =
+        CGIExe(config, req_ctx, cgi_script_abs_path, cgi_script_path_segment);
     if (status == http::kOk) {
       return None<HTTPResponse *>();
     }
@@ -460,27 +461,25 @@ const char **RequestHandler::MakeArgv(const std::string &script_name,
                                       std::string &first_line) {
   const char **ret;
   if (first_line[0] == '#' && first_line[1] == '!') {
-    if (first_line.find("#!/usr/bin/env") == 0){
-    char *path = getenv("PATH");
-    std::stringstream ss(first_line);
-    std::string exec_filename;
-    ss >> exec_filename;
-    ss >> exec_filename;
-    std::istringstream path_stream(path);
-    std::string dir;
-    std::string program_path;
-    while (std::getline(path_stream, dir, ':')) {
-        std::string tmp = dir + "/"+ exec_filename;
+    if (first_line.find("#!/usr/bin/env") == 0) {
+      char *path = getenv("PATH");
+      std::stringstream ss(first_line);
+      std::string exec_filename;
+      ss >> exec_filename;
+      ss >> exec_filename;
+      std::istringstream path_stream(path);
+      std::string dir;
+      std::string program_path;
+      while (std::getline(path_stream, dir, ':')) {
+        std::string tmp = dir + "/" + exec_filename;
         if (access(tmp.c_str(), X_OK) == 0) {
-           program_path = tmp;
-            break;
+          program_path = tmp;
+          break;
         }
-    }
-    if (program_path.empty())
-      std::exit(1);
-    first_line = program_path;
-    }
-    else {
+      }
+      if (program_path.empty()) std::exit(1);
+      first_line = program_path;
+    } else {
       first_line = first_line.substr(2);
     }
     ret = const_cast<const char **>(new char *[3]);

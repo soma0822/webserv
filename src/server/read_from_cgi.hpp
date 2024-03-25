@@ -4,9 +4,9 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "config.hpp"
 #include "cgi_handler.hpp"
 #include "cgi_parser.hpp"
+#include "config.hpp"
 #include "http_request.hpp"
 #include "http_request_parser.hpp"
 #include "http_response.hpp"

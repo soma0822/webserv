@@ -39,14 +39,16 @@ Result<int, std::string> ReadFromCGI::Execute() {
   }
   if (len == 0) {
     Result<HTTPRequest *, int> result = parser_.Parser(buf_);
-    if (result.IsErr()){
+    if (result.IsErr()) {
       return Ok(kContinue);
     }
-    Option <HTTPResponse *> option = CGIHandler::Handle(config_, result.Unwrap(), req_ctx_);
-    if (option.IsSome()){
+    Option<HTTPResponse *> option =
+        CGIHandler::Handle(config_, result.Unwrap(), req_ctx_);
+    if (option.IsSome()) {
       HTTPResponse *response = option.Unwrap();
       delete result.Unwrap();
-      IOTaskManager::AddTask(new WriteResponseToClient(req_ctx_.fd, response, req_ctx_.request));
+      IOTaskManager::AddTask(
+          new WriteResponseToClient(req_ctx_.fd, response, req_ctx_.request));
     }
     return Ok(kFdDelete);
   }

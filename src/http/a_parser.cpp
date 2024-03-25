@@ -89,7 +89,8 @@ int AParser::SetHeader() {
     key_pos = request_line.find(":");
     value_pos = request_line.find("\r\n") - key_pos - 1;
     // 最後まで見てしまった時
-    if (key_pos == std::string::npos || key_pos > request_line.find("\r\n")) break;
+    if (key_pos == std::string::npos || key_pos > request_line.find("\r\n"))
+      break;
     // どちらかの辺が空白、もしくは右辺だけない。
     if (value_pos == 0 || key_pos == 0) return kBadRequest;
     key = request_line.substr(0, key_pos);
