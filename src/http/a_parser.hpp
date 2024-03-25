@@ -17,7 +17,8 @@ class AParser {
     kNotEnough = 1,
     kEndParse = 2,
     kBadRequest = http::kBadRequest,
-    kHttpVersionNotSupported = http::kHttpVersionNotSupported
+    kHttpVersionNotSupported = http::kHttpVersionNotSupported,
+    kPayloadTooLarge = http::kPayloadTooLarge
   };
   AParser();
   AParser(const AParser &other);
@@ -31,6 +32,7 @@ class AParser {
     kNeedChunkedSize,
     kNeedChunkedBody,
   };
+  kMaxBodySize = 100000000;
   HTTPRequest *request_;
   std::string row_line_;
   int parser_state_;

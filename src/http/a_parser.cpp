@@ -122,6 +122,7 @@ int AParser::SetRequestBody() {
     std::string length = request_->GetHeaders().find("CONTENT-LENGTH")->second;
     Result<int, std::string> result = string_utils::StrToI(length);
     if (result.IsErr()) return kBadRequest;
+    if (kMaxBodySize < result.Unwrap()) return kPayloadTooLarge;
     // request_lineを取得して、長さの確認
     int pos = static_cast<int>(request_line.length());
     if (pos < result.Unwrap()) return kNotEnough;
