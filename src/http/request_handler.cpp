@@ -327,7 +327,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
     dup2(cgi_fd[1], 1);
     close(cgi_fd[1]);
     std::map<std::string, std::string> env_map =
-        GetEnv(config, req_ctx, path_translated);
+        GetEnv(config, req_ctx, script_name, path_translated);
     char **env = DupEnv(env_map);
     if (env_map["REQUEST_METHOD"] == "POST") {
       close(redirect_fd[1]);
@@ -335,17 +335,13 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       close(redirect_fd[0]);
     }
     std::ifstream inf(script_name.c_str());
-    std::string program_path;
-    inf >> program_path;
-    Logger::Info() << "CGI実行" << std::endl;
-    if (program_path[0] == '#' && program_path[1] == '/') {
-      program_path.substr(1);
-      const char *argv[] = {program_path.c_str(), script_name.c_str(), NULL};
-      execve(program_path.c_str(), const_cast<char *const *>(argv), env);
-    } else {
-      const char *argv[] = {script_name.c_str(), NULL};
-      execve(script_name.c_str(), const_cast<char *const *>(argv), env);
-    }
+    if (inf.is_open() == false)
+      std::exit(1);
+    std::string first_line;
+    std::getline(inf,first_line);
+    const char **argv = MakeArgv(script_name, first_line);
+    Logger::Info() << "CGI実行: " << argv[0] << std::endl;
+    execve(argv[0], const_cast<char *const *>(argv), env);
     Logger::Error() << "execve エラー" << std::endl;
     std::exit(1);
   }
@@ -420,6 +416,20 @@ void RequestHandler::DeleteEnv(char **env) {
     delete[] env[i];
   }
   delete[] env;
+}
+
+const char **RequestHandler::MakeArgv(const std::string &script_name, std::string &first_line){
+  const char **ret;
+  if (first_line[0] == '#' && first_line[1] == '!') {
+    first_line = first_line.substr(2);
+    ret = const_cast<const char**>(new char*[3]);
+    ret[0] = first_line.c_str();
+    ret[1] = script_name.c_str();
+  } else {
+    ret =  const_cast<const char**>(new char*[2]);
+    ret[0] = script_name.c_str();
+  }
+  return ret;
 }
 
 RequestHandler::RequestHandler() {}
