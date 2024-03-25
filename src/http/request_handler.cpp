@@ -245,7 +245,7 @@ std::string RequestHandler::GetAbsoluteCGIScriptPath(const IConfig &config,
                                                      RequestContext req_ctx) {
   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   // 拡張子以降のパスセグメントは除外する
-  size_t pos_period = request_file_path.find('.');
+  size_t pos_period = request_file_path.find('.', 1);
   size_t pos_separator = request_file_path.substr(pos_period).find('/');
   // '/'が見つからない場合には拡張子以降のパスセグメントがないのでそのまま返す
   if (pos_separator == std::string::npos) {
@@ -460,7 +460,29 @@ const char **RequestHandler::MakeArgv(const std::string &script_name,
                                       std::string &first_line) {
   const char **ret;
   if (first_line[0] == '#' && first_line[1] == '!') {
-    first_line = first_line.substr(2);
+    if (first_line.find("#!/usr/bin/env") == 0){
+    char *path = getenv("PATH");
+    std::stringstream ss(first_line);
+    std::string exec_filename;
+    ss >> exec_filename;
+    ss >> exec_filename;
+    std::istringstream path_stream(path);
+    std::string dir;
+    std::string program_path;
+    while (std::getline(path_stream, dir, ':')) {
+        std::string tmp = dir + "/"+ exec_filename;
+        if (access(tmp.c_str(), X_OK) == 0) {
+           program_path = tmp;
+            break;
+        }
+    }
+    if (program_path.empty())
+      std::exit(1);
+    first_line = program_path;
+    }
+    else {
+      first_line = first_line.substr(2);
+    }
     ret = const_cast<const char **>(new char *[3]);
     ret[0] = first_line.c_str();
     ret[1] = script_name.c_str();
