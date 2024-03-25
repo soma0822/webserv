@@ -26,6 +26,8 @@ class RequestHandler {
                                               RequestContext req_ctx);
   static std::string GetAbsolutePathForPathSegment(const IConfig &config,
                                                    RequestContext req_ctx);
+  static char const **MakeArgv(const std::string &script_name,
+                               std::string &first_line);
 
  private:
   RequestHandler();
@@ -48,6 +50,7 @@ class RequestHandler {
   static std::string ResolveAbsoluteRootPath(const IConfig &config,
                                              const RequestContext req_ctx);
   static bool IsCGIRequest(const IConfig &config, RequestContext req_ctx);
+  static bool IsAllowedMethod(const IConfig &config, RequestContext req_ctx);
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_

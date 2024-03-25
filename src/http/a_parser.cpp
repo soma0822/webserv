@@ -122,7 +122,12 @@ int AParser::SetRequestBody() {
     // content-lengthの値を取得
     std::string length = request_->GetHeaders().find("CONTENT-LENGTH")->second;
     Result<int, std::string> result = string_utils::StrToI(length);
-    if (result.IsErr()) return kBadRequest;
+    if (result.IsErr() || kMaxBodySize < result.Unwrap()) {
+      if (!validation::IsNumber(length))
+        return kBadRequest;
+      else
+        return kPayloadTooLarge;
+    }
     // request_lineを取得して、長さの確認
     int pos = static_cast<int>(request_line.length());
     if (pos < result.Unwrap()) return kNotEnough;
@@ -138,38 +143,45 @@ int AParser::SetRequestBody() {
 }
 
 int AParser::SetChunkedBody() {
-  static int chunked_state = kNeedChunkedSize;
-  static size_t chunked_size = 0;
+  static ChunkedState status = {kNeedChunkedSize, 0, 0};
   size_t pos = 0;
 
   while (1) {
     // sizeが書かれているか確認
-    if (chunked_state == kNeedChunkedSize) {
+    if (status.chunked_state == kNeedChunkedSize) {
       pos = row_line_.find("\r\n");
-      if (pos == 0) return kBadRequest;
+      if (pos == 0) return ResetChunkedBody(status, kBadRequest);
       if (pos == std::string::npos) return kNotEnough;
       Result<int, std::string> result =
           string_utils::StrToHex(row_line_.substr(0, pos));
-      if (result.IsErr()) return BadChunkedBody(chunked_state, chunked_size);
-      chunked_size = static_cast<size_t>(result.Unwrap());
+      if (result.IsErr() ||
+          kMaxBodySize < result.Unwrap() + status.total_size) {
+        if (!validation::IsHexNumber(row_line_.substr(0, pos)))
+          return ResetChunkedBody(status, kBadRequest);
+        else
+          return ResetChunkedBody(status, kPayloadTooLarge);
+      }
+      status.chunked_size = static_cast<size_t>(result.Unwrap());
+      status.total_size += status.chunked_size;
       row_line_ = row_line_.substr(pos + 2);
-      chunked_state = kNeedChunkedBody;
+      status.chunked_state = kNeedChunkedBody;
     }
-    // sizeの分だけbodyがあるか確認
-    if (chunked_state == kNeedChunkedBody) {
+    if (status.chunked_state == kNeedChunkedBody) {
       pos = row_line_.find("\r\n");
       if (pos == std::string::npos) return kNotEnough;
       // size == 0の時はすぐに\r\nが来て終わる
-      if (pos == 0 && chunked_size == 0) {
-        row_line_ = row_line_.substr(chunked_size + 2);
-        chunked_state = kNeedChunkedSize;
-        return kOk;
-      } else if (pos == chunked_size) {
-        request_->AddBody(row_line_.substr(0, chunked_size));
-        row_line_ = row_line_.substr(chunked_size + 2);
-        chunked_state = kNeedChunkedSize;
-      } else
-        return BadChunkedBody(chunked_state, chunked_size);
+      if (pos == 0 && status.chunked_size == 0) {
+        row_line_ = row_line_.substr(status.chunked_size + 2);
+        return ResetChunkedBody(status, kOk);
+      } else if (status.chunked_size < pos) {
+        return ResetChunkedBody(status, kBadRequest);
+      } else {
+        request_->AddBody(row_line_.substr(0, pos));
+        row_line_ = row_line_.substr(pos + 2);
+        status.chunked_size -= pos;
+        if (0 < status.chunked_size) return kNotEnough;
+        status.chunked_state = kNeedChunkedSize;
+      }
     }
   }
 }
@@ -179,20 +191,12 @@ int AParser::SetBody() {
   return kOk;
 }
 
-const Result<HTTPRequest *, int> AParser::HttpVersionNotSupported() {
+const Result<HTTPRequest *, int> AParser::ErrRequest(int status_code) {
   parser_state_ = kBeforeProcess;
   row_line_ = "";  // 一旦リセット
   delete request_;
   request_ = NULL;
-  return Err(kHttpVersionNotSupported);
-}
-
-const Result<HTTPRequest *, int> AParser::BadRequest() {
-  parser_state_ = kBeforeProcess;
-  row_line_ = "";  // 一旦リセット
-  delete request_;
-  request_ = NULL;
-  return Err(kBadRequest);
+  return Err(status_code);
 }
 
 const Result<HTTPRequest *, int> AParser::OkRequest() {
@@ -202,10 +206,11 @@ const Result<HTTPRequest *, int> AParser::OkRequest() {
   return Ok(request);
 }
 
-int AParser::BadChunkedBody(int &chunked_state, size_t &chunked_size) {
-  chunked_size = 0;
-  chunked_state = kNeedChunkedSize;
-  return kBadRequest;
+int AParser::ResetChunkedBody(ChunkedState &state, int status_code) {
+  state.chunked_state = kNeedChunkedSize;
+  state.chunked_size = 0;
+  state.total_size = 0;
+  return status_code;
 }
 
 bool AParser::IsChunked() {

@@ -13,6 +13,10 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   if (!request) {
     return Some(GenerateErrorResponse(http::kInternalServerError, config));
   }
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
+  }
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const Result<LocationContext, std::string> location_ctx_result =
@@ -451,6 +455,55 @@ bool RequestHandler::IsCGIRequest(const IConfig &config,
   // cgi extensionが0より大きければCGIリクエストである
   return location_ctx_result.IsOk() &&
          location_ctx_result.Unwrap().GetCgiExtension().size() > 0;
+}
+
+bool RequestHandler::IsAllowedMethod(const IConfig &config,
+                                     RequestContext req_ctx) {
+  const HTTPRequest *request = req_ctx.request;
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const std::string &uri = request->GetUri();
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
+  return location_ctx_result.IsOk() &&
+         location_ctx_result.Unwrap().IsAllowedMethod(request->GetMethod());
+}
+
+const char **RequestHandler::MakeArgv(const std::string &script_name,
+                                      std::string &first_line) {
+  const char **ret;
+  if (first_line[0] == '#' && first_line[1] == '!') {
+    if (first_line.find("#!/usr/bin/env") == 0) {
+      char *path = getenv("PATH");
+      std::stringstream ss(first_line);
+      std::string exec_filename;
+      ss >> exec_filename;
+      ss >> exec_filename;
+      std::istringstream path_stream(path);
+      std::string dir;
+      std::string program_path;
+      while (std::getline(path_stream, dir, ':')) {
+        std::string tmp = dir + "/" + exec_filename;
+        if (access(tmp.c_str(), X_OK) == 0) {
+          program_path = tmp;
+          break;
+        }
+      }
+      if (program_path.empty()) std::exit(1);
+      first_line = program_path;
+    } else {
+      first_line = first_line.substr(2);
+    }
+    ret = const_cast<const char **>(new char *[3]);
+    ret[0] = first_line.c_str();
+    ret[1] = script_name.c_str();
+    ret[2] = NULL;
+  } else {
+    ret = const_cast<const char **>(new char *[2]);
+    ret[0] = script_name.c_str();
+    ret[1] = NULL;
+  }
+  return ret;
 }
 
 RequestHandler::RequestHandler() {}
