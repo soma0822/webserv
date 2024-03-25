@@ -20,7 +20,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
 
   // リクエストボディのサイズが制限を超えている場合には413を返す
   if (location_ctx_result.IsOk() &&
-      request->GetBody().length() >
+      static_cast<int>(request->GetBody().length()) >
           location_ctx_result.Unwrap().GetLimitClientBody()) {
     return Some(GenerateErrorResponse(http::kPayloadTooLarge, config));
   }
