@@ -46,6 +46,7 @@ class RequestHandler {
                                               const RequestContext req_ctx);
   static std::string ResolveAbsoluteRootPath(const IConfig &config,
                                              const RequestContext req_ctx);
+  static bool IsCGIRequest(const IConfig &config, const HTTPRequest *request);
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_

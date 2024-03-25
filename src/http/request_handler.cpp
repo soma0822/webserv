@@ -437,6 +437,20 @@ void RequestHandler::DeleteEnv(char **env) {
   delete[] env;
 }
 
+bool RequestHandler::IsCGIRequest(const IConfig &config,
+                                  RequestContext req_ctx) {
+  const HTTPRequest *request = req_ctx.request;
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const std::string &uri = request->GetUri();
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
+
+  // cgi extensionが0より大きければCGIリクエストである
+  return location_ctx_result.IsOk() &&
+      location_ctx_result.Unwrap().GetCgiExtension().size() > 0;
+}
+
 RequestHandler::RequestHandler() {}
 
 RequestHandler::RequestHandler(const RequestHandler &other) { (void)other; }
