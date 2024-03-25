@@ -272,3 +272,22 @@ TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegmentWithoutPathSegment) {
       RequestHandler::GetAbsolutePathForPathSegment(config_mock.get(), req_ctx),
       "");
 }
+
+TEST(RequestHandler, MakeArgv){
+  std::string script_name = "./test.py";
+  std::string first_line = "#!/usr/bin/python3";
+  const char **argv = RequestHandler::MakeArgv(script_name, first_line);
+  ASSERT_EQ("/usr/bin/python3", std::string(argv[0]));
+  ASSERT_EQ("./test.py", std::string(argv[1]));
+  ASSERT_EQ(nullptr, argv[2]);
+  delete argv;
+}
+
+TEST(RequestHandler, MakeArgvNotShebang){
+  std::string script_name = "./test.py";
+  std::string first_line = "/usr/bin/python3";
+  const char **argv = RequestHandler::MakeArgv(script_name, first_line);
+  ASSERT_EQ("./test.py", std::string(argv[0]));
+  ASSERT_EQ(nullptr, argv[1]);
+  delete argv;
+}
