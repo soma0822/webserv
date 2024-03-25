@@ -49,6 +49,14 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
         GetAbsoluteCGIScriptPath(config, req_ctx);
     const std::string cgi_script_path_segment =
         GetAbsolutePathForPathSegment(config, req_ctx);
+
+    // CGIスクリプトの拡張子が許可されていない場合にはテキストとして返す
+    if (location_ctx_result.IsOk() &&
+        location_ctx_result.Unwrap().IsValidCgiExtension(
+            cgi_script_abs_path.substr(cgi_script_abs_path.find('.')))) {
+      return Get(config, req_ctx);
+    }
+
     http::StatusCode status =
         CGIExe(config, req_ctx, cgi_script_abs_path, cgi_script_path_segment);
     if (status == http::kOk) {
@@ -309,17 +317,6 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   // スクリプトが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(script_name)) {
     return http::kNotFound;
-  }
-
-  // CGIスクリプトの拡張子が許可されていない場合には500を返す
-  const IServerContext &server_ctx = config.SearchServer(
-      req_ctx.port, req_ctx.ip, req_ctx.request->GetHostHeader());
-  const Result<LocationContext, std::string> location_ctx_result =
-      server_ctx.SearchLocation(req_ctx.request->GetUri());
-  if (location_ctx_result.IsOk() &&
-      location_ctx_result.Unwrap().IsValidCgiExtension(
-          script_name.substr(script_name.find('.')))) {
-    return http::kInternalServerError;
   }
 
   // スクリプトが実行可能でない場合には403を返す
