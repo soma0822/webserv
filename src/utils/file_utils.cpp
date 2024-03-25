@@ -23,8 +23,7 @@ bool file_utils::IsDirectory(const std::string &path) {
 }
 
 bool file_utils::DoesFileExist(const std::string &path) {
-  struct stat st;
-  return stat(path.c_str(), &st) == 0;
+  return access(path.c_str(), F_OK) == 0;
 }
 
 bool file_utils::IsReadable(const std::string &path) {
