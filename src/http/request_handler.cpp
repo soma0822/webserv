@@ -40,13 +40,11 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   if (!is_cgi_request && request->GetMethod() == "DELETE") {
     return Delete(config, req_ctx);
   }
-  // TODO 有効な拡張子であるか、実行権限があるかのチェック
   if (is_cgi_request) {
     const std::string cgi_script_abs_path =
         GetAbsoluteCGIScriptPath(config, req_ctx);
     const std::string cgi_script_path_segment =
         GetAbsolutePathForPathSegment(config, req_ctx);
-    // TODO CGIExeの呼び出し
     http::StatusCode status =
         CGIExe(config, req_ctx, cgi_script_abs_path, cgi_script_path_segment);
     if (status == http::kOk) {
@@ -303,12 +301,28 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       req_ctx.request->GetMethod() != "POST") {
     return http::kMethodNotAllowed;
   }
+
+  // スクリプトが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(script_name)) {
     return http::kNotFound;
   }
+
+  // CGIスクリプトの拡張子が許可されていない場合には500を返す
+  const IServerContext &server_ctx = config.SearchServer(
+      req_ctx.port, req_ctx.ip, req_ctx.request->GetHostHeader());
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(req_ctx.request->GetUri());
+  if (location_ctx_result.IsOk() &&
+      location_ctx_result.Unwrap().IsValidCgiExtension(
+          script_name.substr(script_name.find('.')))) {
+    return http::kInternalServerError;
+  }
+
+  // スクリプトが実行可能でない場合には403を返す
   if (file_utils::IsExecutable(script_name)) {
     return http::kForbidden;
   }
+
   int redirect_fd[2], cgi_fd[2];
   pid_t pid;
   if (pipe(cgi_fd) == -1) {

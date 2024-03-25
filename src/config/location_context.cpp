@@ -37,6 +37,10 @@ const std::string &LocationContext::GetIndex() const { return index_; }
 const std::vector<std::string> &LocationContext::GetCgiExtension() const {
   return cgi_extension_;
 }
+bool LocationContext::IsValidCgiExtension(const std::string &extension) const {
+  return std::find(cgi_extension_.begin(), cgi_extension_.end(), extension) !=
+         cgi_extension_.end();
+}
 const std::map<std::string, bool> &LocationContext::GetAllowMethod() const {
   return allow_method_;
 }

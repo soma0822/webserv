@@ -21,6 +21,7 @@ class LocationContext {
   const std::string &GetRoot() const;
   const std::string &GetIndex() const;
   const std::vector<std::string> &GetCgiExtension() const;
+  bool IsValidCgiExtension(const std::string &extension) const;
   const std::map<std::string, bool> &GetAllowMethod() const;
   // セッター
   void SetCanAutoIndex(bool can_auto_inde);
