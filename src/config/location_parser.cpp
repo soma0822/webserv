@@ -41,7 +41,6 @@ void LocationParser::ParseFuncInit(std::map<std::string, parseFunction> &func) {
   func["alias"] = &LocationParser::ParseAlias;
   func["root"] = &LocationParser::ParseRoot;
   func["index"] = &LocationParser::ParseIndex;
-  func["cgi_path"] = &LocationParser::ParseCgiPath;
   func["cgi_extension"] = &LocationParser::ParseCgiExtension;
   func["allow_methods"] = &LocationParser::ParseAllowMethod;
   parsed_auto_index_ = false;
@@ -103,15 +102,6 @@ bool LocationParser::ParseIndex(const std::vector<std::string> &value,
   if (value.size() != 1) return false;
   location.SetIndex(value.at(0));
   parsed_index_ = true;
-  return true;
-}
-bool LocationParser::ParseCgiPath(const std::vector<std::string> &value,
-                                  LocationContext &location) {
-  if (value.size() == 0) return false;
-  for (unsigned int i = 0; i < value.size(); ++i) {
-    if (validation::IsPath(value.at(i)) == false) return false;
-    location.AddCgiPath(value.at(i));
-  }
   return true;
 }
 bool LocationParser::ParseCgiExtension(const std::vector<std::string> &value,

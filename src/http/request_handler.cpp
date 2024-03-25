@@ -268,12 +268,12 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
 
   return HTTPResponse::Builder().SetStatusCode(http::kOk).SetBody(body).Build();
 }
-// ex.) program_path = /usr/bin/python3 script_name = /cgi-bin/default.py
+// ex.) script_name = /cgi-bin/default.py path_translated:パスセグメントの絶対パス
 // TODO: 実行権限の確認
 http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
-                                        const std::string &program_path,
-                                        const std::string &script_name) {
+                                        const std::string &script_name,
+                                        const std::string &path_translated) {
   // TODO:　Locationでallow_methodがあることがあるので呼び出しもとでこのチェックはしたい
   if (req_ctx.request->GetMethod() != "GET" &&
       req_ctx.request->GetMethod() != "POST") {
@@ -281,7 +281,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   }
   int redirect_fd[2], cgi_fd[2];
   pid_t pid;
-  std::map<std::string, std::string> env_map = GetEnv(config, req_ctx);
+  std::map<std::string, std::string> env_map = GetEnv(config, req_ctx, path_translated);
   char **env = DupEnv(env_map);
   if (env == NULL) {
     return http::kInternalServerError;
@@ -340,9 +340,18 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       dup2(redirect_fd[0], 0);
       close(redirect_fd[0]);
     }
-    const char *argv[] = {program_path.c_str(), script_name.c_str(), NULL};
+    std::ifstream inf(script_name.c_str());
+    std::string program_path;
+    inf >> program_path;
     Logger::Info() << "CGI実行" << std::endl;
-    execve(program_path.c_str(), const_cast<char *const *>(argv), env);
+    if (program_path[0] == '#' && program_path[1] == '/'){
+      program_path.substr(1);
+      const char *argv[] = {program_path.c_str(), script_name.c_str(), NULL};
+      execve(program_path.c_str(), const_cast<char *const *>(argv), env);
+    } else {
+      const char *argv[] = {script_name.c_str(), NULL};
+      execve(script_name.c_str(), const_cast<char *const *>(argv), env);
+    }
     Logger::Error() << "execve エラー" << std::endl;
     std::exit(1);
   }
@@ -358,7 +367,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
 }
 
 std::map<std::string, std::string> RequestHandler::GetEnv(
-    const IConfig &config, const RequestContext &req_ctx) {
+    const IConfig &config, const RequestContext &req_ctx, const std::string &script_name, const std::string &path_translated) {
   std::map<std::string, std::string> env_map;
   (void)config;
   const HTTPRequest *req = req_ctx.request;
@@ -379,13 +388,11 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   else
     env_map["CONTENT_TYPE"] = "";
   env_map["GATEWAY_INTERFACE"] = "CGI/1.1";
-  // uriからpath_infoを取得
-  //  env_map["PATH_INFO"] = req->GetUri();
-  // TODO: 絶対パスの取得
-  //  env_map["PATH_TRANSLATED"] = req->GetUri();
-  env_map["QUERY_STRING"] = req->GetUri().substr(req->GetUri().find("?") + 1);
-  // TODO:
-  //  env_map["REMOTE_ADDR"] = req_ctx.client_addr.sin_addr.s_addr;
+   env_map["PATH_INFO"] = req->GetUri();
+   env_map["PATH_TRANSLATED"] = path_translated;
+  env_map["QUERY_STRING"] = req->GetQuery();
+  //TODO: inet_ntoa使用禁止なので自作
+   env_map["REMOTE_ADDR"] = inet_ntoa(req_ctx.client_addr.sin_addr);
   // REMOTE_HOSTは使用可能関数ではわからない
   env_map["REMOTE_HOST"] = "";
   // TODO: userの取得
@@ -393,8 +400,7 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
     env_map["REMOTE_USER"] = "";
   else
     env_map["REMOTE_USER"] = "user";
-  // TODO: スクリプト名の取得
-  //  env_map["SCRIPT_NAME"] = req->GetUri();
+   env_map["SCRIPT_NAME"] = script_name;
   // TODO: URIからサーバ名の取得
   env_map["SERVER_NAME"] = "localhost";
   env_map["SERVER_PORT"] = req_ctx.port;
