@@ -14,7 +14,8 @@ WriteResponseToClient::~WriteResponseToClient() {
 
 Result<int, std::string> WriteResponseToClient::Execute() {
   std::string response_str = response_->ToString();
-  int bytes_written = write(fd_, response_str.c_str(), response_str.size());
+  int bytes_written = write(fd_, response_str.c_str() + wrote_size_,
+                            response_str.size() - wrote_size_);
   if (bytes_written == -1) {
     Logger::Error() << "write エラー" << std::endl;
     return Ok(kFdDelete);
@@ -25,5 +26,7 @@ Result<int, std::string> WriteResponseToClient::Execute() {
     if (response_->GetStatusCode() == http::kBadRequest) return Ok(kFdDelete);
     return Ok(kTaskDelete);
   }
+  Logger::Info() << bytes_written << " / " << response_str.size()
+                 << "書き込みました" << std::endl;
   return Ok(kContinue);
 }
