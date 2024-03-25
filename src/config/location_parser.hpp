@@ -35,8 +35,6 @@ class LocationParser {
                         LocationContext &location);
   static bool ParseIndex(const std::vector<std::string> &value,
                          LocationContext &location);
-  static bool ParseCgiPath(const std::vector<std::string> &value,
-                           LocationContext &location);
   static bool ParseCgiExtension(const std::vector<std::string> &value,
                                 LocationContext &location);
   static bool ParseAllowMethod(const std::vector<std::string> &value,

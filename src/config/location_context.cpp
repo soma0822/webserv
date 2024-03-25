@@ -20,7 +20,6 @@ LocationContext &LocationContext::operator=(const LocationContext &other) {
   alias_ = other.alias_;
   root_ = other.root_;
   index_ = other.index_;
-  cgi_path_ = other.cgi_path_;
   cgi_extension_ = other.cgi_extension_;
   allow_method_ = other.allow_method_;
   return *this;
@@ -35,9 +34,6 @@ const std::string &LocationContext::GetReturn() const { return return_; }
 const std::string &LocationContext::GetAlias() const { return alias_; }
 const std::string &LocationContext::GetRoot() const { return root_; }
 const std::string &LocationContext::GetIndex() const { return index_; }
-const std::vector<std::string> &LocationContext::GetCgiPath() const {
-  return cgi_path_;
-}
 const std::vector<std::string> &LocationContext::GetCgiExtension() const {
   return cgi_extension_;
 }
@@ -56,12 +52,6 @@ void LocationContext::SetReturn(const std::string &ret) { return_ = ret; }
 void LocationContext::SetAlias(const std::string &alias) { alias_ = alias; }
 void LocationContext::SetRoot(const std::string &root) { root_ = root; }
 void LocationContext::SetIndex(const std::string &index) { index_ = index; }
-void LocationContext::AddCgiPath(const std::string &cgi_path) {
-  if (cgi_path_.end() !=
-      std::find(cgi_path_.begin(), cgi_path_.end(), cgi_path))
-    throw std::invalid_argument("cgi_pathで同じものが複数指定されています");
-  cgi_path_.push_back(cgi_path);
-}
 void LocationContext::AddCgiExtension(const std::string &cgi_extension) {
   if (cgi_extension_.end() !=
       std::find(cgi_extension_.begin(), cgi_extension_.end(), cgi_extension))
@@ -85,11 +75,6 @@ std::ostream &operator<<(std::ostream &os, LocationContext &obj) {
   for (std::map<std::string, bool>::const_iterator it = allow_method.begin();
        it != allow_method.end(); ++it) {
     os << (it->second ? it->first + " " : "");
-  }
-  os << "\n cgiPath: ";
-  for (std::vector<std::string>::const_iterator it = obj.GetCgiPath().begin();
-       it != obj.GetCgiPath().end(); ++it) {
-    os << *it << " ";
   }
   os << "\n cgiExtension: ";
   for (std::vector<std::string>::const_iterator it =
@@ -115,14 +100,6 @@ std::ostream &operator<<(std::ostream &os, const LocationContext &obj) {
   for (std::map<std::string, bool>::const_iterator it = allow_method.begin();
        it != allow_method.end(); ++it) {
     os << (it->second ? it->first + " " : "");
-  }
-  os << "\n cgiPath: ";
-  if (obj.GetCgiPath().size() == 0)
-    os << "no set";
-  else {
-    for (std::vector<std::string>::const_iterator it = obj.GetCgiPath().begin();
-         it != obj.GetCgiPath().end(); ++it)
-      os << *it << " ";
   }
   os << "\n cgiExtension: ";
   if (obj.GetCgiExtension().size() == 0)

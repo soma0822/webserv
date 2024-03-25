@@ -20,7 +20,6 @@ class LocationContext {
   const std::string &GetAlias() const;
   const std::string &GetRoot() const;
   const std::string &GetIndex() const;
-  const std::vector<std::string> &GetCgiPath() const;
   const std::vector<std::string> &GetCgiExtension() const;
   const std::map<std::string, bool> &GetAllowMethod() const;
   // セッター
@@ -31,7 +30,6 @@ class LocationContext {
   void SetAlias(const std::string &alias);
   void SetRoot(const std::string &root);
   void SetIndex(const std::string &index);
-  void AddCgiPath(const std::string &cgi_path);
   void AddCgiExtension(const std::string &cgi_extension);
   void AddAllowMethod(const std::string &key);
 
@@ -43,7 +41,6 @@ class LocationContext {
   std::string alias_;
   std::string root_;
   std::string index_;
-  std::vector<std::string> cgi_path_;
   std::vector<std::string> cgi_extension_;
   std::map<std::string, bool> allow_method_;
 };

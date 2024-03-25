@@ -4,6 +4,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "cgi_handler.hpp"
+#include "cgi_parser.hpp"
 #include "config.hpp"
 #include "http_request.hpp"
 #include "http_request_parser.hpp"
@@ -23,7 +25,7 @@ class ReadFromCGI : public AIOTask {
  private:
   RequestContext req_ctx_;
   const IConfig &config_;
-  HTTPRequestParser parser_;
+  CGIParser parser_;
   static const int buf_size_ = 1024;
   std::string buf_;
   int pid_;
