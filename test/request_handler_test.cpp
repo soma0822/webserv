@@ -293,10 +293,16 @@ TEST(RequestHandler, MakeArgvNotShebang) {
 }
 
 TEST(RequestHandler, MakeArgvEnv) {
+  FILE *which_pipe;
+  char buffer[1000];
+  which_pipe = popen("which ls", "r");
+  fgets(buffer, 1000, which_pipe);
+  buffer[strcspn(buffer, "\n")] = '\0';
+  std::string abs_path(buffer);
   std::string script_name = "./test.py";
   std::string first_line = "#!/usr/bin/env ls";
   const char **argv = RequestHandler::MakeArgv(script_name, first_line);
-  ASSERT_EQ("/bin/ls", std::string(argv[0]));
+  ASSERT_EQ(buffer, std::string(argv[0]));
   ASSERT_EQ("./test.py", std::string(argv[1]));
   ASSERT_EQ(nullptr, argv[2]);
   delete argv;
