@@ -40,12 +40,8 @@ const std::vector<std::string> &LocationContext::GetCgiExtension() const {
 const std::map<std::string, bool> &LocationContext::GetAllowMethod() const {
   return allow_method_;
 }
-bool LocationContext::IsAllowedMethod(const std::string &key) const {
-  try {
-    return allow_method_.at(key);
-  } catch (const std::out_of_range &e) {
-    return false;
-  }
+bool LocationContext::IsAllowedMethod(const std::string &key) {
+  return allow_method_[key] == true;
 }
 // セッター
 void LocationContext::SetCanAutoIndex(bool can_auto_index) {
