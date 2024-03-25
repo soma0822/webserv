@@ -9,6 +9,7 @@
 #include "http_status_code.hpp"
 #include "result.hpp"
 #include "string_utils.hpp"
+#include "validation.hpp"
 
 class AParser {
  public:
@@ -17,7 +18,8 @@ class AParser {
     kNotEnough = 1,
     kEndParse = 2,
     kBadRequest = http::kBadRequest,
-    kHttpVersionNotSupported = http::kHttpVersionNotSupported
+    kHttpVersionNotSupported = http::kHttpVersionNotSupported,
+    kPayloadTooLarge = http::kPayloadTooLarge
   };
   AParser();
   AParser(const AParser &other);
@@ -27,9 +29,15 @@ class AParser {
 
  protected:
   enum StatusFlag { kBeforeProcess, kNeedHeader, kEndHeader, kNeedBody };
-  enum chunked_state {
+  enum ChunkedStateFlag {
     kNeedChunkedSize,
     kNeedChunkedBody,
+    kMaxBodySize = 100000000
+  };
+  struct ChunkedState {
+    int chunked_state;
+    size_t chunked_size;
+    size_t total_size;
   };
   HTTPRequest *request_;
   std::string row_line_;
@@ -55,12 +63,11 @@ class AParser {
   int CheckHeader();
   int SetRequestBody();
   int SetChunkedBody();
-  int BadChunkedBody(int &chunked_state, size_t &chunked_size);
+  int ResetChunkedBody(ChunkedState &state, int status_code);
   int SetBody();
 
-  const Result<HTTPRequest *, int> HttpVersionNotSupported();
-  const Result<HTTPRequest *, int> BadRequest();
   const Result<HTTPRequest *, int> OkRequest();
+  const Result<HTTPRequest *, int> ErrRequest(int status_code);
 };
 
 #endif  // WEBSERVE_SRC_HTTP_A_PARSER_HPP

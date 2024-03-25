@@ -23,6 +23,7 @@ class LocationContext {
   const std::vector<std::string> &GetCgiExtension() const;
   bool IsValidCgiExtension(const std::string &extension) const;
   const std::map<std::string, bool> &GetAllowMethod() const;
+  bool IsAllowedMethod(const std::string &key);
   // セッター
   void SetCanAutoIndex(bool can_auto_inde);
   void SetLimitClientBody(int limit_client_body_bytes);

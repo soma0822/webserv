@@ -12,6 +12,10 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   if (!request) {
     return Some(GenerateErrorResponse(http::kInternalServerError, config));
   }
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
+  }
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const Result<LocationContext, std::string> location_ctx_result =
@@ -472,6 +476,18 @@ bool RequestHandler::IsCGIRequest(const IConfig &config,
   // cgi extensionが0より大きければCGIリクエストである
   return location_ctx_result.IsOk() &&
          location_ctx_result.Unwrap().GetCgiExtension().size() > 0;
+}
+
+bool RequestHandler::IsAllowedMethod(const IConfig &config,
+                                     RequestContext req_ctx) {
+  const HTTPRequest *request = req_ctx.request;
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const std::string &uri = request->GetUri();
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(uri);
+  return location_ctx_result.IsOk() &&
+         location_ctx_result.Unwrap().IsAllowedMethod(request->GetMethod());
 }
 
 const char **RequestHandler::MakeArgv(const std::string &script_name,

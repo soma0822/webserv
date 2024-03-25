@@ -44,6 +44,9 @@ bool LocationContext::IsValidCgiExtension(const std::string &extension) const {
 const std::map<std::string, bool> &LocationContext::GetAllowMethod() const {
   return allow_method_;
 }
+bool LocationContext::IsAllowedMethod(const std::string &key) {
+  return allow_method_[key] == true;
+}
 // セッター
 void LocationContext::SetCanAutoIndex(bool can_auto_index) {
   can_auto_index_ = can_auto_index;
