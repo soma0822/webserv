@@ -291,3 +291,13 @@ TEST(RequestHandler, MakeArgvNotShebang) {
   ASSERT_EQ(nullptr, argv[1]);
   delete argv;
 }
+
+TEST(RequestHandler, MakeArgvEnv) {
+  std::string script_name = "./test.py";
+  std::string first_line = "#!/usr/bin/env ls";
+  const char **argv = RequestHandler::MakeArgv(script_name, first_line);
+  ASSERT_EQ("/bin/ls", std::string(argv[0]));
+  ASSERT_EQ("./test.py", std::string(argv[1]));
+  ASSERT_EQ(nullptr, argv[2]);
+  delete argv;
+}
