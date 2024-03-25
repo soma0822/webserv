@@ -33,6 +33,11 @@ class AParser {
     kNeedChunkedBody,
     kMaxBodySize = 100000000
   };
+  struct ChunkedState {
+    int chunked_state;
+    size_t chunked_size;
+    size_t total_size;
+  };
   HTTPRequest *request_;
   std::string row_line_;
   int parser_state_;
@@ -57,7 +62,7 @@ class AParser {
   int CheckHeader();
   int SetRequestBody();
   int SetChunkedBody();
-  int BadChunkedBody(int &chunked_state, size_t &chunked_size);
+  int ResetChunkedBody(ChunkedState &state, int status_code);
   int SetBody();
 
   const Result<HTTPRequest *, int> OkRequest();
