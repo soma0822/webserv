@@ -26,8 +26,6 @@ class RequestHandler {
                                               RequestContext req_ctx);
   static std::string GetAbsolutePathForPathSegment(const IConfig &config,
                                                    RequestContext req_ctx);
-  static char const **MakeArgv(const std::string &script_name,
-                               std::string &first_line);
 
  private:
   RequestHandler();

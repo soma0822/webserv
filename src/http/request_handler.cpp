@@ -360,11 +360,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       dup2(redirect_fd[0], 0);
       close(redirect_fd[0]);
     }
-    std::ifstream inf(script_name.c_str());
-    if (inf.is_open() == false) std::exit(1);
-    std::string first_line;
-    std::getline(inf, first_line);
-    const char **argv = MakeArgv(script_name, first_line);
+    const char *argv[] = {script_name.c_str(), NULL};
     Logger::Info() << "CGI実行: " << argv[0] << std::endl;
     execve(argv[0], const_cast<char *const *>(argv), env);
     Logger::Error() << "execve エラー" << std::endl;
@@ -455,43 +451,6 @@ bool RequestHandler::IsCGIRequest(const IConfig &config,
   // cgi extensionが0より大きければCGIリクエストである
   return location_ctx_result.IsOk() &&
          location_ctx_result.Unwrap().GetCgiExtension().size() > 0;
-}
-
-const char **RequestHandler::MakeArgv(const std::string &script_name,
-                                      std::string &first_line) {
-  const char **ret;
-  if (first_line[0] == '#' && first_line[1] == '!') {
-    if (first_line.find("#!/usr/bin/env") == 0) {
-      char *path = getenv("PATH");
-      std::stringstream ss(first_line);
-      std::string exec_filename;
-      ss >> exec_filename;
-      ss >> exec_filename;
-      std::istringstream path_stream(path);
-      std::string dir;
-      std::string program_path;
-      while (std::getline(path_stream, dir, ':')) {
-        std::string tmp = dir + "/" + exec_filename;
-        if (access(tmp.c_str(), X_OK) == 0) {
-          program_path = tmp;
-          break;
-        }
-      }
-      if (program_path.empty()) std::exit(1);
-      first_line = program_path;
-    } else {
-      first_line = first_line.substr(2);
-    }
-    ret = const_cast<const char **>(new char *[3]);
-    ret[0] = first_line.c_str();
-    ret[1] = script_name.c_str();
-    ret[2] = NULL;
-  } else {
-    ret = const_cast<const char **>(new char *[2]);
-    ret[0] = script_name.c_str();
-    ret[1] = NULL;
-  }
-  return ret;
 }
 
 RequestHandler::RequestHandler() {}
