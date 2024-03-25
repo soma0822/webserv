@@ -11,13 +11,25 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
                                               RequestContext req_ctx) {
   HTTPRequest *request = req_ctx.request;
   if (!request) {
-    return Some(HTTPResponse::Builder()
-                    .SetStatusCode(http::kInternalServerError)
-                    .Build());
+    return Some(GenerateErrorResponse(http::kInternalServerError, config));
   }
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const Result<LocationContext, std::string> location_ctx_result =
+      server_ctx.SearchLocation(request->GetUri());
+
+  // リクエストボディのサイズが制限を超えている場合には413を返す
+  if (location_ctx_result.IsOk() &&
+      request->GetBody().length() >
+          location_ctx_result.Unwrap().GetLimitClientBody()) {
+    return Some(GenerateErrorResponse(http::kPayloadTooLarge, config));
+  }
+
+  // URIの長さが制限を超えている場合には414を返す
   if (request->GetUri().length() >= kMaxUriLength) {
     return Some(GenerateErrorResponse(http::kUriTooLong, config));
   }
+
   if (request->GetMethod() == "GET") {
     return Get(config, req_ctx);
   }
