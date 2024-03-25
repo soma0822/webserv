@@ -48,7 +48,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     const std::string cgi_script_path_segment =
         GetAbsolutePathForPathSegment(config, req_ctx);
     // TODO CGIExeの呼び出し
-    http::StatusCode status = http::kOk /* = CGIExe() */;
+    http::StatusCode status = CGIExe(config, req_ctx, cgi_script_abs_path, cgi_script_path_segment);
     if (status == http::kOk) {
       return None<HTTPResponse *>();
     }
