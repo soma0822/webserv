@@ -33,7 +33,7 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
     else if (return_state != kOk)
       return ErrRequest(return_state);
     else {
-    if (CheckNeedBodyHeader() == false) return ErrRequest(kBadRequest);
+      if (CheckNeedBodyHeader() == false) return ErrRequest(kBadRequest);
     }
   }
   // bodyの内容を確認

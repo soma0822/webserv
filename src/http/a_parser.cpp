@@ -140,6 +140,7 @@ int AParser::SetRequestBody() {
 int AParser::SetChunkedBody() {
   static int chunked_state = kNeedChunkedSize;
   static size_t chunked_size = 0;
+  static size_t total_body_size = 0;
   size_t pos = 0;
 
   while (1) {
@@ -152,10 +153,11 @@ int AParser::SetChunkedBody() {
           string_utils::StrToHex(row_line_.substr(0, pos));
       if (result.IsErr()) return BadChunkedBody(chunked_state, chunked_size);
       chunked_size = static_cast<size_t>(result.Unwrap());
+      total_body_size += chunked_size;
+      if (kMaxBodySize < total_body_size) return kPayloadTooLarge;
       row_line_ = row_line_.substr(pos + 2);
       chunked_state = kNeedChunkedBody;
     }
-    // sizeの分だけbodyがあるか確認
     if (chunked_state == kNeedChunkedBody) {
       pos = row_line_.find("\r\n");
       if (pos == std::string::npos) return kNotEnough;
