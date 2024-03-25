@@ -273,7 +273,7 @@ TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegmentWithoutPathSegment) {
       "");
 }
 
-TEST(RequestHandler, MakeArgv){
+TEST(RequestHandler, MakeArgv) {
   std::string script_name = "./test.py";
   std::string first_line = "#!/usr/bin/python3";
   const char **argv = RequestHandler::MakeArgv(script_name, first_line);
@@ -283,7 +283,7 @@ TEST(RequestHandler, MakeArgv){
   delete argv;
 }
 
-TEST(RequestHandler, MakeArgvNotShebang){
+TEST(RequestHandler, MakeArgvNotShebang) {
   std::string script_name = "./test.py";
   std::string first_line = "/usr/bin/python3";
   const char **argv = RequestHandler::MakeArgv(script_name, first_line);

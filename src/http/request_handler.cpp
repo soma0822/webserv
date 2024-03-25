@@ -335,10 +335,9 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       close(redirect_fd[0]);
     }
     std::ifstream inf(script_name.c_str());
-    if (inf.is_open() == false)
-      std::exit(1);
+    if (inf.is_open() == false) std::exit(1);
     std::string first_line;
-    std::getline(inf,first_line);
+    std::getline(inf, first_line);
     const char **argv = MakeArgv(script_name, first_line);
     Logger::Info() << "CGI実行: " << argv[0] << std::endl;
     execve(argv[0], const_cast<char *const *>(argv), env);
@@ -418,15 +417,16 @@ void RequestHandler::DeleteEnv(char **env) {
   delete[] env;
 }
 
-const char **RequestHandler::MakeArgv(const std::string &script_name, std::string &first_line){
+const char **RequestHandler::MakeArgv(const std::string &script_name,
+                                      std::string &first_line) {
   const char **ret;
   if (first_line[0] == '#' && first_line[1] == '!') {
     first_line = first_line.substr(2);
-    ret = const_cast<const char**>(new char*[3]);
+    ret = const_cast<const char **>(new char *[3]);
     ret[0] = first_line.c_str();
     ret[1] = script_name.c_str();
   } else {
-    ret =  const_cast<const char**>(new char*[2]);
+    ret = const_cast<const char **>(new char *[2]);
     ret[0] = script_name.c_str();
   }
   return ret;
