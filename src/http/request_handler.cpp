@@ -1,7 +1,6 @@
 #include "request_handler.hpp"
 
 #include <dirent.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 #include "config.hpp"
@@ -296,15 +295,16 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
 }
 // ex.) script_name = /cgi-bin/default.py
 // path_translated:パスセグメントの絶対パス
-// TODO: 実行権限の確認
 http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
                                         const std::string &script_name,
                                         const std::string &path_translated) {
-  // TODO:　Locationでallow_methodがあることがあるので呼び出しもとでこのチェックはしたい
   if (req_ctx.request->GetMethod() != "GET" &&
       req_ctx.request->GetMethod() != "POST") {
     return http::kMethodNotAllowed;
+  }
+  if (file_utils::IsExecutable(script_name)) {
+    return http::kForbidden;
   }
   int redirect_fd[2], cgi_fd[2];
   pid_t pid;
