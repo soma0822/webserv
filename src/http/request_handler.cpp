@@ -303,6 +303,9 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       req_ctx.request->GetMethod() != "POST") {
     return http::kMethodNotAllowed;
   }
+  if (!file_utils::DoesFileExist(script_name)) {
+    return http::kNotFound;
+  }
   if (file_utils::IsExecutable(script_name)) {
     return http::kForbidden;
   }
