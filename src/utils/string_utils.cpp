@@ -1,5 +1,7 @@
 #include "string_utils.hpp"
 
+#include <algorithm>
+
 #include "validation.hpp"
 
 namespace string_utils {
@@ -44,5 +46,27 @@ std::string SkipSpace(std::string s) {
   if (pos_first == std::string::npos || pos_last == std::string::npos)
     return "";
   return s.substr(pos_first, pos_last - pos_first + 1);
+}
+
+std::string StrToLower(std::string s) {
+  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+  return s;
+}
+
+std::string StrToUpper(std::string s) {
+  std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+  return s;
+}
+
+std::string CapitalizeHyphenSeparatedWords(std::string s) {
+  // e.g. "content-length" -> "Content-Length"
+  for (size_t i = 0; i < s.size(); ++i) {
+    if (i == 0 || s[i - 1] == '-') {
+      s[i] = toupper(s[i]);
+    } else {
+      s[i] = tolower(s[i]);
+    }
+  }
+  return s;
 }
 }  // namespace string_utils

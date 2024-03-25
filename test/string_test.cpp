@@ -55,3 +55,14 @@ TEST(STRINGSTOHEX, INTMAXPlus1) {
   Result<int, std::string> result = string_utils::StrToHex(str);
   ASSERT_TRUE(result.IsErr());
 }
+
+TEST(Capitalize, OneWord) {
+  std::string target = "hello";
+  ASSERT_EQ("Hello", string_utils::CapitalizeHyphenSeparatedWords(target));
+}
+
+TEST(Capitalize, TwoWords) {
+  std::string target = "hello-there";
+  ASSERT_EQ("Hello-There",
+            string_utils::CapitalizeHyphenSeparatedWords(target));
+}

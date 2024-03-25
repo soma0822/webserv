@@ -89,7 +89,7 @@ http::StatusCode HTTPResponse::GetStatusCode() const { return status_code_; }
 const std::string &HTTPResponse::GetBody() const { return body_; }
 
 void HTTPResponse::AddHeader(const std::string &key, const std::string &value) {
-  headers_[key] = value;
+  headers_[string_utils::StrToUpper(key)] = value;
 }
 
 const std::map<std::string, std::string> &HTTPResponse::GetHeaders() const {
@@ -103,12 +103,17 @@ std::string HTTPResponse::ToString() {
 
   // ステータスライン
   ss << http_version_ << " " << status_code_ << " "
-     << http::GetStatusMessage(status_code_) << "\r\n";
+     << GetStatusMessage(status_code_) << "\r\n";
 
   // ヘッダ
   for (std::map<std::string, std::string>::iterator it = headers_.begin();
        it != headers_.end(); ++it) {
-    ss << it->first << ": " << it->second << "\r\n";
+    ss << string_utils::CapitalizeHyphenSeparatedWords(it->first) << ": "
+       << it->second << "\r\n";
+  }
+
+  if (headers_.count("content-length") == 0) {
+    ss << "Content-Length: " << body_.size() << "\r\n";
   }
 
   // 空行
