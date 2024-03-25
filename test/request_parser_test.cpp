@@ -383,7 +383,7 @@ TEST(HTTPRequestParser, ParseRequestPOST_Transfer_chunked_Error4) {
   request = "5F5E100\r\n";
   Result<HTTPRequest *, int> req5 = parser.Parser(request);
   EXPECT_EQ(req5.UnwrapErr(), HTTPRequestParser::kPayloadTooLarge);
-  request = 
+  request =
       "POST / HTTP/1.1\r\nHost: localhost:8080\r\nTransfer-Encoding: "
       "chunked\r\n\r\n0123456789abcdef\r\n";
   Result<HTTPRequest *, int> req6 = parser.Parser(request);
