@@ -164,9 +164,10 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
   }
 
-  // パーミッションがない場合には403を返す
-  if (!(file_utils::IsWritable(request_file_path) &&
-        file_utils::IsWritable(request_file_path))) {
+  const std::string parent_dir =
+      request_file_path.substr(0, request_file_path.find_last_of('/'));
+  // 親ディレクトリに書き込み権限がない場合には403を返す
+  if (!file_utils::IsWritable(parent_dir)) {
     return Some(
         HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
   }
