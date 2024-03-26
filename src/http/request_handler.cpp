@@ -332,6 +332,12 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
     return http::kMethodNotAllowed;
   }
 
+  // GETとPOST以外のメソッドはサポートしていない
+  if (req_ctx.request->GetMethod() != "POST" &&
+      req_ctx.request->GetMethod() != "GET") {
+    return http::kNotImplemented;
+  }
+
   // スクリプトが実行可能でない場合には403を返す
   if (file_utils::IsExecutable(script_name)) {
     return http::kForbidden;
