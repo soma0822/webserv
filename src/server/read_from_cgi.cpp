@@ -10,7 +10,6 @@ ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
 
 ReadFromCGI::~ReadFromCGI() {}
 
-// TODO: ここのエラーはクライアントにInternal Server Errorを返す
 Result<int, std::string> ReadFromCGI::Execute() {
   (void)config_;
   char buf[buf_size_ + 1];
@@ -18,6 +17,9 @@ Result<int, std::string> ReadFromCGI::Execute() {
   int len = read(fd_, buf, buf_size_);
   if (len == -1) {
     Logger::Error() << "read エラー" << std::endl;
+    IOTaskManager::AddTask(new WriteResponseToClient(
+        req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
+        req_ctx_.request));
     return Ok(kFdDelete);
   }
   buf[len] = '\0';
@@ -26,6 +28,9 @@ Result<int, std::string> ReadFromCGI::Execute() {
   int result = waitpid(pid_, &status, WNOHANG);
   if (result == -1) {  // エラー
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
+    IOTaskManager::AddTask(new WriteResponseToClient(
+        req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
+        req_ctx_.request));
     return Ok(kFdDelete);
   } else if (result == 0) {  // まだ終了していない
     return Ok(kOk);
