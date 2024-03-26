@@ -320,7 +320,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   }
 
   // スクリプトが実行可能でない場合には403を返す
-  if (file_utils::IsExecutable(script_name)) {
+  if (!file_utils::IsExecutable(script_name)) {
     return http::kForbidden;
   }
 
