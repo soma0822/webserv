@@ -24,20 +24,12 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
   buf[len] = '\0';
   Result<HTTPRequest *, int> result = parser_.Parser(buf);
   if (result.IsErr() && result.UnwrapErr() == HTTPRequestParser::kNotEnough) {
-    return Ok(0);
     Logger::Info() << port_ << " : "
                    << "リクエストをパース中です : " << buf << len << std::endl;
+    return Ok(kOk);
   } else if (result.IsErr() &&
-             result.UnwrapErr() == HTTPRequestParser::kBadRequest) {
-    std::cout << "bad request" << std::endl;
-    // TODO: badrequestの処理
-    //  IOTaskManager::AddTask(new WriteResponseToClient write_response(fd_,
-    //  badrequest_response));
-  } else if (result.IsErr() &&
-             result.UnwrapErr() ==
-                 HTTPRequestParser::kHttpVersionNotSupported) {
-    std::cout << "HttpVersion Not Supported" << std::endl;
-    // TODO: HttpVersionNotSupportedの処理
+             http::GetStatusMessage(static_cast<http::StatusCode>(result.UnwrapErr())).empty() == false) {
+    IOTaskManager::AddTask(new WriteResponseToClient(fd_, GenerateErrorResponse(static_cast<http::StatusCode>(result.UnwrapErr()), config_), static_cast<HTTPRequest *>(NULL)));
   } else {
     Logger::Info() << port_ << " : "
                    << "リクエストをパースしました : " << buf << len
@@ -52,7 +44,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
                      << "レスポンスのタスクを追加しました" << std::endl;
     }
   }
-  return Ok(0);
+  return Ok(kOk);
 }
 
 const std::string &ReadRequestFromClient::GetPort() const { return port_; }

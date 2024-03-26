@@ -6,7 +6,7 @@
 
 // canonical
 HTTPRequestParser::HTTPRequestParser() {}
-HTTPRequestParser::~HTTPRequestParser() { delete request_; }
+HTTPRequestParser::~HTTPRequestParser() {}
 
 // リクエストのパース
 const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
