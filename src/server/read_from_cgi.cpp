@@ -2,7 +2,7 @@
 
 ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
                          const IConfig &config)
-    : AIOTask(fd, POLLIN),
+    : AIOTask(fd, POLLIN | POLLHUP),
       req_ctx_(req_ctx),
       config_(config),
       parser_(CGIParser()),
