@@ -77,10 +77,13 @@ void IOTaskManager::ExecuteTasks() {
     }
     for (unsigned int i = 0; i < fds_.size(); ++i) {
       if (fds_.at(i).fd == -1) continue;
-      tasks_array_.at(i).index >= tasks_array_.at(i).tasks.size() ? tasks_array_.at(i).index = 0 : 0;
-      while (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) == NULL ||
-             !(tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->GetEvent() &
-               fds_.at(i).revents)) {
+      tasks_array_.at(i).index >= tasks_array_.at(i).tasks.size()
+          ? tasks_array_.at(i).index = 0
+          : 0;
+      while (
+          tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) == NULL ||
+          !(tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->GetEvent() &
+            fds_.at(i).revents)) {
         ++(tasks_array_.at(i).index);
         if (tasks_array_.at(i).index >= tasks_array_.at(i).tasks.size()) {
           tasks_array_.at(i).index = 0;
