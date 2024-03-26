@@ -30,6 +30,7 @@ TEST_F(RequestHandlerTest, GetMethodNormal) {
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.AddAllowMethod("GET");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
@@ -43,6 +44,7 @@ TEST_F(RequestHandlerTest, GetMethodNormal) {
 
   HTTPRequest request;
   request.SetUri(uri);
+  request.SetMethod("GET");
   RequestContext req_ctx = {&request, "80", "", 0, 0};
   response = RequestHandler::Get(config_mock.get(), req_ctx).Unwrap();
 
@@ -59,6 +61,7 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.AddAllowMethod("POST");
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
       .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
@@ -71,6 +74,7 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
 
   HTTPRequest request;
   request.SetUri(uri);
+  request.SetMethod("POST");
   request.AddBody(body);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
   response = RequestHandler::Post(config_mock.get(), req_ctx).Unwrap();
@@ -121,6 +125,7 @@ TEST_F(RequestHandlerTest, DeleteMethodNormalTest) {
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.AddAllowMethod("DELETE");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
@@ -134,6 +139,7 @@ TEST_F(RequestHandlerTest, DeleteMethodNormalTest) {
 
   HTTPRequest request;
   request.SetUri(uri);
+  request.SetMethod("DELETE");
   RequestContext req_ctx = {&request, "80", "", 0, 0};
   response = RequestHandler::Delete(config_mock.get(), req_ctx).Unwrap();
 
