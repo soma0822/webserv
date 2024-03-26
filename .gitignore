@@ -12,3 +12,4 @@ a.out
 .DS*
 log.txt
 obj/
+webserv_debug
