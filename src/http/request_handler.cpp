@@ -12,10 +12,6 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   if (!request) {
     return Some(GenerateErrorResponse(http::kInternalServerError, config));
   }
-  // 許可されていないメソッドの場合には405を返す
-  if (!IsAllowedMethod(config, req_ctx)) {
-    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
-  }
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const Result<LocationContext, std::string> location_ctx_result =
@@ -45,20 +41,28 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     return Delete(config, req_ctx);
   }
   if (is_cgi_request) {
-    const std::string cgi_script_abs_path =
-        GetAbsoluteCGIScriptPath(config, req_ctx);
-    const std::string cgi_script_path_segment =
-        GetAbsolutePathForPathSegment(config, req_ctx);
+    // GETとPOST以外のメソッドはサポートしていない
+    if (req_ctx.request->GetMethod() != "POST" &&
+        req_ctx.request->GetMethod() != "GET") {
+      return Some(GenerateErrorResponse(http::kNotImplemented, config));
+    }
+
+    const std::string cgi_script_path = GetCGIScriptPath(config, req_ctx);
+    const std::string path_translated = GetPathInfoPath(config, req_ctx);
 
     // CGIスクリプトの拡張子が許可されていない場合にはテキストとして返す
-    if (location_ctx_result.IsOk() &&
+    bool is_valid_cgi_extension =
+        location_ctx_result.IsOk() &&
         location_ctx_result.Unwrap().IsValidCgiExtension(
-            cgi_script_abs_path.substr(cgi_script_abs_path.find('.')))) {
+            cgi_script_path.substr(cgi_script_path.find('.', 1)));
+    bool is_method_allowed = IsAllowedMethod(config, req_ctx);
+    if (!is_valid_cgi_extension && req_ctx.request->GetMethod() == "GET" &&
+        is_method_allowed) {
       return Get(config, req_ctx);
     }
 
     http::StatusCode status =
-        CGIExe(config, req_ctx, cgi_script_abs_path, cgi_script_path_segment);
+        CGIExe(config, req_ctx, cgi_script_path, path_translated);
     if (status == http::kOk) {
       return None<HTTPResponse *>();
     }
@@ -100,6 +104,10 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
       return Some(
           HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
     }
+    // 許可されていないメソッドの場合には405を返す
+    if (!IsAllowedMethod(config, req_ctx)) {
+      return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
+    }
     // パーミッションがない場合には403を返す
     if (!file_utils::IsReadable(request_file_path)) {
       return Some(
@@ -120,6 +128,10 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   // ファイルが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(request_file_path)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+  }
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
   // パーミッションがない場合には403を返す
   if (!file_utils::IsReadable(request_file_path)) {
@@ -155,6 +167,10 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   // 親ディレクトリが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(parent_dir)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+  }
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
   if (!file_utils::IsWritable(parent_dir)) {
@@ -201,6 +217,11 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
   }
 
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
+  }
+
   const std::string parent_dir =
       request_file_path.substr(0, request_file_path.find_last_of('/'));
   // 親ディレクトリに書き込み権限がない場合には403を返す
@@ -219,8 +240,8 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
   return Some(HTTPResponse::Builder().SetStatusCode(http::kOk).Build());
 }
 
-std::string RequestHandler::ResolveAbsoluteRootPath(const IConfig &config,
-                                                    RequestContext req_ctx) {
+std::string RequestHandler::ResolveRootPath(const IConfig &config,
+                                            const RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
@@ -240,7 +261,7 @@ std::string RequestHandler::ResolveAbsoluteRootPath(const IConfig &config,
 std::string RequestHandler::ResolveRequestTargetPath(
     const IConfig &config, const RequestContext req_ctx) {
   // rootを取得する
-  std::string root = ResolveAbsoluteRootPath(config, req_ctx);
+  std::string root = ResolveRootPath(config, req_ctx);
 
   // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
   // origin-form = absolute-path [ "?" query ]
@@ -251,8 +272,8 @@ std::string RequestHandler::ResolveRequestTargetPath(
   return root + req_ctx.request->GetUri();
 }
 
-std::string RequestHandler::GetAbsoluteCGIScriptPath(const IConfig &config,
-                                                     RequestContext req_ctx) {
+std::string RequestHandler::GetCGIScriptPath(const IConfig &config,
+                                             RequestContext req_ctx) {
   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   // 拡張子以降のパスセグメントは除外する
   size_t pos_period = request_file_path.find('.', 1);
@@ -265,17 +286,17 @@ std::string RequestHandler::GetAbsoluteCGIScriptPath(const IConfig &config,
 }
 
 // 存在しない場合は空文字を返す
-std::string RequestHandler::GetAbsolutePathForPathSegment(
-    const IConfig &config, RequestContext req_ctx) {
+std::string RequestHandler::GetPathInfoPath(const IConfig &config,
+                                            RequestContext req_ctx) {
   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
 
   // CGIスクリプトの絶対パス以降がパスセグメントになる
-  std::string path_segment = request_file_path.substr(
-      GetAbsoluteCGIScriptPath(config, req_ctx).size());
+  std::string path_segment =
+      request_file_path.substr(GetCGIScriptPath(config, req_ctx).size());
   if (path_segment.empty()) {
     return "";
   }
-  return ResolveAbsoluteRootPath(config, req_ctx) + path_segment;
+  return ResolveRootPath(config, req_ctx) + path_segment;
 }
 
 HTTPResponse *RequestHandler::GenerateAutoIndexPage(
@@ -309,14 +330,14 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
                                         const std::string &script_name,
                                         const std::string &path_translated) {
-  if (req_ctx.request->GetMethod() != "GET" &&
-      req_ctx.request->GetMethod() != "POST") {
-    return http::kMethodNotAllowed;
-  }
-
   // スクリプトが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(script_name)) {
     return http::kNotFound;
+  }
+
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return http::kMethodNotAllowed;
   }
 
   // スクリプトが実行可能でない場合には403を返す

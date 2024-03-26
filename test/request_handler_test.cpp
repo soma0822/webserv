@@ -30,6 +30,7 @@ TEST_F(RequestHandlerTest, GetMethodNormal) {
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.AddAllowMethod("GET");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
@@ -43,6 +44,7 @@ TEST_F(RequestHandlerTest, GetMethodNormal) {
 
   HTTPRequest request;
   request.SetUri(uri);
+  request.SetMethod("GET");
   RequestContext req_ctx = {&request, "80", "", 0, 0};
   response = RequestHandler::Get(config_mock.get(), req_ctx).Unwrap();
 
@@ -59,6 +61,7 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.AddAllowMethod("POST");
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
       .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
@@ -71,6 +74,7 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
 
   HTTPRequest request;
   request.SetUri(uri);
+  request.SetMethod("POST");
   request.AddBody(body);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
   response = RequestHandler::Post(config_mock.get(), req_ctx).Unwrap();
@@ -121,6 +125,7 @@ TEST_F(RequestHandlerTest, DeleteMethodNormalTest) {
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.AddAllowMethod("DELETE");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
@@ -134,6 +139,7 @@ TEST_F(RequestHandlerTest, DeleteMethodNormalTest) {
 
   HTTPRequest request;
   request.SetUri(uri);
+  request.SetMethod("DELETE");
   RequestContext req_ctx = {&request, "80", "", 0, 0};
   response = RequestHandler::Delete(config_mock.get(), req_ctx).Unwrap();
 
@@ -193,9 +199,8 @@ TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithMultiplePathSegments) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(
-      RequestHandler::GetAbsoluteCGIScriptPath(config_mock.get(), req_ctx),
-      "/var/www/html/cgi-bin/cgi.py");
+  ASSERT_EQ(RequestHandler::GetCGIScriptPath(config_mock.get(), req_ctx),
+            "/var/www/html/cgi-bin/cgi.py");
 }
 
 TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithoutPathSegment) {
@@ -218,12 +223,11 @@ TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithoutPathSegment) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(
-      RequestHandler::GetAbsoluteCGIScriptPath(config_mock.get(), req_ctx),
-      "/var/www/html/cgi-bin/cgi.py");
+  ASSERT_EQ(RequestHandler::GetCGIScriptPath(config_mock.get(), req_ctx),
+            "/var/www/html/cgi-bin/cgi.py");
 }
 
-TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegment) {
+TEST_F(RequestHandlerTest, GetPathInfoPath) {
   const std::string root = "/var/www/html";
   const std::string uri = "/cgi-bin/cgi.py/foo/bar";
 
@@ -243,9 +247,8 @@ TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegment) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(
-      RequestHandler::GetAbsolutePathForPathSegment(config_mock.get(), req_ctx),
-      "/var/www/html/foo/bar");
+  ASSERT_EQ(RequestHandler::GetPathInfoPath(config_mock.get(), req_ctx),
+            "/var/www/html/foo/bar");
 }
 
 TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegmentWithoutPathSegment) {
@@ -268,9 +271,7 @@ TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegmentWithoutPathSegment) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(
-      RequestHandler::GetAbsolutePathForPathSegment(config_mock.get(), req_ctx),
-      "");
+  ASSERT_EQ(RequestHandler::GetPathInfoPath(config_mock.get(), req_ctx), "");
 }
 
 TEST(RequestHandler, MakeArgv) {
