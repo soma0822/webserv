@@ -11,3 +11,5 @@ a.out
 *.swp
 .DS*
 log.txt
+obj/
+webserv_debug

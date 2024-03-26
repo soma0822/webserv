@@ -31,6 +31,12 @@ LocationContext LocationParser::ParseLocation(std::ifstream &inf) {
                                   container::MergeContainer(value, " "));
     }
   }
+  if (location.IsAllowedMethod("GET") || location.IsAllowedMethod("POST") ||
+      location.IsAllowedMethod("DELETE")) {
+    ;
+  } else {
+    location.AddAllowMethod("GET");
+  }
   return location;
 }
 
