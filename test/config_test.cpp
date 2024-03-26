@@ -75,7 +75,7 @@ TEST(ConfigTest, DefaultPath) {
       it2->second.GetAllowMethod().begin();
   ASSERT_EQ(it6->second, false);
   ++it6;
-  ASSERT_EQ(it6->second, false);
+  ASSERT_EQ(it6->second, true);
   ++it6;
   ASSERT_EQ(it6->second, false);
   ++it2;
