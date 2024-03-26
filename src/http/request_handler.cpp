@@ -1,7 +1,6 @@
 #include "request_handler.hpp"
 
 #include <dirent.h>
-#include <sys/stat.h>
 #include <unistd.h>
 
 #include "config.hpp"
@@ -45,13 +44,19 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   if (!is_cgi_request && request->GetMethod() == "DELETE") {
     return Delete(config, req_ctx);
   }
-  // TODO 有効な拡張子であるか、実行権限があるかのチェック
   if (is_cgi_request) {
     const std::string cgi_script_abs_path =
         GetAbsoluteCGIScriptPath(config, req_ctx);
     const std::string cgi_script_path_segment =
         GetAbsolutePathForPathSegment(config, req_ctx);
-    // TODO CGIExeの呼び出し
+
+    // CGIスクリプトの拡張子が許可されていない場合にはテキストとして返す
+    if (location_ctx_result.IsOk() &&
+        location_ctx_result.Unwrap().IsValidCgiExtension(
+            cgi_script_abs_path.substr(cgi_script_abs_path.find('.')))) {
+      return Get(config, req_ctx);
+    }
+
     http::StatusCode status =
         CGIExe(config, req_ctx, cgi_script_abs_path, cgi_script_path_segment);
     if (status == http::kOk) {
@@ -300,16 +305,25 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
 }
 // ex.) script_name = /cgi-bin/default.py
 // path_translated:パスセグメントの絶対パス
-// TODO: 実行権限の確認
 http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
                                         const std::string &script_name,
                                         const std::string &path_translated) {
-  // TODO:　Locationでallow_methodがあることがあるので呼び出しもとでこのチェックはしたい
   if (req_ctx.request->GetMethod() != "GET" &&
       req_ctx.request->GetMethod() != "POST") {
     return http::kMethodNotAllowed;
   }
+
+  // スクリプトが存在しない場合には404を返す
+  if (!file_utils::DoesFileExist(script_name)) {
+    return http::kNotFound;
+  }
+
+  // スクリプトが実行可能でない場合には403を返す
+  if (file_utils::IsExecutable(script_name)) {
+    return http::kForbidden;
+  }
+
   int redirect_fd[2], cgi_fd[2];
   pid_t pid;
   if (pipe(cgi_fd) == -1) {
