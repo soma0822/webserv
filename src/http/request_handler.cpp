@@ -41,15 +41,25 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     return Delete(config, req_ctx);
   }
   if (is_cgi_request) {
+    // GETとPOST以外のメソッドはサポートしていない
+    if (req_ctx.request->GetMethod() != "POST" &&
+        req_ctx.request->GetMethod() != "GET") {
+      return Some(GenerateErrorResponse(http::kNotImplemented, config));
+    }
+
     const std::string cgi_script_abs_path =
         GetAbsoluteCGIScriptPath(config, req_ctx);
     const std::string cgi_script_path_segment =
         GetAbsolutePathForPathSegment(config, req_ctx);
 
     // CGIスクリプトの拡張子が許可されていない場合にはテキストとして返す
-    if (location_ctx_result.IsOk() &&
+    bool is_valid_cgi_extension =
+        location_ctx_result.IsOk() &&
         location_ctx_result.Unwrap().IsValidCgiExtension(
-            cgi_script_abs_path.substr(cgi_script_abs_path.find('.')))) {
+            cgi_script_abs_path.substr(cgi_script_abs_path.find('.')));
+    bool is_method_allowed = IsAllowedMethod(config, req_ctx);
+    if (!is_valid_cgi_extension && req_ctx.request->GetMethod() == "GET" &&
+        is_method_allowed) {
       return Get(config, req_ctx);
     }
 
@@ -330,12 +340,6 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   // 許可されていないメソッドの場合には405を返す
   if (!IsAllowedMethod(config, req_ctx)) {
     return http::kMethodNotAllowed;
-  }
-
-  // GETとPOST以外のメソッドはサポートしていない
-  if (req_ctx.request->GetMethod() != "POST" &&
-      req_ctx.request->GetMethod() != "GET") {
-    return http::kNotImplemented;
   }
 
   // スクリプトが実行可能でない場合には403を返す
