@@ -25,6 +25,7 @@ TEST(HTTPResponseBuilderTest, BuildResponseWithoutStatus) {
                           .SetBody("Hello, World!")
                           .Build();
   ASSERT_EQ(res->GetStatusCode(), http::kInternalServerError);
+  delete res;
 }
 
 TEST(GenerateErrorResponse, DefaultNotFound) {
