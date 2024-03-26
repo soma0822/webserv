@@ -39,3 +39,5 @@ endforeach ()
 # FakeItをインクルード
 target_include_directories(${PROGRAM} PRIVATE "${PROJECT_SOURCE_DIR}/lib/fakeit")
 
+target_compile_options(${PROGRAM} PRIVATE -fsanitize=address)
+target_link_options(${PROGRAM} PRIVATE -fsanitize=address)
