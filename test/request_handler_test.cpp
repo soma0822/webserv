@@ -199,8 +199,7 @@ TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithMultiplePathSegments) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(
-      RequestHandler::GetAbsoluteCGIScriptPath(config_mock.get(), req_ctx),
+  ASSERT_EQ(RequestHandler::GetCGIScriptPath(config_mock.get(), req_ctx),
       "/var/www/html/cgi-bin/cgi.py");
 }
 
@@ -224,12 +223,11 @@ TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithoutPathSegment) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(
-      RequestHandler::GetAbsoluteCGIScriptPath(config_mock.get(), req_ctx),
+  ASSERT_EQ(RequestHandler::GetCGIScriptPath(config_mock.get(), req_ctx),
       "/var/www/html/cgi-bin/cgi.py");
 }
 
-TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegment) {
+TEST_F(RequestHandlerTest, GetPathInfoPath) {
   const std::string root = "/var/www/html";
   const std::string uri = "/cgi-bin/cgi.py/foo/bar";
 
@@ -249,8 +247,7 @@ TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegment) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(
-      RequestHandler::GetAbsolutePathForPathSegment(config_mock.get(), req_ctx),
+  ASSERT_EQ(RequestHandler::GetPathInfoPath(config_mock.get(), req_ctx),
       "/var/www/html/foo/bar");
 }
 
@@ -274,8 +271,7 @@ TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegmentWithoutPathSegment) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(
-      RequestHandler::GetAbsolutePathForPathSegment(config_mock.get(), req_ctx),
+  ASSERT_EQ(RequestHandler::GetPathInfoPath(config_mock.get(), req_ctx),
       "");
 }
 
