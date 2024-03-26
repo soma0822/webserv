@@ -12,10 +12,6 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   if (!request) {
     return Some(GenerateErrorResponse(http::kInternalServerError, config));
   }
-  // 許可されていないメソッドの場合には405を返す
-  if (!IsAllowedMethod(config, req_ctx)) {
-    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
-  }
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const Result<LocationContext, std::string> location_ctx_result =
@@ -100,6 +96,10 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
       return Some(
           HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
     }
+    // 許可されていないメソッドの場合には405を返す
+    if (!IsAllowedMethod(config, req_ctx)) {
+      return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
+    }
     // パーミッションがない場合には403を返す
     if (!file_utils::IsReadable(request_file_path)) {
       return Some(
@@ -120,6 +120,10 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   // ファイルが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(request_file_path)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+  }
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
   // パーミッションがない場合には403を返す
   if (!file_utils::IsReadable(request_file_path)) {
@@ -155,6 +159,10 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   // 親ディレクトリが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(parent_dir)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+  }
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
   if (!file_utils::IsWritable(parent_dir)) {
@@ -199,6 +207,11 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
   // ファイルが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(request_file_path)) {
     return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+  }
+
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
 
   const std::string parent_dir =
@@ -309,14 +322,14 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
                                         const std::string &script_name,
                                         const std::string &path_translated) {
-  if (req_ctx.request->GetMethod() != "GET" &&
-      req_ctx.request->GetMethod() != "POST") {
-    return http::kMethodNotAllowed;
-  }
-
   // スクリプトが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(script_name)) {
     return http::kNotFound;
+  }
+
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return http::kMethodNotAllowed;
   }
 
   // スクリプトが実行可能でない場合には403を返す
