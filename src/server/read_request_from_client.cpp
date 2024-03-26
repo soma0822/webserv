@@ -28,8 +28,14 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
                    << "リクエストをパース中です : " << buf << len << std::endl;
     return Ok(kOk);
   } else if (result.IsErr() &&
-             http::GetStatusMessage(static_cast<http::StatusCode>(result.UnwrapErr())).empty() == false) {
-    IOTaskManager::AddTask(new WriteResponseToClient(fd_, GenerateErrorResponse(static_cast<http::StatusCode>(result.UnwrapErr()), config_), static_cast<HTTPRequest *>(NULL)));
+             http::GetStatusMessage(
+                 static_cast<http::StatusCode>(result.UnwrapErr()))
+                     .empty() == false) {
+    IOTaskManager::AddTask(new WriteResponseToClient(
+        fd_,
+        GenerateErrorResponse(static_cast<http::StatusCode>(result.UnwrapErr()),
+                              config_),
+        static_cast<HTTPRequest *>(NULL)));
   } else {
     Logger::Info() << port_ << " : "
                    << "リクエストをパースしました : " << buf << len
