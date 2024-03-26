@@ -49,7 +49,8 @@ Result<LocationContext, std::string> ServerContext::SearchLocation(
     } else {
       if (path.find(it->first) == 0 && ret_len < it->first.length() &&
           (path.length() == it->first.length() ||
-           path[it->first.length()] == '/')) {
+           path[it->first.length()] == '/' ||
+           path[it->first.length() - 1] == '/')) {
         ret_len = it->first.length();
         ret = it;
       }
