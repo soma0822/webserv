@@ -8,9 +8,10 @@ print("Content-type: text/html; charset=utf-8\r\n\r\n", end="")
 print("<html><body>")
 form = cgi.FieldStorage()
 
-for key in form:
-    value = form[key].value
+# GETメソッドで送信されたデータを取得
+for key in form.keys():
+    # FieldStorageオブジェクトのvalue属性を使用して値を取得
+    value = form.getvalue(key)
     print('<p>%s: %s</p>' % (key, value))
 
 print("</body></html>")
-

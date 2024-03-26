@@ -10,11 +10,7 @@ const Result<HTTPRequest *, int> CGIParser::Parser(std::string request_line) {
   if (row_line_ == "") return Err(kEndParse);
   if (request_ == NULL) request_ = new HTTPRequest();
   // Headerの内容を確認
-  int status = SetHeader();
-  if (status == kNotEnough)
-    return Err(kNotEnough);
-  else if (status != kOk)
-    return ErrRequest(status);
+  SetHeader();
   // bodyをセット
   SetBody();
   return OkRequest();

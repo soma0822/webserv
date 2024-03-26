@@ -364,11 +364,7 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
       dup2(redirect_fd[0], 0);
       close(redirect_fd[0]);
     }
-    std::ifstream inf(script_name.c_str());
-    if (inf.is_open() == false) std::exit(1);
-    std::string first_line;
-    std::getline(inf, first_line);
-    const char **argv = MakeArgv(script_name, first_line);
+    const char *argv[] = {script_name.c_str(), NULL};
     Logger::Info() << "CGI実行: " << argv[0] << std::endl;
     execve(argv[0], const_cast<char *const *>(argv), env);
     Logger::Error() << "execve エラー" << std::endl;
