@@ -40,7 +40,7 @@ TEST(HTTPRequestParser, ParseRequestGET) {
   EXPECT_EQ(req1.Unwrap()->GetVersion(), "1.1");
   EXPECT_EQ(req1.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req1.Unwrap()->GetBody(), "");
-  delete req.Unwrap();
+  delete req1.Unwrap();
   // Hostの中身がない
   request = "GET / HTTP/1.1\r\nHost:\r\n\r\n";
   Result<HTTPRequest *, int> req9 = parser.Parser(request);
