@@ -1,12 +1,13 @@
 #include "read_from_cgi.hpp"
 
 ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
-                         const IConfig &config)
+                         const IConfig &config, timespec ts)
     : AIOTask(fd, POLLIN),
       req_ctx_(req_ctx),
       config_(config),
       parser_(CGIParser()),
-      pid_(pid) {}
+      pid_(pid),
+      ts_(ts) {}
 
 ReadFromCGI::~ReadFromCGI() {}
 
@@ -27,7 +28,17 @@ Result<int, std::string> ReadFromCGI::Execute() {
   if (result == -1) {  // エラー
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
     return Ok(kFdDelete);
-  } else if (result == 0) {  // まだ終了していない
+  } else if (result ==
+             0) {  // まだ終了していない timeout3秒でInternalServerErrorを返す。
+    if (time_utils::TimeOut(ts_, 3)) {
+      Logger::Error() << "CGIがタイムアウトしました" << std::endl;
+      kill(pid_, SIGKILL);
+      IOTaskManager::AddTask(new WriteResponseToClient(
+          req_ctx_.fd,
+          GenerateErrorResponse(http::kInternalServerError, config_),
+          req_ctx_.request));
+      return Ok(kFdDelete);
+    }
     return Ok(kOk);
   }
   if (WIFEXITED(status) == 0 || WEXITSTATUS(status) != 0) {  // 異常終了
