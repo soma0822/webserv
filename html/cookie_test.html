@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>訪問回数カウンター</title>
+</head>
+<body>
+<center>
+<table border='1' width='90%' bgcolor='#FDF5E6'>
+  <thead>
+    <tr>
+      <th>このページの訪問回数</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <form action="cookie_test.py" method="get">
+          <input type='text' size='10' disabled='disabled' value='0 回訪問' id="visit_count">
+          <input type="button" value="クリア" onclick="clearCounter()">
+          <input type="submit" value="数え始める">
+        </form>
+        <br>
+        24時間以内にページを更新したり、再び入りなおすと、回数が増えていきます。
+      </td>
+    </tr>
+  </tbody>
+</table>
+</center>
+
+<script>
+function clearCounter() {
+  document.cookie = "visit_count=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  document.getElementById("visit_count").value = "0 回訪問";
+}
+</script>
+</body>
+</html>
+
