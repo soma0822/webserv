@@ -48,8 +48,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     }
 
     const std::string cgi_script_path = GetCGIScriptPath(config, req_ctx);
-    const std::string path_translated =
-        GetPathInfoPath(config, req_ctx);
+    const std::string path_translated = GetPathInfoPath(config, req_ctx);
 
     // CGIスクリプトの拡張子が許可されていない場合にはテキストとして返す
     bool is_valid_cgi_extension =
@@ -274,7 +273,7 @@ std::string RequestHandler::ResolveRequestTargetPath(
 }
 
 std::string RequestHandler::GetCGIScriptPath(const IConfig &config,
-                                                     RequestContext req_ctx) {
+                                             RequestContext req_ctx) {
   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   // 拡張子以降のパスセグメントは除外する
   size_t pos_period = request_file_path.find('.', 1);
@@ -287,12 +286,13 @@ std::string RequestHandler::GetCGIScriptPath(const IConfig &config,
 }
 
 // 存在しない場合は空文字を返す
-std::string RequestHandler::GetPathInfoPath(
-    const IConfig &config, RequestContext req_ctx) {
+std::string RequestHandler::GetPathInfoPath(const IConfig &config,
+                                            RequestContext req_ctx) {
   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
 
   // CGIスクリプトの絶対パス以降がパスセグメントになる
-  std::string path_segment = request_file_path.substr(GetCGIScriptPath(config, req_ctx).size());
+  std::string path_segment =
+      request_file_path.substr(GetCGIScriptPath(config, req_ctx).size());
   if (path_segment.empty()) {
     return "";
   }

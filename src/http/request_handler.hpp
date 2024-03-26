@@ -23,9 +23,9 @@ class RequestHandler {
                                  const std::string &script_name,
                                  const std::string &path_translated);
   static std::string GetCGIScriptPath(const IConfig &config,
-                                              RequestContext req_ctx);
+                                      RequestContext req_ctx);
   static std::string GetPathInfoPath(const IConfig &config,
-                                                   RequestContext req_ctx);
+                                     RequestContext req_ctx);
   static char const **MakeArgv(const std::string &script_name,
                                std::string &first_line);
 
@@ -48,7 +48,7 @@ class RequestHandler {
   static std::string ResolveRequestTargetPath(const IConfig &config,
                                               const RequestContext req_ctx);
   static std::string ResolveRootPath(const IConfig &config,
-                                             const RequestContext req_ctx);
+                                     const RequestContext req_ctx);
   static bool IsCGIRequest(const IConfig &config, RequestContext req_ctx);
   static bool IsAllowedMethod(const IConfig &config, RequestContext req_ctx);
 };
