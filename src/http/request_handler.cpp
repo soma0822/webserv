@@ -47,7 +47,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
       return Some(GenerateErrorResponse(http::kNotImplemented, config));
     }
 
-    const std::string cgi_script_abs_path =
+    const std::string cgi_script_path =
         GetAbsoluteCGIScriptPath(config, req_ctx);
     const std::string cgi_script_path_segment =
         GetAbsolutePathForPathSegment(config, req_ctx);
@@ -56,7 +56,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     bool is_valid_cgi_extension =
         location_ctx_result.IsOk() &&
         location_ctx_result.Unwrap().IsValidCgiExtension(
-            cgi_script_abs_path.substr(cgi_script_abs_path.find('.')));
+            cgi_script_path.substr(cgi_script_path.find('.', 1)));
     bool is_method_allowed = IsAllowedMethod(config, req_ctx);
     if (!is_valid_cgi_extension && req_ctx.request->GetMethod() == "GET" &&
         is_method_allowed) {
@@ -64,7 +64,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     }
 
     http::StatusCode status =
-        CGIExe(config, req_ctx, cgi_script_abs_path, cgi_script_path_segment);
+        CGIExe(config, req_ctx, cgi_script_path, cgi_script_path_segment);
     if (status == http::kOk) {
       return None<HTTPResponse *>();
     }
