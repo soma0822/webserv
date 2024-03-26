@@ -101,7 +101,7 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2, config.GetServer()[0].GetLocation().end());
   ASSERT_EQ("/", config.GetServer()[0].SearchLocation("/").Unwrap().GetPath());
   ASSERT_EQ("/", config.GetServer()[0].SearchLocation("/index.html").Unwrap().GetPath());
-  ASSERT_EQ("/red", config.GetServer()[0].SearchLocation("/red").Unwrap().GetPath());
+  ASSERT_EQ("= /red", config.GetServer()[0].SearchLocation("/red").Unwrap().GetPath());
   ASSERT_EQ("/red", config.GetServer()[0].SearchLocation("/red/").Unwrap().GetPath());
   ASSERT_EQ("/tours", config.GetServer()[0].SearchLocation("/tours/index.html").Unwrap().GetPath());
   ASSERT_EQ("/tours", config.GetServer()[0].SearchLocation("/tours/").Unwrap().GetPath());
