@@ -36,7 +36,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
         GenerateErrorResponse(static_cast<http::StatusCode>(result.UnwrapErr()),
                               config_),
         static_cast<HTTPRequest *>(NULL)));
-  } else {
+  } else if (result.IsOk()){
     Logger::Info() << port_ << " : "
                    << "リクエストをパースしました : " << buf << len
                    << std::endl;
