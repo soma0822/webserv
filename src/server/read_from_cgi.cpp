@@ -26,6 +26,9 @@ Result<int, std::string> ReadFromCGI::Execute() {
   int result = waitpid(pid_, &status, WNOHANG);
   if (result == -1) {  // エラー
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
+    IOTaskManager::AddTask(new WriteResponseToClient(
+        req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
+        req_ctx_.request));
     return Ok(kFdDelete);
   } else if (result == 0) {  // まだ終了していない
     return Ok(kOk);
