@@ -6,10 +6,11 @@ from http import cookies
 import os
 import sys
 import datetime
+import subprocess
 
 # 関数定義：クッキーの取得
 def get_cookie():
-    cookie = cookies.SimpleCookie(os.environ.get('HTTP_COOKIE'))
+    cookie = cookies.SimpleCookie(os.environ.get('COOKIE'))
     return cookie.get('visit_count')
 
 # メイン処理
@@ -60,7 +61,8 @@ def main():
     return string
 
 if __name__ == "__main__":
+    # sys.stderr.write(str(os.environ)) #環境変数の表示
     string = main()
-    # sys.stderr.write(string)
+    # sys.stderr.write(string) #HTMLの表示
     print(string)
 

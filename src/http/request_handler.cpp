@@ -453,6 +453,10 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   env_map["SERVER_PORT"] = req_ctx.port;
   env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
   env_map["SERVER_SOFTWARE"] = "webserv";
+  // Cookieの取得
+  env_map["COOKIE"] = req_ctx.request->GetHeaders().count("COOKIE") == 1
+                          ? req_ctx.request->GetHeaders().find("COOKIE")->second
+                          : "";
   return env_map;
 }
 
