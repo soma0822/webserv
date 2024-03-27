@@ -11,7 +11,9 @@ ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
       config_(config),
       parser_(HTTPRequestParser()) {}
 
-ReadRequestFromClient::~ReadRequestFromClient() {Logger::Info() << ip_ << ":" << port_ << " : 接続を切りました" << std::endl;}
+ReadRequestFromClient::~ReadRequestFromClient() {
+  Logger::Info() << ip_ << ":" << port_ << " : 接続を切りました" << std::endl;
+}
 
 Result<int, std::string> ReadRequestFromClient::Execute() {
   char buf[buf_size_ + 1];
@@ -20,7 +22,11 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     Logger::Error() << "read エラー" << std::endl;
     return Ok(kFdDelete);
   }
-  if (len == 0) {Logger::Info() << ip_ << ":" << port_ << " : 接続が切られました" << std::endl; return Ok(kFdDelete);}
+  if (len == 0) {
+    Logger::Info() << ip_ << ":" << port_ << " : 接続が切られました"
+                   << std::endl;
+    return Ok(kFdDelete);
+  }
   buf[len] = '\0';
   Result<HTTPRequest *, int> result = parser_.Parser(buf);
   if (result.IsErr() && result.UnwrapErr() == HTTPRequestParser::kNotEnough) {
@@ -35,7 +41,8 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
                               config_),
         static_cast<HTTPRequest *>(NULL)));
   } else if (result.IsOk()) {
-    Logger::Info() << "リクエストを受け取りました\n\n" << *result.Unwrap() << std::endl;
+    Logger::Info() << "リクエストを受け取りました\n\n"
+                   << *result.Unwrap() << std::endl;
     RequestContext req_ctx = {result.Unwrap(), port_, ip_,
                               client_addr_,    fd_,   0};
     Option<HTTPResponse *> option = RequestHandler::Handle(config_, req_ctx);

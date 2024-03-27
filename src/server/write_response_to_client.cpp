@@ -21,8 +21,8 @@ Result<int, std::string> WriteResponseToClient::Execute() {
     return Ok(kFdDelete);
   }
   if ((wrote_size_ += bytes_written) == response_str.size()) {
-    Logger::Info() << "レスポンスを書き込みました\n\n" << response_str
-                   << std::endl;
+    Logger::Info() << "レスポンスを書き込みました\n\n"
+                   << response_str << std::endl;
     if (response_->GetStatusCode() == http::kBadRequest) return Ok(kFdDelete);
     return Ok(kTaskDelete);
   }

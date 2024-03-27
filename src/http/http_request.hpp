@@ -3,9 +3,9 @@
 
 #include <arpa/inet.h>
 
+#include <iostream>
 #include <map>
 #include <string>
-#include <iostream>
 
 class HTTPRequest {
  public:
