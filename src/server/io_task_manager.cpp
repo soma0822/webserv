@@ -99,8 +99,10 @@ void IOTaskManager::ExecuteTasks() {
         switch (result.Unwrap()) {
           case AIOTask::kOk: 
             ++(tasks_array_.at(i).index);
+            tasks_array_.at(i).ts = time_utils::GetCurrentTime();
             break;
           case AIOTask::kContinue:
+            tasks_array_.at(i).ts = time_utils::GetCurrentTime();
             break;
           case AIOTask::kNotReady:
             ++(tasks_array_.at(i).index);
