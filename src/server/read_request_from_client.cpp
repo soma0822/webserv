@@ -24,8 +24,6 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
   buf[len] = '\0';
   Result<HTTPRequest *, int> result = parser_.Parser(buf);
   if (result.IsErr() && result.UnwrapErr() == HTTPRequestParser::kNotEnough) {
-    Logger::Info() << port_ << " : "
-                   << "リクエストをパース中です : " << buf << len << std::endl;
     return Ok(kOk);
   } else if (result.IsErr() &&
              http::GetStatusMessage(
@@ -37,17 +35,13 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
                               config_),
         static_cast<HTTPRequest *>(NULL)));
   } else if (result.IsOk()) {
-    Logger::Info() << port_ << " : "
-                   << "リクエストをパースしました : " << buf << len
-                   << std::endl;
+    Logger::Info() << "リクエストを受け取りました\n\n" << *result.Unwrap() << std::endl;
     RequestContext req_ctx = {result.Unwrap(), port_, ip_,
                               client_addr_,    fd_,   0};
     Option<HTTPResponse *> option = RequestHandler::Handle(config_, req_ctx);
     if (option.IsSome()) {
       IOTaskManager::AddTask(
           new WriteResponseToClient(fd_, option.Unwrap(), result.Unwrap()));
-      Logger::Info() << port_ << " : "
-                     << "レスポンスのタスクを追加しました" << std::endl;
     }
   }
   return Ok(kOk);

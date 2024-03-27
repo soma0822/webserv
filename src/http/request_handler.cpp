@@ -374,7 +374,6 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
     }
     IOTaskManager::AddTask(
         new WriteToCGI(redirect_fd[1], req_ctx.request->GetBody()));
-    Logger::Info() << "WriteToCGIを追加" << std::endl;
   }
   pid = fork();
   if (pid == -1) {
@@ -408,7 +407,6 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
   close(cgi_fd[1]);
   if (req_ctx.request->GetMethod() == "POST") close(redirect_fd[0]);
   IOTaskManager::AddTask(new ReadFromCGI(pid, cgi_fd[0], req_ctx, config));
-  Logger::Info() << "ReadFromCGIを追加" << std::endl;
   return http::kOk;
 }
 
@@ -459,14 +457,15 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
 char **RequestHandler::DupEnv(
     const std::map<std::string, std::string> &env_map) {
   char **env = new char *[env_map.size() + 1];
-  Logger::Info() << "-------env_map--------" << env_map.size() << std::endl;
+  Logger::Debug() << "-------env_map--------" << env_map.size() << std::endl;
   std::map<std::string, std::string>::const_iterator it = env_map.begin();
   for (unsigned int i = 0; it != env_map.end(); ++it, ++i) {
     std::string tmp = it->first + "=" + it->second;
     env[i] = new char[tmp.size() + 1];
     std::strcpy(env[i], tmp.c_str());
-    Logger::Info() << env[i] << std::endl;
+    Logger::Debug() << env[i] << std::endl;
   }
+  Logger::Debug() << "----------------------" << env_map.size() << std::endl;
   env[env_map.size()] = NULL;
   return env;
 }

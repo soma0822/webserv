@@ -24,7 +24,7 @@ Result<int, std::string> ReadFromCGI::Execute() {
   }
   buf[len] = '\0';
   buf_.append(buf);
-  Logger::Info() << "buf_: " << buf_ << std::endl;
+  Logger::Info() << "CGIから読み取りました\n" << buf_ << std::endl;
   int result = waitpid(pid_, &status, WNOHANG);
   if (result == -1) {  // エラー
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
