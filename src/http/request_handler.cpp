@@ -471,6 +471,7 @@ char **RequestHandler::DupEnv(
     std::strcpy(env[i], tmp.c_str());
     Logger::Info() << env[i] << std::endl;
   }
+  env[env_map.size()] = NULL;
   return env;
 }
 
