@@ -28,6 +28,10 @@ def main():
         # クッキーがない場合、初めての訪問
         n = 1
 
+    # resetのクエリがある場合、訪問回数を更新
+    if os.environ.get('QUERY_STRING') == 'reset': 
+        n = 1
+
     # クッキーの設定
     cookie = cookies.SimpleCookie()
     cookie['visit_count'] = str(n)
@@ -49,6 +53,12 @@ def main():
             <tr>
                 <td>
                     {} 回訪問
+                    <form method="post" action="./cookie_test.py">
+                        <input type="submit" name="update" value="更新">
+                    </form>
+                    <form method="post" action="./cookie_test.py?reset">
+                        <input type="submit" name="reset" value="リセット">
+                    </form>
                 </td>
             </tr>
         </table>
