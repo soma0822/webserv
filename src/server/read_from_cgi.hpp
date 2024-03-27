@@ -22,7 +22,7 @@ class ReadFromCGI : public AIOTask {
   ReadFromCGI(int pid, int fd, RequestContext req_ctx, const IConfig &config,
               timespec ts);
   ~ReadFromCGI();
-  Result<int, std::string> Execute();
+  Result<int, std::string> Execute(int revent);
 
  private:
   RequestContext req_ctx_;

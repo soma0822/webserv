@@ -7,11 +7,11 @@
 
 class AIOTask {
  public:
-  enum IOTaskStatus { kOk, kContinue, kTaskDelete, kFdDelete };
+  enum IOTaskStatus { kOk, kContinue, kNotReady, kTaskDelete, kFdDelete };
   AIOTask();
   AIOTask(int fd, int event);
   virtual ~AIOTask();
-  virtual Result<int, std::string> Execute() = 0;
+  virtual Result<int, std::string> Execute(int revent) = 0;
   int GetFd() const;
   int GetEvent() const;
 

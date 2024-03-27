@@ -94,7 +94,7 @@ void IOTaskManager::ExecuteTasks() {
           (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->GetEvent() &
            fds_.at(i).revents)) {
         Result<int, std::string> result =
-            tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->Execute();
+            tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->Execute(int revent);
         if (result.IsErr()) {
           DeleteTasks();
           throw std::invalid_argument("taskエラー");

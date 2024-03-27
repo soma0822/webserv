@@ -11,7 +11,9 @@ ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
 
 ReadFromCGI::~ReadFromCGI() {}
 
-Result<int, std::string> ReadFromCGI::Execute() {
+Result<int, std::string> ReadFromCGI::Execute(int revent) {
+  if (!(event_ & revent))
+    return Ok(kNotReady);
   (void)config_;
   char buf[buf_size_ + 1];
   int status;

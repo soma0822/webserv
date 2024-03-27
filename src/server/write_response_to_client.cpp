@@ -12,7 +12,9 @@ WriteResponseToClient::~WriteResponseToClient() {
   delete response_;
 }
 
-Result<int, std::string> WriteResponseToClient::Execute() {
+Result<int, std::string> WriteResponseToClient::Execute(int revent) {
+  if (!(event_ & revent))
+    return Ok(kNotReady);
   std::string response_str = response_->ToString();
   int bytes_written = write(fd_, response_str.c_str() + wrote_size_,
                             response_str.size() - wrote_size_);
