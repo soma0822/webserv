@@ -2,7 +2,7 @@
 
 WriteResponseToClient::WriteResponseToClient(int fd, HTTPResponse *response,
                                              HTTPRequest *request)
-    : AIOTask(fd, POLLOUT),
+    : AIOTask(fd, POLLOUT, timeout_),
       response_(response),
       request_(request),
       wrote_size_(0) {}

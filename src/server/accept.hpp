@@ -34,6 +34,7 @@ class Accept : public AIOTask {
   std::string port_;
   std::string ip_;
   const IConfig &config_;
+  const static int timeout_ = -1;
 };
 
 #endif

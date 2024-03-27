@@ -2,7 +2,7 @@
 
 Accept::Accept(int fd, const std::string &port, const std::string &ip,
                const IConfig &config)
-    : AIOTask(fd, POLLIN), port_(port), ip_(ip), config_(config) {}
+    : AIOTask(fd, POLLIN, timeout_), port_(port), ip_(ip), config_(config) {}
 
 Accept::~Accept() {}
 

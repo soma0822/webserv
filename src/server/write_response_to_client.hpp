@@ -24,6 +24,7 @@ class WriteResponseToClient : public AIOTask {
   HTTPResponse *response_;
   HTTPRequest *request_;
   unsigned int wrote_size_;
+  const static int timeout_ = 60;
 };
 
 #endif  // WEBSERV_SRC_WRITE_RESPONSE_TO_CLIENT_HPP

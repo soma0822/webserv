@@ -4,7 +4,7 @@ ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
                                              const std::string &ip,
                                              struct sockaddr_in client_addr,
                                              const IConfig &config)
-    : AIOTask(fd, POLLIN),
+    : AIOTask(fd, POLLIN, timeout_),
       port_(port),
       ip_(ip),
       client_addr_(client_addr),
