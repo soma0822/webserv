@@ -81,20 +81,16 @@ void IOTaskManager::ExecuteTasks() {
           ? tasks_array_.at(i).index = 0
           : 0;
       while (
-          tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) == NULL ||
-          !(tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->GetEvent() &
-            fds_.at(i).revents)) {
+          tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) == NULL) {
         ++(tasks_array_.at(i).index);
         if (tasks_array_.at(i).index >= tasks_array_.at(i).tasks.size()) {
           tasks_array_.at(i).index = 0;
           break;
         }
       }
-      if (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) != NULL &&
-          (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->GetEvent() &
-           fds_.at(i).revents)) {
+      if (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) != NULL) {
         Result<int, std::string> result =
-            tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->Execute(int revent);
+            tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->Execute(fds_.at(i).revents);
         if (result.IsErr()) {
           DeleteTasks();
           throw std::invalid_argument("taskエラー");
@@ -106,7 +102,7 @@ void IOTaskManager::ExecuteTasks() {
           --i;
         } else if (result.Unwrap() == AIOTask::kContinue) {
           ;
-        } else if (result.Unwrap() == AIOTask::kOk) {
+        } else if (result.Unwrap() == AIOTask::kOk || result.Unwrap() == AIOTask::kNotReady) {
           ++(tasks_array_.at(i).index);
         }
       }
