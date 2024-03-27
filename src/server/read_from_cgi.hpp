@@ -32,6 +32,7 @@ class ReadFromCGI : public AIOTask {
   std::string buf_;
   int pid_;
   timespec ts_;
+  const static int child_process_timeout_ = 3;
 };
 
 #endif

@@ -12,7 +12,7 @@ ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
 ReadFromCGI::~ReadFromCGI() {}
 
 Result<int, std::string> ReadFromCGI::Execute(int revent) {
-  if (time_utils::TimeOut(ts_, 3)) {
+  if (time_utils::TimeOut(ts_, child_process_timeout_)) {
     Logger::Error() << "CGIがタイムアウトしました" << std::endl;
     kill(pid_, SIGKILL);
     IOTaskManager::AddTask(new WriteResponseToClient(
