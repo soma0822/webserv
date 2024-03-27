@@ -12,6 +12,15 @@ ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
 ReadFromCGI::~ReadFromCGI() {}
 
 Result<int, std::string> ReadFromCGI::Execute(int revent) {
+  if (time_utils::TimeOut(ts_, 3)) {
+    Logger::Error() << "CGIがタイムアウトしました" << std::endl;
+    kill(pid_, SIGKILL);
+    IOTaskManager::AddTask(new WriteResponseToClient(
+        req_ctx_.fd,
+        GenerateErrorResponse(http::kInternalServerError, config_),
+        req_ctx_.request));
+    return Ok(kFdDelete);
+  }
   if (!(event_ & revent))
     return Ok(kNotReady);
   (void)config_;
@@ -37,15 +46,6 @@ Result<int, std::string> ReadFromCGI::Execute(int revent) {
     return Ok(kFdDelete);
   } else if (result ==
              0) {  // まだ終了していない timeout3秒でInternalServerErrorを返す。
-    if (time_utils::TimeOut(ts_, 3)) {
-      Logger::Error() << "CGIがタイムアウトしました" << std::endl;
-      kill(pid_, SIGKILL);
-      IOTaskManager::AddTask(new WriteResponseToClient(
-          req_ctx_.fd,
-          GenerateErrorResponse(http::kInternalServerError, config_),
-          req_ctx_.request));
-      return Ok(kFdDelete);
-    }
     return Ok(kOk);
   }
   if (WIFEXITED(status) == 0 || WEXITSTATUS(status) != 0) {  // 異常終了

@@ -15,8 +15,7 @@ for key in form.keys():
     value = form.getvalue(key)
     print('<p>%s: %s</p>' % (key, value))
 
-print("</body></html>")
+print("</body></html>", flush=True)
 
 while True:
     time.sleep(0.01)
-    print("a",flush=True)
