@@ -46,7 +46,8 @@ Result<int, std::string> ReadFromCGI::Execute() {
     if (result.IsErr()) {
       return Ok(kContinue);
     }
-    Logger::Info() << "CGIからリクエストを受け取りました\n\n" << *result.Unwrap() << std::endl;
+    Logger::Info() << "CGIからリクエストを受け取りました\n\n"
+                   << *result.Unwrap() << std::endl;
     Option<HTTPResponse *> option =
         CGIHandler::Handle(config_, result.Unwrap(), req_ctx_);
     if (option.IsSome()) {
