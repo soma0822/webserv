@@ -38,7 +38,8 @@ void IOTaskManager::AddTask(AIOTask *task) {
       return;
     }
   }
-  Tasks tmp = {std::vector<AIOTask *>(1, task), 0, time_utils::GetCurrentTime()};
+  Tasks tmp = {std::vector<AIOTask *>(1, task), 0,
+               time_utils::GetCurrentTime()};
   tasks_array_.push_back(tmp);
   fds_.push_back(fd);
 }
@@ -81,8 +82,7 @@ void IOTaskManager::ExecuteTasks() {
       tasks_array_.at(i).index >= tasks_array_.at(i).tasks.size()
           ? tasks_array_.at(i).index = 0
           : 0;
-      while (
-          tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) == NULL) {
+      while (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) == NULL) {
         ++(tasks_array_.at(i).index);
         if (tasks_array_.at(i).index >= tasks_array_.at(i).tasks.size()) {
           tasks_array_.at(i).index = 0;
@@ -91,13 +91,15 @@ void IOTaskManager::ExecuteTasks() {
       }
       if (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) != NULL) {
         Result<int, std::string> result =
-            tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->Execute(fds_.at(i).revents);
+            tasks_array_.at(i)
+                .tasks.at(tasks_array_.at(i).index)
+                ->Execute(fds_.at(i).revents);
         if (result.IsErr()) {
           DeleteTasks();
           throw std::invalid_argument("taskエラー");
         }
         switch (result.Unwrap()) {
-          case AIOTask::kOk: 
+          case AIOTask::kOk:
             ++(tasks_array_.at(i).index);
             tasks_array_.at(i).ts = time_utils::GetCurrentTime();
             break;
@@ -120,15 +122,12 @@ void IOTaskManager::ExecuteTasks() {
   }
 }
 
-void  IOTaskManager::CheckTimeout(){
-  for (unsigned int i = 0; i < tasks_array_.size(); i++){
-    if (tasks_array_.at(i).tasks.size() == 0)
-      continue;
-    if (tasks_array_.at(i).tasks.at(0) == NULL)
-      continue;
+void IOTaskManager::CheckTimeout() {
+  for (unsigned int i = 0; i < tasks_array_.size(); i++) {
+    if (tasks_array_.at(i).tasks.size() == 0) continue;
+    if (tasks_array_.at(i).tasks.at(0) == NULL) continue;
     int timeout = tasks_array_.at(i).tasks.at(0)->GetTimeout();
-    if (timeout <= 0)
-      continue;
+    if (timeout <= 0) continue;
     if (time_utils::TimeOut(tasks_array_.at(i).ts, timeout))
       RemoveFd(tasks_array_.at(i).tasks.at(0));
   }

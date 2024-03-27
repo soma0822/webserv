@@ -14,8 +14,7 @@ ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
 ReadRequestFromClient::~ReadRequestFromClient() {}
 
 Result<int, std::string> ReadRequestFromClient::Execute(int revent) {
-  if (!(event_ & revent))
-    return Ok(kNotReady);
+  if (!(event_ & revent)) return Ok(kNotReady);
   char buf[buf_size_ + 1];
   int len = read(fd_, buf, buf_size_);
   if (len == -1) {

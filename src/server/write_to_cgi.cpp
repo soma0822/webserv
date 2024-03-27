@@ -6,8 +6,7 @@ WriteToCGI::WriteToCGI(int fd, const std::string &body)
 WriteToCGI::~WriteToCGI() {}
 
 Result<int, std::string> WriteToCGI::Execute(int revent) {
-  if (!(event_ & revent))
-    return Ok(kNotReady);
+  if (!(event_ & revent)) return Ok(kNotReady);
   int ret = write(fd_, body_.c_str() + wrote_size_, body_.size() - wrote_size_);
   wrote_size_ += ret;
   if (wrote_size_ == body_.size()) {

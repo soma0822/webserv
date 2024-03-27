@@ -16,13 +16,11 @@ Result<int, std::string> ReadFromCGI::Execute(int revent) {
     Logger::Error() << "CGIがタイムアウトしました" << std::endl;
     kill(pid_, SIGKILL);
     IOTaskManager::AddTask(new WriteResponseToClient(
-        req_ctx_.fd,
-        GenerateErrorResponse(http::kInternalServerError, config_),
+        req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
         req_ctx_.request));
     return Ok(kFdDelete);
   }
-  if (!(event_ & revent))
-    return Ok(kNotReady);
+  if (!(event_ & revent)) return Ok(kNotReady);
   (void)config_;
   char buf[buf_size_ + 1];
   int status;

@@ -20,11 +20,7 @@ class AIOTask {
   int event_;
   int timeout_s_;
 
-  enum Timeout {
-    kAccept = 0,
-    kClientSocket = 60,
-    kCGIFd = 10
-  };
+  enum Timeout { kAccept = 0, kClientSocket = 60, kCGIFd = 10 };
 };
 
 #endif

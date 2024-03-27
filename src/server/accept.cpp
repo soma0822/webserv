@@ -13,8 +13,7 @@ Accept &Accept::operator=(const Accept &other) {
 
 // ここでのエラーは流すのでkOkで返すことでServer側で何もしないようにしている
 Result<int, std::string> Accept::Execute(int revent) {
-  if (!(event_ & revent))
-    return Ok(kNotReady);
+  if (!(event_ & revent)) return Ok(kNotReady);
   struct sockaddr_in client_addr;
   std::memset(&client_addr, 0, sizeof(client_addr));
   socklen_t len = sizeof(client_addr);

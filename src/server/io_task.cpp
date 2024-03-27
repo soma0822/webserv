@@ -2,7 +2,8 @@
 
 AIOTask::AIOTask() {}
 
-AIOTask::AIOTask(int fd, int event, int timeout_s) : fd_(fd), event_(event), timeout_s_(timeout_s) {}
+AIOTask::AIOTask(int fd, int event, int timeout_s)
+    : fd_(fd), event_(event), timeout_s_(timeout_s) {}
 
 AIOTask::~AIOTask() {}
 
