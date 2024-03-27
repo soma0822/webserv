@@ -457,7 +457,7 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
 char **RequestHandler::DupEnv(
     const std::map<std::string, std::string> &env_map) {
   char **env = new char *[env_map.size() + 1];
-  Logger::Debug() << "-------env_map--------" << env_map.size() << std::endl;
+  Logger::Debug() << "-------env_map--------" << std::endl;
   std::map<std::string, std::string>::const_iterator it = env_map.begin();
   for (unsigned int i = 0; it != env_map.end(); ++it, ++i) {
     std::string tmp = it->first + "=" + it->second;
@@ -465,7 +465,7 @@ char **RequestHandler::DupEnv(
     std::strcpy(env[i], tmp.c_str());
     Logger::Debug() << env[i] << std::endl;
   }
-  Logger::Debug() << "----------------------" << env_map.size() << std::endl;
+  Logger::Debug() << "----------------------" << std::endl;
   env[env_map.size()] = NULL;
   return env;
 }
