@@ -11,7 +11,7 @@ ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
       config_(config),
       parser_(HTTPRequestParser()) {}
 
-ReadRequestFromClient::~ReadRequestFromClient() {}
+ReadRequestFromClient::~ReadRequestFromClient() {Logger::Info() << ip_ << ":" << port_ << " : 接続を切りました" << std::endl;}
 
 Result<int, std::string> ReadRequestFromClient::Execute() {
   char buf[buf_size_ + 1];
@@ -20,7 +20,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
     Logger::Error() << "read エラー" << std::endl;
     return Ok(kFdDelete);
   }
-  if (len == 0) return Ok(kFdDelete);
+  if (len == 0) {Logger::Info() << ip_ << ":" << port_ << " : 接続が切られました" << std::endl; return Ok(kFdDelete);}
   buf[len] = '\0';
   Result<HTTPRequest *, int> result = parser_.Parser(buf);
   if (result.IsErr() && result.UnwrapErr() == HTTPRequestParser::kNotEnough) {
