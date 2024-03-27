@@ -55,8 +55,8 @@ def main():
 </body>
 </html>
 """.format(n)
-    string += "\n"
-    string += "\n"
+    string += "\r\n"
+    string += "\r\n"
     return string
 
 if __name__ == "__main__":
