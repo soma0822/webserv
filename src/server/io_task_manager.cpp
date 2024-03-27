@@ -123,7 +123,7 @@ void IOTaskManager::ExecuteTasks() {
 }
 
 void IOTaskManager::CheckTimeout() {
-  for (unsigned int i = 0; i < tasks_array_.size(); i++) {
+  for (unsigned int i = 0; i < tasks_array_.size(); ++i) {
     if (tasks_array_.at(i).tasks.size() == 0) continue;
     if (tasks_array_.at(i).tasks.at(0) == NULL) continue;
     int timeout = tasks_array_.at(i).tasks.at(0)->GetTimeout();
