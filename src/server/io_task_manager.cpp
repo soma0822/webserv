@@ -52,7 +52,6 @@ void IOTaskManager::RemoveFd(AIOTask *task) {
       tasks_array_.at(i).tasks.clear();
       tasks_array_.at(i).index = 0;
       fds_.at(i).fd = -1;
-      Logger::Info() << "接続を削除しました" << std::endl;
       return;
     }
   }
