@@ -23,7 +23,6 @@ class WriteToCGI : public AIOTask {
  private:
   std::string body_;
   unsigned int wrote_size_;
-  const static int timeout_ = 10;
 };
 
 #endif

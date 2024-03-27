@@ -4,7 +4,6 @@
 #include <string>
 
 #include "result.hpp"
-
 class AIOTask {
  public:
   enum IOTaskStatus { kOk, kContinue, kNotReady, kTaskDelete, kFdDelete };
@@ -20,6 +19,12 @@ class AIOTask {
   int fd_;
   int event_;
   int timeout_s_;
+
+  enum Timeout {
+    kAccept = 0,
+    kClientSocket = 60,
+    kCGIFd = 10
+  };
 };
 
 #endif

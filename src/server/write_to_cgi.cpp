@@ -1,7 +1,7 @@
 #include "write_to_cgi.hpp"
 
 WriteToCGI::WriteToCGI(int fd, const std::string &body)
-    : AIOTask(fd, POLLOUT, timeout_), body_(body), wrote_size_(0) {}
+    : AIOTask(fd, POLLOUT, kCGIFd), body_(body), wrote_size_(0) {}
 
 WriteToCGI::~WriteToCGI() {}
 
