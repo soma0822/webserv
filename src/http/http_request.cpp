@@ -60,9 +60,11 @@ const std::map<std::string, std::string> &HTTPRequest::GetHeaders() const {
 const std::string &HTTPRequest::GetBody() const { return body_; }
 
 std::ostream &operator<<(std::ostream &os, HTTPRequest &obj) {
+  if (obj.GetMethod().size() != 0){
   os << obj.GetMethod() << " " << obj.GetUri();
   os << (obj.GetQuery() == "" ? "" : "?" + obj.GetQuery()) << " ";
   os << obj.GetProtocol() << "/" << obj.GetVersion() << std::endl;
+  }
   for (std::map<std::string, std::string>::const_iterator it =
            obj.GetHeaders().begin();
        it != obj.GetHeaders().end(); it++) {
@@ -74,9 +76,11 @@ std::ostream &operator<<(std::ostream &os, HTTPRequest &obj) {
 }
 
 std::ostream &operator<<(std::ostream &os, const HTTPRequest &obj) {
+  if (obj.GetMethod().size() != 0){
   os << obj.GetMethod() << " " << obj.GetUri();
   os << (obj.GetQuery() == "" ? "" : "?" + obj.GetQuery()) << " ";
   os << obj.GetProtocol() << "/" << obj.GetVersion() << std::endl;
+  }
   for (std::map<std::string, std::string>::const_iterator it =
            obj.GetHeaders().begin();
        it != obj.GetHeaders().end(); it++) {

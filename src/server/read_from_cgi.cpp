@@ -24,7 +24,6 @@ Result<int, std::string> ReadFromCGI::Execute() {
   }
   buf[len] = '\0';
   buf_.append(buf);
-  Logger::Info() << "CGIから読み取りました\n" << buf_ << std::endl;
   int result = waitpid(pid_, &status, WNOHANG);
   if (result == -1) {  // エラー
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
@@ -47,6 +46,7 @@ Result<int, std::string> ReadFromCGI::Execute() {
     if (result.IsErr()) {
       return Ok(kContinue);
     }
+    Logger::Info() << "CGIからリクエストを受け取りました\n\n" << *result.Unwrap() << std::endl;
     Option<HTTPResponse *> option =
         CGIHandler::Handle(config_, result.Unwrap(), req_ctx_);
     if (option.IsSome()) {
