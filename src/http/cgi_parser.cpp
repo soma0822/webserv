@@ -2,7 +2,7 @@
 
 // canonical
 CGIParser::CGIParser() {}
-CGIParser::~CGIParser() { delete request_; }
+CGIParser::~CGIParser() {}
 
 // リクエストのパース
 const Result<HTTPRequest *, int> CGIParser::Parser(std::string request_line) {

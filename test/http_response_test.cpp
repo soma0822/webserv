@@ -25,12 +25,13 @@ TEST(HTTPResponseBuilderTest, BuildResponseWithoutStatus) {
                           .SetBody("Hello, World!")
                           .Build();
   ASSERT_EQ(res->GetStatusCode(), http::kInternalServerError);
+  delete res;
 }
 
 TEST(GenerateErrorResponse, DefaultNotFound) {
   Mock<IConfig> mock;
-  When(Method(mock, GetErrorPage))
-      .AlwaysReturn(std::map<std::string, std::string>{});
+  std::map<std::string, std::string> error_page = {};
+  When(Method(mock, GetErrorPage)).AlwaysReturn(error_page);
 
   HTTPResponse *res = GenerateErrorResponse(http::kNotFound, mock.get());
   const std::string expected =
