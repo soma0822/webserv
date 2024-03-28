@@ -7,6 +7,7 @@
 #include "io_task_manager.hpp"
 #include "option.hpp"
 #include "read_from_cgi.hpp"
+#include "time.hpp"
 #include "write_to_cgi.hpp"
 
 class RequestHandler {
