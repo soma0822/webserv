@@ -23,7 +23,7 @@ class Accept : public AIOTask {
   Accept(int fd, const std::string &port, const std::string &ip,
          const IConfig &config);
   virtual ~Accept();
-  virtual Result<int, std::string> Execute();
+  virtual Result<int, std::string> Execute(int revent);
   const std::string &GetPort() const;
   const std::string &GetIp() const;
 
