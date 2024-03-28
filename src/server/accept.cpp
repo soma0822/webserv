@@ -26,7 +26,7 @@ Result<int, std::string> Accept::Execute(int revent) {
     close(client_sock);
     return Ok(kOk);
   }
-  Logger::Info() << port_ << " : 接続しました" << std::endl;
+  Logger::Info() << ip_ << ":" << port_ << " : 接続しました" << std::endl;
   IOTaskManager::AddTask(
       new ReadRequestFromClient(client_sock, port_, ip_, client_addr, config_));
   return Ok(0);

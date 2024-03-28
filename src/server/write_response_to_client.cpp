@@ -22,12 +22,16 @@ Result<int, std::string> WriteResponseToClient::Execute(int revent) {
     return Ok(kFdDelete);
   }
   if ((wrote_size_ += bytes_written) == response_str.size()) {
-    Logger::Info() << "レスポンスを書き込みました: " << response_str
-                   << std::endl;
-    if (response_->GetStatusCode() == http::kBadRequest) return Ok(kFdDelete);
+    Logger::Info() << "レスポンスを書き込みました\n\n"
+                   << response_str << std::endl;
+    std::map<std::string, std::string>::const_iterator it_conn =
+        request_->GetHeaders().find("CONNECTION");
+    bool have_conn_close =
+        (it_conn == request_->GetHeaders().end() ? false
+                                                 : it_conn->second == "close");
+    if (response_->GetStatusCode() == http::kBadRequest || have_conn_close)
+      return Ok(kFdDelete);
     return Ok(kTaskDelete);
   }
-  Logger::Info() << bytes_written << " / " << response_str.size()
-                 << "書き込みました" << std::endl;
   return Ok(kContinue);
 }

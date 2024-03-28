@@ -11,7 +11,9 @@ ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
       config_(config),
       parser_(HTTPRequestParser()) {}
 
-ReadRequestFromClient::~ReadRequestFromClient() {}
+ReadRequestFromClient::~ReadRequestFromClient() {
+  Logger::Info() << ip_ << ":" << port_ << " : 接続を切りました" << std::endl;
+}
 
 Result<int, std::string> ReadRequestFromClient::Execute(int revent) {
   if (!(event_ & revent)) return Ok(kNotReady);
@@ -21,12 +23,14 @@ Result<int, std::string> ReadRequestFromClient::Execute(int revent) {
     Logger::Error() << "read エラー" << std::endl;
     return Ok(kFdDelete);
   }
-  if (len == 0) return Ok(kFdDelete);
+  if (len == 0) {
+    Logger::Info() << ip_ << ":" << port_ << " : 接続が切られました"
+                   << std::endl;
+    return Ok(kFdDelete);
+  }
   buf[len] = '\0';
   Result<HTTPRequest *, int> result = parser_.Parser(buf);
   if (result.IsErr() && result.UnwrapErr() == HTTPRequestParser::kNotEnough) {
-    Logger::Info() << port_ << " : "
-                   << "リクエストをパース中です : " << buf << len << std::endl;
     return Ok(kOk);
   } else if (result.IsErr() &&
              http::GetStatusMessage(
@@ -38,17 +42,14 @@ Result<int, std::string> ReadRequestFromClient::Execute(int revent) {
                               config_),
         static_cast<HTTPRequest *>(NULL)));
   } else if (result.IsOk()) {
-    Logger::Info() << port_ << " : "
-                   << "リクエストをパースしました : " << buf << len
-                   << std::endl;
+    Logger::Info() << "リクエストを受け取りました\n\n"
+                   << *result.Unwrap() << std::endl;
     RequestContext req_ctx = {result.Unwrap(), port_, ip_,
                               client_addr_,    fd_,   0};
     Option<HTTPResponse *> option = RequestHandler::Handle(config_, req_ctx);
     if (option.IsSome()) {
       IOTaskManager::AddTask(
           new WriteResponseToClient(fd_, option.Unwrap(), result.Unwrap()));
-      Logger::Info() << port_ << " : "
-                     << "レスポンスのタスクを追加しました" << std::endl;
     }
   }
   return Ok(kOk);
