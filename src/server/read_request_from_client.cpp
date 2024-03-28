@@ -20,44 +20,47 @@ Result<int, std::string> ReadRequestFromClient::Execute(int revent) {
     return ExecuteNotReady();
   }
   Result<std::string, AIOTask::IOTaskStatus> read_result = ReadRequest();
-  if (read_result.IsErr())
-    return Ok(read_result.UnwrapErr());
+  if (read_result.IsErr()) return Ok(read_result.UnwrapErr());
   return ExecuteReady(read_result.Unwrap());
 }
 
-Result<int, std::string> ReadRequestFromClient::ExecuteReady(const std::string &buf){
+Result<int, std::string> ReadRequestFromClient::ExecuteReady(
+    const std::string &buf) {
   Result<HTTPRequest *, int> result = parser_.Parser(buf);
-  if (result.IsErr() &&http::GetStatusMessage(static_cast<http::StatusCode>(result.UnwrapErr())).empty() == false) {
+  if (result.IsErr() &&
+      http::GetStatusMessage(static_cast<http::StatusCode>(result.UnwrapErr()))
+              .empty() == false) {
     return AddErrResponse(static_cast<http::StatusCode>(result.UnwrapErr()));
-  } else if (result.IsOk()){
+  } else if (result.IsOk()) {
     return AddResponse(result.Unwrap());
   }
   return Ok(kOk);
 }
 
-Result<int, std::string> ReadRequestFromClient::ExecuteNotReady(){
+Result<int, std::string> ReadRequestFromClient::ExecuteNotReady() {
   Result<HTTPRequest *, int> result = parser_.Parser("");
-  if (result.IsErr() &&http::GetStatusMessage(static_cast<http::StatusCode>(result.UnwrapErr())).empty() == false) {
+  if (result.IsErr() &&
+      http::GetStatusMessage(static_cast<http::StatusCode>(result.UnwrapErr()))
+              .empty() == false) {
     return AddErrResponse(static_cast<http::StatusCode>(result.UnwrapErr()));
-  } else if (result.IsOk()){
+  } else if (result.IsOk()) {
     return AddResponse(result.Unwrap());
   }
   return Ok(kNotReady);
 }
 
-Result<int, std::string> ReadRequestFromClient::AddErrResponse(http::StatusCode status){
-  IOTaskManager::AddTask(new WriteResponseToClient(
-      fd_,
-      GenerateErrorResponse(status,config_),
-      static_cast<HTTPRequest *>(NULL)));
+Result<int, std::string> ReadRequestFromClient::AddErrResponse(
+    http::StatusCode status) {
+  IOTaskManager::AddTask(
+      new WriteResponseToClient(fd_, GenerateErrorResponse(status, config_),
+                                static_cast<HTTPRequest *>(NULL)));
   return Ok(kOk);
 }
 
-Result<int, std::string> ReadRequestFromClient::AddResponse(HTTPRequest *request){
-  Logger::Info() << "リクエストを受け取りました\n\n"
-                << *request << std::endl;
-  RequestContext req_ctx = {request, port_, ip_,
-                            client_addr_,    fd_,   0};
+Result<int, std::string> ReadRequestFromClient::AddResponse(
+    HTTPRequest *request) {
+  Logger::Info() << "リクエストを受け取りました\n\n" << *request << std::endl;
+  RequestContext req_ctx = {request, port_, ip_, client_addr_, fd_, 0};
   Option<HTTPResponse *> option = RequestHandler::Handle(config_, req_ctx);
   if (option.IsSome()) {
     IOTaskManager::AddTask(
@@ -66,7 +69,8 @@ Result<int, std::string> ReadRequestFromClient::AddResponse(HTTPRequest *request
   return Ok(kOk);
 }
 
-Result<std::string, AIOTask::IOTaskStatus> ReadRequestFromClient::ReadRequest(){
+Result<std::string, AIOTask::IOTaskStatus>
+ReadRequestFromClient::ReadRequest() {
   char buf[buf_size_ + 1];
   int len = read(fd_, buf, buf_size_);
   if (len == -1) {

@@ -23,10 +23,6 @@ class ReadRequestFromClient : public AIOTask {
                         struct sockaddr_in client_addr, const IConfig &config);
   virtual ~ReadRequestFromClient();
   virtual Result<int, std::string> Execute(int revent);
-  Result<int, std::string> ExecuteReady(const std::string &buf);
-  virtual Result<int, std::string> ExecuteNotReady();
-  Result<int, std::string> AddErrResponse(http::StatusCode status);
-  Result<int, std::string> AddResponse(HTTPRequest *request);
   const std::string &GetPort() const;
   const std::string &GetIp() const;
 
@@ -35,6 +31,10 @@ class ReadRequestFromClient : public AIOTask {
   ReadRequestFromClient(const ReadRequestFromClient &other);
   ReadRequestFromClient &operator=(const ReadRequestFromClient &other);
   Result<std::string, AIOTask::IOTaskStatus> ReadRequest();
+  Result<int, std::string> ExecuteReady(const std::string &buf);
+  virtual Result<int, std::string> ExecuteNotReady();
+  Result<int, std::string> AddErrResponse(http::StatusCode status);
+  Result<int, std::string> AddResponse(HTTPRequest *request);
   std::string port_;
   std::string ip_;
   struct sockaddr_in client_addr_;
