@@ -53,7 +53,7 @@ Result<int, std::string> ReadRequestFromClient::AddErrResponse(
     http::StatusCode status) {
   IOTaskManager::AddTask(
       new WriteResponseToClient(fd_, GenerateErrorResponse(status, config_),
-                                static_cast<HTTPRequest *>(NULL)));
+                                new HTTPRequest()));
   return Ok(kOk);
 }
 
