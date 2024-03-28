@@ -34,10 +34,12 @@ void IOTaskManager::AddTask(AIOTask *task) {
     if (fds_.at(i).fd == -1) {
       fds_.at(i) = fd;
       tasks_array_.at(i).tasks.push_back(task);
+      tasks_array_.at(i).ts = time_utils::GetCurrentTime();
       return;
     }
   }
-  Tasks tmp = {std::vector<AIOTask *>(1, task), 0};
+  Tasks tmp = {std::vector<AIOTask *>(1, task), 0,
+               time_utils::GetCurrentTime()};
   tasks_array_.push_back(tmp);
   fds_.push_back(fd);
 }
@@ -79,36 +81,53 @@ void IOTaskManager::ExecuteTasks() {
       tasks_array_.at(i).index >= tasks_array_.at(i).tasks.size()
           ? tasks_array_.at(i).index = 0
           : 0;
-      while (
-          tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) == NULL ||
-          !(tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->GetEvent() &
-            fds_.at(i).revents)) {
+      while (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) == NULL) {
         ++(tasks_array_.at(i).index);
         if (tasks_array_.at(i).index >= tasks_array_.at(i).tasks.size()) {
           tasks_array_.at(i).index = 0;
           break;
         }
       }
-      if (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) != NULL &&
-          (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->GetEvent() &
-           fds_.at(i).revents)) {
+      if (tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) != NULL) {
         Result<int, std::string> result =
-            tasks_array_.at(i).tasks.at(tasks_array_.at(i).index)->Execute();
+            tasks_array_.at(i)
+                .tasks.at(tasks_array_.at(i).index)
+                ->Execute(fds_.at(i).revents);
         if (result.IsErr()) {
           DeleteTasks();
           throw std::invalid_argument("taskエラー");
-        } else if (result.Unwrap() == AIOTask::kTaskDelete) {
-          delete tasks_array_.at(i).tasks.at(tasks_array_.at(i).index);
-          tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) = NULL;
-        } else if (result.Unwrap() == AIOTask::kFdDelete) {
-          RemoveFd(tasks_array_.at(i).tasks.at(tasks_array_.at(i).index));
-          --i;
-        } else if (result.Unwrap() == AIOTask::kContinue) {
-          ;
-        } else if (result.Unwrap() == AIOTask::kOk) {
-          ++(tasks_array_.at(i).index);
+        }
+        switch (result.Unwrap()) {
+          case AIOTask::kOk:
+            ++(tasks_array_.at(i).index);
+            tasks_array_.at(i).ts = time_utils::GetCurrentTime();
+            break;
+          case AIOTask::kContinue:
+            tasks_array_.at(i).ts = time_utils::GetCurrentTime();
+            break;
+          case AIOTask::kNotReady:
+            ++(tasks_array_.at(i).index);
+            break;
+          case AIOTask::kTaskDelete:
+            tasks_array_.at(i).tasks.at(tasks_array_.at(i).index) = NULL;
+            break;
+          case AIOTask::kFdDelete:
+            RemoveFd(tasks_array_.at(i).tasks.at(tasks_array_.at(i).index));
+            break;
         }
       }
     }
+    CheckTimeout();
+  }
+}
+
+void IOTaskManager::CheckTimeout() {
+  for (unsigned int i = 0; i < tasks_array_.size(); ++i) {
+    if (tasks_array_.at(i).tasks.size() == 0) continue;
+    if (tasks_array_.at(i).tasks.at(0) == NULL) continue;
+    int timeout = tasks_array_.at(i).tasks.at(0)->GetTimeout();
+    if (timeout <= 0) continue;
+    if (time_utils::TimeOut(tasks_array_.at(i).ts, timeout))
+      RemoveFd(tasks_array_.at(i).tasks.at(0));
   }
 }

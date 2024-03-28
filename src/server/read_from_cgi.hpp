@@ -1,6 +1,7 @@
 #ifndef WEBSERV_SRC_SERVER_READ_FROM_CGI_HPP
 #define WEBSERV_SRC_SERVER_READ_FROM_CGI_HPP
 
+#include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -18,9 +19,10 @@
 
 class ReadFromCGI : public AIOTask {
  public:
-  ReadFromCGI(int pid, int fd, RequestContext req_ctx, const IConfig &config);
+  ReadFromCGI(int pid, int fd, RequestContext req_ctx, const IConfig &config,
+              timespec ts);
   ~ReadFromCGI();
-  Result<int, std::string> Execute();
+  Result<int, std::string> Execute(int revent);
 
  private:
   RequestContext req_ctx_;
@@ -29,6 +31,9 @@ class ReadFromCGI : public AIOTask {
   static const int buf_size_ = 1024;
   std::string buf_;
   int pid_;
+  timespec ts_;
+  bool sended_signal_;
+  const static int child_process_timeout_ = 3;
 };
 
 #endif
