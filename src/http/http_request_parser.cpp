@@ -14,7 +14,12 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   int return_state;
   row_line_ = row_line_ + request_line;
 
-  if (row_line_ == "") return Err(kEndParse);
+  // リクエストラインが来るまでの適当改行などは無視するように
+  if (parser_state_ == kBeforeProcess &&
+      (row_line_ == "\r\n" || row_line_ == "")) {
+    row_line_ = "";
+    return Err(kEndParse);
+  }
   if (request_ == NULL) request_ = new HTTPRequest();
   // requestlineの内容を確認
   if (parser_state_ == kBeforeProcess) {
