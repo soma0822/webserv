@@ -51,9 +51,8 @@ Result<int, std::string> ReadRequestFromClient::ExecuteNotReady() {
 
 Result<int, std::string> ReadRequestFromClient::AddErrResponse(
     http::StatusCode status) {
-  IOTaskManager::AddTask(
-      new WriteResponseToClient(fd_, GenerateErrorResponse(status, config_),
-                                new HTTPRequest()));
+  IOTaskManager::AddTask(new WriteResponseToClient(
+      fd_, GenerateErrorResponse(status, config_), new HTTPRequest()));
   return Ok(kOk);
 }
 
