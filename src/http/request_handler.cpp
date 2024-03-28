@@ -5,6 +5,7 @@
 
 #include "config.hpp"
 #include "file_utils.hpp"
+#include "http_status_code.hpp"
 
 Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
                                               RequestContext req_ctx) {
@@ -30,6 +31,10 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   }
 
   bool is_cgi_request = IsCGIRequest(config, req_ctx);
+
+  // cgiのリクエストuriに.がない時はcgiではなく通常のページとして解釈するように変更
+  if (is_cgi_request && request->GetUri().find(".") == std::string::npos)
+    is_cgi_request = false;
 
   if (!is_cgi_request && request->GetMethod() == "GET") {
     return Get(config, req_ctx);
