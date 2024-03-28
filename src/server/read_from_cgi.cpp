@@ -12,19 +12,36 @@ ReadFromCGI::ReadFromCGI(int pid, int fd, RequestContext req_ctx,
 ReadFromCGI::~ReadFromCGI() {}
 
 Result<int, std::string> ReadFromCGI::Execute(int revent) {
-  if (time_utils::TimeOut(ts_, child_process_timeout_)) {
-    Logger::Error() << "CGIがタイムアウトしました" << std::endl;
-    kill(pid_, SIGKILL);
+  int status;
+  int result = waitpid(pid_, &status, WNOHANG);
+  if (result == -1) {
+    Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
+    IOTaskManager::AddTask(new WriteResponseToClient(
+        req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
+        req_ctx_.request));
+    return Ok(kFdDelete);
+  } else if (result != 0 && (WIFEXITED(status) == 0 ||
+                             WEXITSTATUS(status) != 0)) {  // 異常終了の判定
+    Logger::Error() << "cgi エラー" << std::endl;
     IOTaskManager::AddTask(new WriteResponseToClient(
         req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
         req_ctx_.request));
     return Ok(kFdDelete);
   }
-  if (!(event_ & revent)) return Ok(kNotReady);
+  if (!sended_signal_ && result == 0 &&
+      time_utils::TimeOut(ts_, child_process_timeout_)) {  // タイムアウトの判定
+    Logger::Error() << "CGIがタイムアウトしました" << std::endl;
+    kill(
+        pid_,
+        SIGKILL);  // シグナルで子プロセスを終了させて、次のexecuteで異常終了の判定をする
+    sended_signal_ = true;
+    return Ok(kContinue);
+  }
+  if (!(event_ & revent)) return Ok(kNotReady);  // fdのreadyの判定
   (void)config_;
   char buf[buf_size_ + 1];
-  int status;
-  int len = read(fd_, buf, buf_size_);
+  int len = read(
+      fd_, buf, buf_size_);  // 子プロセスの正常終了、実行中にかかわらず読み込む
   if (len == -1) {
     Logger::Error() << "read エラー" << std::endl;
     IOTaskManager::AddTask(new WriteResponseToClient(
@@ -35,25 +52,10 @@ Result<int, std::string> ReadFromCGI::Execute(int revent) {
   buf[len] = '\0';
   buf_.append(buf);
   Logger::Info() << "buf_: " << buf_ << std::endl;
-  int result = waitpid(pid_, &status, WNOHANG);
-  if (result == -1) {  // エラー
-    Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
-    IOTaskManager::AddTask(new WriteResponseToClient(
-        req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
-        req_ctx_.request));
-    return Ok(kFdDelete);
-  } else if (result ==
-             0) {  // まだ終了していない timeout3秒でInternalServerErrorを返す。
-    return Ok(kOk);
+  if (result == 0) {  // 子プロセス実行中なら読み終わってないので待つ
+    return Ok(kContinue);
   }
-  if (WIFEXITED(status) == 0 || WEXITSTATUS(status) != 0) {  // 異常終了
-    Logger::Error() << "cgi エラー" << std::endl;
-    IOTaskManager::AddTask(new WriteResponseToClient(
-        req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
-        req_ctx_.request));
-    return Ok(kFdDelete);
-  }
-  if (len == 0) {
+  if (len == 0) {  // eofを読んだのでレスポンスを返す
     Result<HTTPRequest *, int> result = parser_.Parser(buf_);
     if (result.IsErr()) {
       return Ok(kContinue);
@@ -67,6 +69,6 @@ Result<int, std::string> ReadFromCGI::Execute(int revent) {
           new WriteResponseToClient(req_ctx_.fd, response, req_ctx_.request));
     }
     return Ok(kFdDelete);
-  }
-  return Ok(kContinue);
+  } else  // eofを読むまで待つ
+    return Ok(kContinue);
 }
