@@ -1,7 +1,5 @@
 #include "http_request_parser.hpp"
 
-#include <unistd.h>
-
 #include "a_parser.hpp"
 
 // canonical
@@ -14,11 +12,11 @@ const Result<HTTPRequest *, int> HTTPRequestParser::Parser(
   int return_state;
   row_line_ = row_line_ + request_line;
 
-  // リクエストラインが来るまでの適当改行などは無視するように
+  // リクエストラインが来るまでの適当な改行などは無視するように
   if (parser_state_ == kBeforeProcess &&
-      (row_line_ == "\r\n" || row_line_ == "")) {
-    row_line_ = "";
-    return Err(kEndParse);
+      (row_line_.find("\r\n") == 0 || row_line_ == "")) {
+    while (row_line_.find("\r\n") == 0) row_line_ = row_line_.substr(2);
+    if (row_line_ == "") return Err(kEndParse);
   }
   if (request_ == NULL) request_ = new HTTPRequest();
   // requestlineの内容を確認
