@@ -46,6 +46,11 @@ TEST(HTTPRequestParser, ParseRequestGET) {
   Result<HTTPRequest *, int> req9 = parser.Parser(request);
   EXPECT_EQ(req9.Unwrap()->GetMethod(), "GET");
   delete req9.Unwrap();
+  // リクエストラインの前に余計な改行がある
+  request = "\r\n\r\nGET / HTTP/1.1\r\nHost:\r\n\r\n";
+  Result<HTTPRequest *, int> req10 = parser.Parser(request);
+  EXPECT_EQ(req10.Unwrap()->GetMethod(), "GET");
+  delete req10.Unwrap();
 }
 
 // GETリクエストのパース(ヘッダがバラバラに送られてくる場合）
