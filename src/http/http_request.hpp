@@ -3,6 +3,7 @@
 
 #include <arpa/inet.h>
 
+#include <iostream>
 #include <map>
 #include <string>
 
@@ -40,6 +41,9 @@ class HTTPRequest {
   std::map<std::string, std::string> headers_;
   std::string body_;
 };
+
+std::ostream &operator<<(std::ostream &os, HTTPRequest &obj);
+std::ostream &operator<<(std::ostream &os, const HTTPRequest &obj);
 
 struct RequestContext {
   HTTPRequest *request;
