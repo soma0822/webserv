@@ -22,7 +22,7 @@ class ReadRequestFromClient : public AIOTask {
   ReadRequestFromClient(int fd, const std::string &port, const std::string &ip,
                         struct sockaddr_in client_addr, const IConfig &config);
   virtual ~ReadRequestFromClient();
-  virtual Result<int, std::string> Execute();
+  virtual Result<int, std::string> Execute(int revent);
   const std::string &GetPort() const;
   const std::string &GetIp() const;
 

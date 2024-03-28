@@ -18,7 +18,7 @@ class WriteToCGI : public AIOTask {
  public:
   WriteToCGI(int fd, const std::string &body);
   ~WriteToCGI();
-  Result<int, std::string> Execute();
+  Result<int, std::string> Execute(int revent);
 
  private:
   std::string body_;
