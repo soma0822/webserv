@@ -5,7 +5,8 @@ import cgitb
 cgitb.enable()
 
 print("Content-type: text/html; charset=utf-8\r\n\r\n", end="")
-print("<html><body>")
+print("<html><head><title>サーバーテスト</title><meta http-equiv=\"content-type\" charset=\"utf-8\"><link rel=\"stylesheet\" href=\"/styles.css\"></head><body><header><nav><a href=\"/\">ホーム</a></nav></header>")
+
 form = cgi.FieldStorage()
 
 for key in form:

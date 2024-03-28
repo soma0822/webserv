@@ -1,0 +1,40 @@
+header {
+  background-color: #b7c2ca; /* ヘッダーの背景色 */
+  color: #fff; /* ヘッダーテキストの色 */
+  padding: 10px 20px;
+  text-align: left;
+}
+
+body {
+  /* プロパティと値 */
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  text-align: center;
+}
+
+h1 {
+  font-size: 64px;
+}
+
+.container {
+  margin: 0 auto;
+  display: flex; /* Flexboxを使用 */
+  justify-content: center; /* 横方向の中央寄せ */
+  align-items: center; /* 縦方向の中央寄せ */
+  flex-direction: column;
+  background-color: rgb(216, 208, 208);
+  width: 50%;
+  height: 70%;
+}
+
+.item {
+  flex: 1; /* アイテムの伸縮性 */
+  border: 1px solid #ccc;
+  margin: 5px; /* アイテム間のマージン */
+}
+
+
+li {
+  padding-top: 5%;
+}
+
