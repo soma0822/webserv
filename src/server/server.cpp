@@ -52,6 +52,6 @@ Result<int, int> Server::Listen(const std::string &port,
   if (listen(sock, SOMAXCONN) == -1) return Err(kListenError);
   if (fcntl(sock, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1)
     return Err(kFcntlError);
-  Logger::Info() << port << " : リッスン開始" << std::endl;
+  Logger::Info() << ip << ":" << port << " : リッスン開始" << std::endl;
   return Ok(sock);
 }
