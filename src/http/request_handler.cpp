@@ -33,7 +33,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   bool is_cgi_request = IsCGIRequest(config, req_ctx);
 
   // cgiのリクエストuriに.がない時はcgiではなく通常のページとして解釈するように変更
-  if (is_cgi_request && request->GetUri().find(".") == std::string::npos) {
+  if (is_cgi_request && request->GetUri().find(".", 1) == std::string::npos) {
     std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
     if (file_utils::IsDirectory(request_file_path)) {
       if (location_ctx_result.IsOk() &&
@@ -42,9 +42,12 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
       } else if (location_ctx_result.IsOk() &&
                  !location_ctx_result.Unwrap().GetIndex().empty()) {
         request->SetUri(request->GetUri() +
+                        (request->GetUri()[request->GetUri().size() - 1] == '/'
+                             ? ""
+                             : "/") +
                         location_ctx_result.Unwrap()
                             .GetIndex());  // 決められたcgiスクリプトを実行
-        if (request->GetUri().find(".") == std::string::npos)
+        if (request->GetUri().find(".", 1) == std::string::npos)
           is_cgi_request = false;
       } else if (!server_ctx.GetIndex().empty()) {
         is_cgi_request = false;
