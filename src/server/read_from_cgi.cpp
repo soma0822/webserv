@@ -51,6 +51,7 @@ Result<int, std::string> ReadFromCGI::Execute(int revent) {
   }
   buf[len] = '\0';
   buf_.append(buf);
+  Logger::Info() << "buf_: " << buf_ << std::endl;
   if (result == 0) {  // 子プロセス実行中なら読み終わってないので待つ
     return Ok(kContinue);
   }
