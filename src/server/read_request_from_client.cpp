@@ -32,7 +32,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
                    << std::endl;
     IOTaskManager::AddTask(new WriteResponseToClient(
         fd_, GenerateErrorResponse(http::kBadRequest, config_),
-        static_cast<HTTPRequest *>(NULL)));
+        new HTTPRequest()));
     return Ok(kOk);
   }
   buf[len] = '\0';
