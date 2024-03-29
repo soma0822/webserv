@@ -401,12 +401,14 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
     const char *argv[] = {script_name.c_str(), NULL};
     Logger::Info() << "CGI実行: " << argv[0] << std::endl;
     execve(argv[0], const_cast<char *const *>(argv), env);
+    perror("execve");
     Logger::Error() << "execve エラー" << std::endl;
     std::exit(1);
   }
   close(cgi_fd[1]);
   if (req_ctx.request->GetMethod() == "POST") close(redirect_fd[0]);
-  IOTaskManager::AddTask(new ReadFromCGI(pid, cgi_fd[0], req_ctx, config));
+  IOTaskManager::AddTask(new ReadFromCGI(pid, cgi_fd[0], req_ctx, config,
+                                         time_utils::GetCurrentTime()));
   return http::kOk;
 }
 
