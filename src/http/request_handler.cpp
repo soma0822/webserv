@@ -32,29 +32,29 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
 
   bool is_cgi_request = IsCGIRequest(config, req_ctx);
 
+  std::cerr << "request->GetUri():" << request->GetUri() << std::endl;
   // cgiのリクエストuriに.がない時はcgiではなく通常のページとして解釈するように変更
   if (is_cgi_request && request->GetUri().find(".") == std::string::npos) {
     std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
-    std::cerr << "request_file_path: " << request_file_path << std::endl;
-    std::cerr << "not cgi request" << std::endl;
     if (file_utils::IsDirectory(request_file_path)) {
-      std::cerr << "is directory" << std::endl;
       if (location_ctx_result.IsOk() &&
-          !location_ctx_result.Unwrap().GetIndex().empty()) {
-        std::cerr << "index" << std::endl;
+          location_ctx_result.Unwrap().GetCanAutoIndex()) {
+        is_cgi_request = false;  // AutoIndexを表示する
+      } else if (location_ctx_result.IsOk() &&
+                 !location_ctx_result.Unwrap().GetIndex().empty()) {
         request->SetUri(request_file_path +
-                        location_ctx_result.Unwrap().GetIndex());
+                        location_ctx_result.Unwrap()
+                            .GetIndex());  // 決められたcgiスクリプトを実行
       } else if (!server_ctx.GetIndex().empty()) {
         request->SetUri(request_file_path + server_ctx.GetIndex());
-        std::cerr << "index.empty" << std::endl;
+        is_cgi_request = false;
+        // index.htmlを表示する
       }
+    } else {
+      is_cgi_request = false;
     }
-    std::cerr << "request_file_path2: " << request_file_path << std::endl;
-  } else {
-    std::cerr << "is not directory" << std::endl;
-    is_cgi_request = false;
   }
-  std::cerr << "uri: " << request->GetUri() << std::endl;
+  std::cerr << "-> request->GetUri():" << request->GetUri() << std::endl;
 
   if (!is_cgi_request && request->GetMethod() == "GET") {
     return Get(config, req_ctx);
