@@ -21,7 +21,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
 
   // リクエストボディのサイズが制限を超えている場合には413を返す
   if (static_cast<int>(request->GetBody().length()) >
-          location_ctx.GetLimitClientBody()) {
+      location_ctx.GetLimitClientBody()) {
     return Some(GenerateErrorResponse(http::kPayloadTooLarge, config));
   }
 
@@ -51,7 +51,8 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
 
   bool need_autoindex = false;
 
-  std::pair<std::string, std::string> resolve_pair = ResolveRequestTargetPath(config, req_ctx);
+  std::pair<std::string, std::string> resolve_pair =
+      ResolveRequestTargetPath(config, req_ctx);
   std::string request_file_path = resolve_pair.first;
   std::string path_translated = resolve_pair.second;
   Logger::Info() << request_file_path << ":" << path_translated << std::endl;
@@ -85,7 +86,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
     }
     return Some(GenerateAutoIndexPage(config, request, request_file_path));
   }
-
+  Logger::Info() << "89" << std::endl;
   // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
   if (file_utils::IsDirectory(request_file_path)) {
     if (!location_ctx.GetIndex().empty()) {
@@ -106,11 +107,14 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   if (!file_utils::IsReadable(request_file_path)) {
     return Some(GenerateErrorResponse(http::kForbidden, config));
   }
-  if (location_ctx.IsValidCgiExtension(request_file_path.substr(request_file_path.find('.', 1)))){
-    http::StatusCode status =CGIExe(config, req_ctx, request_file_path, path_translated);
+  if (request_file_path.find('.', 1) != std::string::npos &&
+      location_ctx.IsValidCgiExtension(
+          request_file_path.substr(request_file_path.find('.', 1)))) {
+    http::StatusCode status =
+        CGIExe(config, req_ctx, request_file_path, path_translated);
     if (status == http::kOk)
       return None<HTTPResponse *>();
-    else 
+    else
       return Some(GenerateErrorResponse(status, config));
   }
 
@@ -129,7 +133,8 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   const LocationContext &location_ctx =
       server_ctx.SearchLocation(request->GetUri());
 
-  std::pair<std::string, std::string> resolve_pair = ResolveRequestTargetPath(config, req_ctx);
+  std::pair<std::string, std::string> resolve_pair =
+      ResolveRequestTargetPath(config, req_ctx);
   std::string request_file_path = resolve_pair.first;
   std::string path_translated = resolve_pair.second;
   // リクエストターゲットがディレクトリの場合には400を返す
@@ -148,11 +153,13 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   }
 
   if (request_file_path.find(".", 1) != std::string::npos &&
-        location_ctx.IsValidCgiExtension(request_file_path.substr(request_file_path.find('.', 1)))){
-    http::StatusCode status =CGIExe(config, req_ctx, request_file_path, path_translated);
+      location_ctx.IsValidCgiExtension(
+          request_file_path.substr(request_file_path.find('.', 1)))) {
+    http::StatusCode status =
+        CGIExe(config, req_ctx, request_file_path, path_translated);
     if (status == http::kOk)
       return None<HTTPResponse *>();
-    else 
+    else
       return Some(GenerateErrorResponse(status, config));
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
@@ -176,10 +183,7 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
 Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
                                               RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
-  // const IServerContext &server_ctx =
-  //     config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  // const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
 
   const std::string request_file_path =
       ResolveRequestTargetPath(config, req_ctx).first;
@@ -221,8 +225,7 @@ std::string RequestHandler::ResolveRootPath(const IConfig &config,
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  const LocationContext &location_ctx =
-      server_ctx.SearchLocation(uri);
+  const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
 
   std::string root = server_ctx.GetRoot();
   if (!location_ctx.GetRoot().empty()) {
@@ -232,51 +235,51 @@ std::string RequestHandler::ResolveRootPath(const IConfig &config,
   return root;
 }
 
-// uriの/cgi-bin/default.py/foo/barの時　pair<./www/cgi-bin/default.py, ./www/foo/bar> で返すようにした
+// uriの/cgi-bin/default.py/foo/barの時　pair<./www/cgi-bin/default.py,
+// ./www/foo/bar> で返すようにした
 std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
     const IConfig &config, const RequestContext req_ctx) {
   // rootを取得する
   std::string root = ResolveRootPath(config, req_ctx);
   std::string uri = req_ctx.request->GetUri();
   std::string target_path;
+  if (root.at(root.size() - 1) == '/') {
+    root.erase(root.size() - 1, 1);
+  }
 
   // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
   // origin-form = absolute-path [ "?" query ]
   // rootが/で終わっている場合には/が重複してしまうので削除する
-  if (root.empty()){
+  if (root.empty()) {
     target_path = server_dir + uri;
-  }
-  else {
-    if (root.at(root.size() - 1) == '/') {
-    root.erase(root.size() - 1, 1);
-    }
+  } else {
     uri = RemoveLocPath(config, req_ctx);
     target_path = root + uri;
   }
   std::string script_path = ResolveScriptPart(target_path);
-  std::string path_translated;
-  if (root.empty()){
-    path_translated = server_dir + target_path.substr(script_path.length());
-  }
-  else if (root.at(root.size() - 1) == '/') {
-    root.erase(root.size() - 1, 1);
-    path_translated = root + target_path.substr(script_path.length());
+  std::string path_translated = target_path.substr(script_path.length());
+  if (!path_translated.empty()) {
+    if (root.empty()) {
+      path_translated = server_dir + target_path.substr(script_path.length());
+    } else {
+      path_translated = root + target_path.substr(script_path.length());
+    }
   }
   return std::make_pair(script_path, path_translated);
 }
 
 // 途中でファイルがあればそこまでを返す。なければそのまま返す。
-std::string RequestHandler::ResolveScriptPart(const std::string &target){
+std::string RequestHandler::ResolveScriptPart(const std::string &target) {
   unsigned long pos = 0;
-  while ((pos = target.find("/", pos + 1)) != std::string::npos){
-    if (file_utils::IsFile(target.substr(0, pos))) 
-      return target.substr(0, pos);
+  while ((pos = target.find("/", pos + 1)) != std::string::npos) {
+    if (file_utils::IsFile(target.substr(0, pos))) return target.substr(0, pos);
   }
   return target;
 }
 
-//uriからLocationのPath部分を消したものを返す
-std::string RequestHandler::RemoveLocPath(const IConfig &config, const RequestContext req_ctx){
+// uriからLocationのPath部分を消したものを返す
+std::string RequestHandler::RemoveLocPath(const IConfig &config,
+                                          const RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
@@ -285,33 +288,6 @@ std::string RequestHandler::RemoveLocPath(const IConfig &config, const RequestCo
 
   return uri.substr(location_ctx.GetPath().length());
 }
-
-// std::string RequestHandler::GetCGIScriptPath(const IConfig &config,
-//                                              RequestContext req_ctx) {
-//   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
-//   // 拡張子以降のパスセグメントは除外する
-//   size_t pos_period = request_file_path.find('.', 1);
-//   size_t pos_separator = request_file_path.substr(pos_period).find('/');
-//   // '/'が見つからない場合には拡張子以降のパスセグメントがないのでそのまま返す
-//   if (pos_separator == std::string::npos) {
-//     return request_file_path;
-//   }
-//   return request_file_path.substr(0, pos_period + pos_separator);
-// }
-
-// 存在しない場合は空文字を返す
-// std::string RequestHandler::GetPathInfoPath(const IConfig &config,
-//                                             RequestContext req_ctx) {
-//   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
-
-//   // CGIスクリプトの絶対パス以降がパスセグメントになる
-//   std::string path_segment =
-//       request_file_path.substr(GetCGIScriptPath(config, req_ctx).size());
-//   if (path_segment.empty()) {
-//     return "";
-//   }
-//   return ResolveRootPath(config, req_ctx) + path_segment;
-// }
 
 HTTPResponse *RequestHandler::GenerateAutoIndexPage(
     const IConfig &config, const HTTPRequest *request,
@@ -326,7 +302,7 @@ HTTPResponse *RequestHandler::GenerateAutoIndexPage(
       "<html><head><title>AutoIndex</title></head><body><h1>AutoIndex</h1><ul>";
   errno = 0;
   while ((dp = readdir(dir)) != NULL) {
-    body += "<li><a href=\"" + request->GetUri() + "/" + dp->d_name + "\">" +
+    body += "<li><a href=\"" + request->GetUri() + dp->d_name + "\">" +
             dp->d_name + "</a></li>";
   }
   if (errno != 0) {

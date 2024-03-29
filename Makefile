@@ -63,7 +63,7 @@ $(OBJDIR)/%.o.debug: $(SRCDIR)/%.cpp
 
 format:
 	clang-format --style=Google -i $(SRCS) $(HEADERS)
-	clang-format --style=Google -i test/*.cpp
+	clang-format --style=Google -i test/unit/*.cpp
 
 # Test ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: test

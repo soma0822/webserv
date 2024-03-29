@@ -45,7 +45,7 @@ TEST(GenerateErrorResponse, DefaultNotFound) {
 TEST(GenerateErrorResponse, ProvidedNotFound) {
   Mock<IConfig> mock;
   std::map<std::string, std::string> error_pages = {
-      {"404", "test/error_page/404.html"}};
+      {"404", "test/unit/error_page/404.html"}};
   When(Method(mock, GetErrorPage)).AlwaysReturn(error_pages);
 
   HTTPResponse *res = GenerateErrorResponse(http::kNotFound, mock.get());

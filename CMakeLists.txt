@@ -18,7 +18,7 @@ FetchContent_MakeAvailable(googletest)
 # ソースファイルの取得
 file(GLOB_RECURSE SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
 list(REMOVE_ITEM SOURCES "${PROJECT_SOURCE_DIR}/src/main.cpp")
-file(GLOB TEST_FILES "${PROJECT_SOURCE_DIR}/test/*_test.cpp")
+file(GLOB TEST_FILES "${PROJECT_SOURCE_DIR}/test/unit/*_test.cpp")
 
 # テストのビルド
 add_executable(${PROGRAM}
