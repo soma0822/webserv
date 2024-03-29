@@ -1,22 +1,18 @@
 <html>
     <head>
-        <title>サーバーテスト</title>
+        <title>Webserv</title>
         <meta http-equiv="content-type" charset="utf-8">
+        <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-    <form action="/cgi-bin/cgi_test.py" method="POST">
-        <div>
-            <label for="name">好きな食べ物</label>
-            <input type="text" name="food" value="りんご">
-            <label for="season">好きな季節</label>
-            <input type="text" name="season" value="冬">
-            <button>送信</button>
-        </div>
-     </form>
-    <form action="/cgi-bin/cookie_test.py" method="GET">
-        <div>
-            <button>cookieのテスト</button>
-        </div>
-    </form>   </form>
+    <header><nav><a href="/">ホーム</a></nav></header>
+    <h1>Welcome to nginx!</h1>
+    <div class="container">
+    <ul>
+        <li class="item"><a href="/cgi_get.html">CGI GETのテストはこちら</a></li>
+        <li class="item"><a href="/cgi_post.html">CGI POSTのテストはこちら</a></li>
+        <li class="item"><a href="/cgi-bin/cookie_test.py">Cookieのテストはこちら</a></li>
+    </ul>
+    </div>
     </body>
 </html>
