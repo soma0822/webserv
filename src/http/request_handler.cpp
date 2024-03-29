@@ -44,6 +44,8 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
         request->SetUri(request->GetUri() +
                         location_ctx_result.Unwrap()
                             .GetIndex());  // 決められたcgiスクリプトを実行
+        if (request->GetUri().find(".") == std::string::npos)
+          is_cgi_request = false;
       } else if (!server_ctx.GetIndex().empty()) {
         is_cgi_request = false;
         // server_ctx.GetIndex() 今回の場合、index.htmlを表示する
