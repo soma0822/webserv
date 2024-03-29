@@ -79,4 +79,3 @@ if __name__ == "__main__":
     string = main()
     # sys.stderr.write(string) #HTMLの表示
     print(string)
-

@@ -50,7 +50,6 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
       server_ctx.SearchLocation(request->GetUri());
 
   bool need_autoindex = false;
-
   std::pair<std::string, std::string> resolve_pair =
       ResolveRequestTargetPath(config, req_ctx);
   std::string request_file_path = resolve_pair.first;
@@ -86,7 +85,6 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
     }
     return Some(GenerateAutoIndexPage(config, request, request_file_path));
   }
-  Logger::Info() << "89" << std::endl;
   // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
   if (file_utils::IsDirectory(request_file_path)) {
     if (!location_ctx.GetIndex().empty()) {
@@ -95,6 +93,14 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
       request_file_path += server_ctx.GetIndex();
     }
   }
+  bool is_cgi = (request_file_path.find('.', 1) != std::string::npos &&
+                 location_ctx.IsValidCgiExtension(
+                     request_file_path.substr(request_file_path.find('.', 1))));
+  // パーミッションがない場合には403を返す
+  if ((!file_utils::IsReadable(request_file_path) && !is_cgi) ||
+      (!file_utils::IsExecutable(request_file_path) && is_cgi)) {
+    return Some(GenerateErrorResponse(http::kForbidden, config));
+  }
   // ファイルが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(request_file_path)) {
     return Some(GenerateErrorResponse(http::kNotFound, config));
@@ -102,10 +108,6 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   // 許可されていないメソッドの場合には405を返す
   if (!IsAllowedMethod(config, req_ctx)) {
     return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
-  }
-  // パーミッションがない場合には403を返す
-  if (!file_utils::IsReadable(request_file_path)) {
-    return Some(GenerateErrorResponse(http::kForbidden, config));
   }
   if (request_file_path.find('.', 1) != std::string::npos &&
       location_ctx.IsValidCgiExtension(
@@ -117,7 +119,6 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
     else
       return Some(GenerateErrorResponse(status, config));
   }
-
   return Some(HTTPResponse::Builder()
                   .SetStatusCode(http::kOk)
                   .SetBody(file_utils::ReadFile(request_file_path))
@@ -137,8 +138,23 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
       ResolveRequestTargetPath(config, req_ctx);
   std::string request_file_path = resolve_pair.first;
   std::string path_translated = resolve_pair.second;
+  Logger::Info() << request_file_path << " : " << path_translated << std::endl;
+  // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
+  std::string cgi_script;
+  if (file_utils::IsDirectory(request_file_path)) {
+    if (!location_ctx.GetIndex().empty()) {
+      cgi_script = request_file_path + location_ctx.GetIndex();
+    } else if (!server_ctx.GetIndex().empty()) {
+      cgi_script = request_file_path + server_ctx.GetIndex();
+    }
+  } else {
+    cgi_script = request_file_path;
+  }
+  bool is_cgi = (cgi_script.find('.', 1) != std::string::npos &&
+                 location_ctx.IsValidCgiExtension(
+                     cgi_script.substr(cgi_script.find('.', 1))));
   // リクエストターゲットがディレクトリの場合には400を返す
-  if (request_file_path.at(request_file_path.size() - 1) == '/') {
+  if (!is_cgi && request_file_path.at(request_file_path.size() - 1) == '/') {
     return Some(GenerateErrorResponse(http::kBadRequest, config));
   }
   const std::string parent_dir =
@@ -151,20 +167,18 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   if (!IsAllowedMethod(config, req_ctx)) {
     return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
-
-  if (request_file_path.find(".", 1) != std::string::npos &&
-      location_ctx.IsValidCgiExtension(
-          request_file_path.substr(request_file_path.find('.', 1)))) {
+  // 親ディレクトリに書き込み権限がない場合には403を返す cgiの場合は実行権限
+  if ((!is_cgi && !file_utils::IsWritable(parent_dir)) ||
+      (is_cgi && !file_utils::IsExecutable(cgi_script))) {
+    return Some(GenerateErrorResponse(http::kForbidden, config));
+  }
+  if (is_cgi) {
     http::StatusCode status =
         CGIExe(config, req_ctx, request_file_path, path_translated);
     if (status == http::kOk)
       return None<HTTPResponse *>();
     else
       return Some(GenerateErrorResponse(status, config));
-  }
-  // 親ディレクトリに書き込み権限がない場合には403を返す
-  if (!file_utils::IsWritable(parent_dir)) {
-    return Some(GenerateErrorResponse(http::kForbidden, config));
   }
 
   std::ofstream ofs(request_file_path.c_str());
@@ -241,16 +255,17 @@ std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
     const IConfig &config, const RequestContext req_ctx) {
   // rootを取得する
   std::string root = ResolveRootPath(config, req_ctx);
+  bool root_empty = root.empty();
   std::string uri = req_ctx.request->GetUri();
   std::string target_path;
-  if (root.at(root.size() - 1) == '/') {
+  if (!root_empty && root.at(root.size() - 1) == '/') {
     root.erase(root.size() - 1, 1);
   }
 
   // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
   // origin-form = absolute-path [ "?" query ]
   // rootが/で終わっている場合には/が重複してしまうので削除する
-  if (root.empty()) {
+  if (root_empty) {
     target_path = server_dir + uri;
   } else {
     uri = RemoveLocPath(config, req_ctx);
@@ -259,7 +274,7 @@ std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
   std::string script_path = ResolveScriptPart(target_path);
   std::string path_translated = target_path.substr(script_path.length());
   if (!path_translated.empty()) {
-    if (root.empty()) {
+    if (root_empty) {
       path_translated = server_dir + target_path.substr(script_path.length());
     } else {
       path_translated = root + target_path.substr(script_path.length());
