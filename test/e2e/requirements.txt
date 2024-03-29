@@ -1,0 +1,9 @@
+certifi @ file:///private/tmp/python-certifi-20240201-4765-6ufe0c/certifi-2024.2.2
+cmake==3.28.3
+numpy @ file:///private/tmp/numpy-20240206-5894-1wazl8/numpy-1.26.4
+openvino @ file:///private/tmp/openvino-20240120-6451-2ye6ih/openvino-2023.3.0/src/bindings/python/wheel
+protobuf==4.25.3
+pywatchman==1.4.1
+setuptools==69.1.1
+TBB @ file:///private/tmp/tbb-20231202-5067-9guvre/oneTBB-2021.11.0/python
+wheel==0.42.0
