@@ -105,7 +105,9 @@ TEST_F(RequestHandlerTest, PostMethodDirectoryRequest) {
 
   // config mock
   Mock<IConfig> config_mock;
+  std::map<std::string, std::string> error_page;
   When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+  When(Method(config_mock, GetErrorPage)).AlwaysReturn(error_page);
 
   HTTPRequest request;
   request.SetUri(uri);
@@ -135,7 +137,9 @@ TEST_F(RequestHandlerTest, DeleteMethodNormalTest) {
 
   // config mock
   Mock<IConfig> config_mock;
+  std::map<std::string, std::string> error_page;
   When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+  When(Method(config_mock, GetErrorPage)).AlwaysReturn(error_page);
 
   HTTPRequest request;
   request.SetUri(uri);
@@ -167,7 +171,9 @@ TEST_F(RequestHandlerTest, DeleteMethodDirectoryTarget) {
 
   // config mock
   Mock<IConfig> config_mock;
+  std::map<std::string, std::string> error_page;
   When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+  When(Method(config_mock, GetErrorPage)).AlwaysReturn(error_page);
 
   HTTPRequest request;
   request.SetUri(uri);
