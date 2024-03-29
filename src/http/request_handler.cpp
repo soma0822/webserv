@@ -53,6 +53,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     // CGIスクリプトの拡張子が許可されていない場合にはテキストとして返す
     bool is_valid_cgi_extension =
         location_ctx_result.IsOk() &&
+        cgi_script_path.find('.') != std::string::npos &&
         location_ctx_result.Unwrap().IsValidCgiExtension(
             cgi_script_path.substr(cgi_script_path.find('.', 1)));
     bool is_method_allowed = IsAllowedMethod(config, req_ctx);
@@ -266,6 +267,9 @@ std::string RequestHandler::GetCGIScriptPath(const IConfig &config,
   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   // 拡張子以降のパスセグメントは除外する
   size_t pos_period = request_file_path.find('.', 1);
+  if (pos_period == std::string::npos) {
+    return request_file_path;
+  }
   size_t pos_separator = request_file_path.substr(pos_period).find('/');
   // '/'が見つからない場合には拡張子以降のパスセグメントがないのでそのまま返す
   if (pos_separator == std::string::npos) {
