@@ -81,6 +81,14 @@ ReadRequestFromClient::ReadRequest() {
                    << std::endl;
     return Err(kFdDelete);
   }
+  if (len == 1 && buf[0] == static_cast<char>(kEOT)) {
+    Logger::Info() << ip_ << ":" << port_ << " : 接続が切られました"
+                   << std::endl;
+    IOTaskManager::AddTask(new WriteResponseToClient(
+        fd_, GenerateErrorResponse(http::kBadRequest, config_),
+        new HTTPRequest()));
+    return Ok(kOk);
+  }
   buf[len] = '\0';
   return Ok(buf);
 }

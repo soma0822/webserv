@@ -42,6 +42,7 @@ class ReadRequestFromClient : public AIOTask {
   HTTPRequestParser parser_;
   static const int buf_size_ = 1024;
   enum Responce { kOk, kContinue, kBadRequest };
+  enum Ascii { kEOT = 4 };
 };
 
 #endif
