@@ -6,7 +6,7 @@
 #include "config.hpp"
 #include "file_utils.hpp"
 
-const std::string RequestHandler::server_dir = "./www";
+const std::string RequestHandler::server_dir = "./www/html";
 
 Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
                                               RequestContext req_ctx) {
@@ -54,6 +54,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   std::pair<std::string, std::string> resolve_pair = ResolveRequestTargetPath(config, req_ctx);
   std::string request_file_path = resolve_pair.first;
   std::string path_translated = resolve_pair.second;
+  Logger::Info() << request_file_path << ":" << path_translated << std::endl;
   if (file_utils::IsDirectory(request_file_path)) {
     // リクエストターゲットのディレクトリが/で終わっていない場合には301を返す
     if (request_file_path.at(request_file_path.size() - 1) != '/') {
@@ -245,8 +246,10 @@ std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
   if (root.empty()){
     target_path = server_dir + uri;
   }
-  else if (root.at(root.size() - 1) == '/') {
+  else {
+    if (root.at(root.size() - 1) == '/') {
     root.erase(root.size() - 1, 1);
+    }
     uri = RemoveLocPath(config, req_ctx);
     target_path = root + uri;
   }
@@ -265,9 +268,9 @@ std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
 // 途中でファイルがあればそこまでを返す。なければそのまま返す。
 std::string RequestHandler::ResolveScriptPart(const std::string &target){
   unsigned long pos = 0;
-  while ((pos = target.find("/", pos)) != std::string::npos){
-    if (file_utils::IsFile(target.substr(0, pos - 1))) 
-      return target.substr(0, pos - 1);
+  while ((pos = target.find("/", pos + 1)) != std::string::npos){
+    if (file_utils::IsFile(target.substr(0, pos))) 
+      return target.substr(0, pos);
   }
   return target;
 }
