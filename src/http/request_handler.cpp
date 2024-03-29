@@ -32,7 +32,6 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
 
   bool is_cgi_request = IsCGIRequest(config, req_ctx);
 
-  std::cerr << "request->GetUri():" << request->GetUri() << std::endl;
   // cgiのリクエストuriに.がない時はcgiではなく通常のページとして解釈するように変更
   if (is_cgi_request && request->GetUri().find(".") == std::string::npos) {
     std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
@@ -42,19 +41,17 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
         is_cgi_request = false;  // AutoIndexを表示する
       } else if (location_ctx_result.IsOk() &&
                  !location_ctx_result.Unwrap().GetIndex().empty()) {
-        request->SetUri(request_file_path +
+        request->SetUri(request->GetUri() +
                         location_ctx_result.Unwrap()
                             .GetIndex());  // 決められたcgiスクリプトを実行
       } else if (!server_ctx.GetIndex().empty()) {
-        request->SetUri(request_file_path + server_ctx.GetIndex());
         is_cgi_request = false;
-        // index.htmlを表示する
+        // server_ctx.GetIndex() 今回の場合、index.htmlを表示する
       }
     } else {
       is_cgi_request = false;
     }
   }
-  std::cerr << "-> request->GetUri():" << request->GetUri() << std::endl;
 
   if (!is_cgi_request && request->GetMethod() == "GET") {
     return Get(config, req_ctx);
