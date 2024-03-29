@@ -73,6 +73,8 @@ BUILD_DIR     = build
 BUILD_PATH    = $(BASE_DIR)/$(BUILD_DIR)
 TEST_EXE_PATH = $(BUILD_PATH)/webserv_test
 
+test: test/unit test/e2e
+
 # Run all tests
 test/unit:
 	@# Ensure cmake runs to generate the test executable
@@ -83,7 +85,7 @@ test/unit:
 	@$(TEST_EXE_PATH) || exit 1
 
 test/e2e:
-	python3 ./test/e2e/test.py
+	python3 ./test/e2e/main.py
 
 # CI -+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: build
