@@ -87,7 +87,7 @@ ReadRequestFromClient::ReadRequest() {
     IOTaskManager::AddTask(new WriteResponseToClient(
         fd_, GenerateErrorResponse(http::kBadRequest, config_),
         new HTTPRequest()));
-    return Ok(kOk);
+    return Err(AIOTask::kOk);
   }
   buf[len] = '\0';
   return Ok(buf);
