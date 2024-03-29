@@ -6,8 +6,6 @@
 #include "config.hpp"
 #include "file_utils.hpp"
 
-const std::string RequestHandler::server_dir = "./www";
-
 Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
                                               RequestContext req_ctx) {
   HTTPRequest *request = req_ctx.request;
@@ -29,13 +27,16 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   if (request->GetUri().length() >= kMaxUriLength) {
     return Some(GenerateErrorResponse(http::kUriTooLong, config));
   }
-  if (request->GetMethod() == "GET") {
+
+  bool is_cgi_request = IsCGIRequest(config, req_ctx);
+
+  if (!is_cgi_request && request->GetMethod() == "GET") {
     return Get(config, req_ctx);
   }
-  if (request->GetMethod() == "POST") {
+  if (!is_cgi_request && request->GetMethod() == "POST") {
     return Post(config, req_ctx);
   }
-  if (request->GetMethod() == "DELETE") {
+  if (!is_cgi_request && request->GetMethod() == "DELETE") {
     return Delete(config, req_ctx);
   }
   if (is_cgi_request) {
@@ -78,9 +79,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
 
   bool need_autoindex = false;
 
-  std::pair<std::string, std::string> resolve_pair = ResolveRequestTargetPath(config, req_ctx);
-  std::string request_file_path = resolve_pair.first;
-  std::string path_translated = resolve_pair.second;
+  std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   if (file_utils::IsDirectory(request_file_path)) {
     // リクエストターゲットのディレクトリが/で終わっていない場合には301を返す
     if (request_file_path.at(request_file_path.size() - 1) != '/') {
@@ -132,13 +131,6 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   if (!file_utils::IsReadable(request_file_path)) {
     return Some(GenerateErrorResponse(http::kForbidden, config));
   }
-  if (location_ctx.IsValidCgiExtension(request_file_path.substr(request_file_path.find('.', 1)))){
-    http::StatusCode status =CGIExe(config, req_ctx, request_file_path, path_translated);
-    if (status == http::kOk)
-      return None<HTTPResponse *>();
-    else 
-      return Some(GenerateErrorResponse(status, config));
-  }
 
   return Some(HTTPResponse::Builder()
                   .SetStatusCode(http::kOk)
@@ -149,11 +141,11 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
 Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
                                             RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
-  // const IServerContext &server_ctx =
-  //     config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  // const LocationContext &location_ctx =
-  //     server_ctx.SearchLocation(uri);
+  const LocationContext &location_ctx =
+      server_ctx.SearchLocation(uri);
 
   const std::string request_file_path =
       ResolveRequestTargetPath(config, req_ctx);
@@ -193,10 +185,10 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
 Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
                                               RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
-  // const IServerContext &server_ctx =
-  //     config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  // const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
+  const LocationContext &location_server_ctx.SearchLocation(uri);
 
   const std::string request_file_path =
       ResolveRequestTargetPath(config, req_ctx);
@@ -249,56 +241,18 @@ std::string RequestHandler::ResolveRootPath(const IConfig &config,
   return root;
 }
 
-// uriの/cgi-bin/default.py/foo/barの時　pair<./www/cgi-bin/default.py, ./www/foo/bar> で返すようにした
-std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
+std::string RequestHandler::ResolveRequestTargetPath(
     const IConfig &config, const RequestContext req_ctx) {
   // rootを取得する
   std::string root = ResolveRootPath(config, req_ctx);
-  std::string uri = req_ctx.request->GetUri();
-  std::string target_path;
 
   // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
   // origin-form = absolute-path [ "?" query ]
   // rootが/で終わっている場合には/が重複してしまうので削除する
-  if (root.empty()){
-    target_path = server_dir + uri;
-  }
-  else if (root.at(root.size() - 1) == '/') {
+  if (root.at(root.size() - 1) == '/') {
     root.erase(root.size() - 1, 1);
-    uri = RemoveLocPath(config, req_ctx);
-    target_path = root + uri;
   }
-  std::string script_path = ResolveScriptPart(target_path);
-  std::string path_translated;
-  if (root.empty()){
-    path_translated = server_dir + target_path.substr(script_path.length());
-  }
-  else if (root.at(root.size() - 1) == '/') {
-    root.erase(root.size() - 1, 1);
-    path_translated = root + target_path.substr(script_path.length());
-  }
-  return std::pair(script_path, path_translated);
-}
-
-// 途中でファイルがあればそこまでを返す。なければそのまま返す。
-std::string RequestHandler::ResolveScriptPart(const std::string &target){
-  int pos = 0;
-  while ((pos = target.find("/", pos)) != std::string::npos){
-    if (file_utils::IsFile(target.substr(0, pos - 1))) 
-      return target.substr(0, pos - 1);
-  }
-  return target;
-}
-
-//uriからLocationのPath部分を消したものを返す
-std::string RequestHandler::RemoveLocPath(const IConfig &config, const RequestContext req_ctx){
-  const HTTPRequest *request = req_ctx.request;
-  const IServerContext &server_ctx =
-      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
-  const std::string &uri = request->GetUri();
-  const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
-
-  return uri.substr(location_ctx.GetPath().length());
+  return root + req_ctx.request->GetUri();
 }
 
 std::string RequestHandler::GetCGIScriptPath(const IConfig &config,

@@ -14,6 +14,7 @@ enum Error {
 std::string ReadFile(const std::string &file_path);
 
 bool IsDirectory(const std::string &path);
+bool file_utils::IsFile(const std::string &path);
 
 bool DoesFileExist(const std::string &path);
 

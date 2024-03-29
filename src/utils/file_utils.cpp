@@ -22,6 +22,14 @@ bool file_utils::IsDirectory(const std::string &path) {
   return S_ISDIR(st.st_mode);
 }
 
+bool file_utils::IsFile(const std::string &path) {
+  struct stat st;
+  if (stat(path.c_str(), &st) != 0) {
+    return false;
+  }
+  return S_ISREG(st.st_mode);
+}
+
 bool file_utils::DoesFileExist(const std::string &path) {
   return access(path.c_str(), F_OK) == 0;
 }
