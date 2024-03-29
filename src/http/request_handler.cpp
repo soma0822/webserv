@@ -302,7 +302,7 @@ std::string RequestHandler::RemoveLocPath(const IConfig &config,
   const std::string &uri = request->GetUri();
   const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
   std::string loc_path = location_ctx.GetPath();
-  if (loc_path.at(loc_path.size() - 1) == '/'){
+  if (loc_path.at(loc_path.size() - 1) == '/') {
     loc_path.erase(loc_path.size() - 1, 1);
   }
 
