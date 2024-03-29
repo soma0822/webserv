@@ -271,6 +271,7 @@ std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
     uri = RemoveLocPath(config, req_ctx);
     target_path = root + uri;
   }
+  Logger::Debug() << root << " : uri : " << uri << std::endl;
   std::string script_path = ResolveScriptPart(target_path);
   std::string path_translated = target_path.substr(script_path.length());
   if (!path_translated.empty()) {
@@ -300,8 +301,12 @@ std::string RequestHandler::RemoveLocPath(const IConfig &config,
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
   const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
+  std::string loc_path = location_ctx.GetPath();
+  if (loc_path.at(loc_path.size() - 1) == '/'){
+    loc_path.erase(loc_path.size() - 1, 1);
+  }
 
-  return uri.substr(location_ctx.GetPath().length());
+  return uri.substr(loc_path.length());
 }
 
 HTTPResponse *RequestHandler::GenerateAutoIndexPage(
