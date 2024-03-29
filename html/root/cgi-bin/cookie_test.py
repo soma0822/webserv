@@ -45,8 +45,12 @@ def main():
 <html>
 <head>
     <title>Pythonでcookieを使った訪問回数の記録方法</title>
+    <link rel=\"stylesheet\" href=\"/styles.css\">
 </head>
 <body>
+    <header>
+        <nav><a href=\"/\">ホーム</a></nav>
+    </header>
     <center>
         <table border='1' width='90%' bgcolor='#FDF5E6'>
             <th>このページの訪問回数</th>
