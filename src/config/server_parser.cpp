@@ -43,6 +43,9 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
   }
   if (server.IsValidContext() == false || UniqueServerName(server) == false)
     throw std::invalid_argument("serverにポートがありません");
+  LocationContext loc;
+  loc.AddAllowMethod("GET");
+  server.AddLocation("", loc);
   return server;
 }
 

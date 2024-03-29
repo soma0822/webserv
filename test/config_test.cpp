@@ -25,9 +25,10 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(config.GetServer()[0].GetIndex(), "index.html");
   ASSERT_EQ(config.GetServer()[0].GetPort(), "8002");
   ASSERT_EQ(config.GetServer()[0].GetServerName(), "localhost");
-  ASSERT_EQ(config.GetServer()[0].GetLocation().size(), 5);
+  ASSERT_EQ(config.GetServer()[0].GetLocation().size(), 6);
   std::map<std::string, LocationContext>::const_iterator it2 =
       config.GetServer()[0].GetLocation().begin();
+  it2++;
   ASSERT_EQ(it2->first, "/");
   ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
@@ -309,4 +310,6 @@ TEST(SerchLocation, DefaultTest) {
   ASSERT_EQ("/tours", tmp.SearchLocation("/tours/usrs").Unwrap().GetPath());
   ASSERT_EQ("/tours/usr",
             tmp.SearchLocation("/tours/usr/sina").Unwrap().GetPath());
+  ASSERT_EQ("",
+            tmp.SearchLocation("").Unwrap().GetPath());
 }

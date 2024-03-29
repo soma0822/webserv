@@ -41,7 +41,7 @@ Result<LocationContext, std::string> ServerContext::SearchLocation(
     return Err("locationが設定されていません");
   }
   std::map<std::string, LocationContext>::const_iterator it = location_.begin();
-  std::map<std::string, LocationContext>::const_iterator ret = location_.end();
+  std::map<std::string, LocationContext>::const_iterator ret = location_.begin();
   long unsigned int ret_len = 0;
   for (; it != location_.end(); ++it) {
     if (it->first[0] == '=' && it->first.substr(2) == path) {
@@ -55,9 +55,6 @@ Result<LocationContext, std::string> ServerContext::SearchLocation(
         ret = it;
       }
     }
-  }
-  if (ret == location_.end()) {
-    return Err("locationが見つかりません");
   }
   return Ok(ret->second);
 }
