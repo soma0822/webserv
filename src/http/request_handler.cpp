@@ -38,33 +38,6 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   if (request->GetMethod() == "DELETE") {
     return Delete(config, req_ctx);
   }
-  if (is_cgi_request) {
-    // GETとPOST以外のメソッドはサポートしていない
-    if (req_ctx.request->GetMethod() != "POST" &&
-        req_ctx.request->GetMethod() != "GET") {
-      return Some(GenerateErrorResponse(http::kNotImplemented, config));
-    }
-
-    const std::string cgi_script_path = GetCGIScriptPath(config, req_ctx);
-    const std::string path_translated = GetPathInfoPath(config, req_ctx);
-
-    // CGIスクリプトの拡張子が許可されていない場合にはテキストとして返す
-    bool is_valid_cgi_extension =
-        location_ctx.IsValidCgiExtension(
-            cgi_script_path.substr(cgi_script_path.find('.', 1)));
-    bool is_method_allowed = IsAllowedMethod(config, req_ctx);
-    if (!is_valid_cgi_extension && req_ctx.request->GetMethod() == "GET" &&
-        is_method_allowed) {
-      return Get(config, req_ctx);
-    }
-
-    http::StatusCode status =
-        CGIExe(config, req_ctx, cgi_script_path, path_translated);
-    if (status == http::kOk) {
-      return None<HTTPResponse *>();
-    }
-    return Some(GenerateErrorResponse(status, config));
-  }
   return Some(GenerateErrorResponse(http::kNotImplemented, config));
 }
 
@@ -149,19 +122,19 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
 Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
                                             RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
-  // const IServerContext &server_ctx =
-  //     config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  // const LocationContext &location_ctx =
-  //     server_ctx.SearchLocation(uri);
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const LocationContext &location_ctx =
+      server_ctx.SearchLocation(request->GetUri());
 
-  const std::string request_file_path =
-      ResolveRequestTargetPath(config, req_ctx);
+  std::pair<std::string, std::string> resolve_pair = ResolveRequestTargetPath(config, req_ctx);
+  std::string request_file_path = resolve_pair.first;
+  std::string path_translated = resolve_pair.second;
   // リクエストターゲットがディレクトリの場合には400を返す
   if (request_file_path.at(request_file_path.size() - 1) == '/') {
     return Some(GenerateErrorResponse(http::kBadRequest, config));
   }
-
   const std::string parent_dir =
       request_file_path.substr(0, request_file_path.find_last_of('/'));
   // 親ディレクトリが存在しない場合には404を返す
@@ -171,6 +144,15 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   // 許可されていないメソッドの場合には405を返す
   if (!IsAllowedMethod(config, req_ctx)) {
     return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
+  }
+
+  if (request_file_path.find(".", 1) != std::string::npos &&
+        location_ctx.IsValidCgiExtension(request_file_path.substr(request_file_path.find('.', 1)))){
+    http::StatusCode status =CGIExe(config, req_ctx, request_file_path, path_translated);
+    if (status == http::kOk)
+      return None<HTTPResponse *>();
+    else 
+      return Some(GenerateErrorResponse(status, config));
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
   if (!file_utils::IsWritable(parent_dir)) {
@@ -199,7 +181,7 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
   // const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
 
   const std::string request_file_path =
-      ResolveRequestTargetPath(config, req_ctx);
+      ResolveRequestTargetPath(config, req_ctx).first;
 
   // リクエストターゲットがディレクトリの場合には400を返す
   if (uri.at(uri.size() - 1) == '/' ||
@@ -277,12 +259,12 @@ std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
     root.erase(root.size() - 1, 1);
     path_translated = root + target_path.substr(script_path.length());
   }
-  return std::pair(script_path, path_translated);
+  return std::make_pair(script_path, path_translated);
 }
 
 // 途中でファイルがあればそこまでを返す。なければそのまま返す。
 std::string RequestHandler::ResolveScriptPart(const std::string &target){
-  int pos = 0;
+  unsigned long pos = 0;
   while ((pos = target.find("/", pos)) != std::string::npos){
     if (file_utils::IsFile(target.substr(0, pos - 1))) 
       return target.substr(0, pos - 1);
@@ -301,32 +283,32 @@ std::string RequestHandler::RemoveLocPath(const IConfig &config, const RequestCo
   return uri.substr(location_ctx.GetPath().length());
 }
 
-std::string RequestHandler::GetCGIScriptPath(const IConfig &config,
-                                             RequestContext req_ctx) {
-  std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
-  // 拡張子以降のパスセグメントは除外する
-  size_t pos_period = request_file_path.find('.', 1);
-  size_t pos_separator = request_file_path.substr(pos_period).find('/');
-  // '/'が見つからない場合には拡張子以降のパスセグメントがないのでそのまま返す
-  if (pos_separator == std::string::npos) {
-    return request_file_path;
-  }
-  return request_file_path.substr(0, pos_period + pos_separator);
-}
+// std::string RequestHandler::GetCGIScriptPath(const IConfig &config,
+//                                              RequestContext req_ctx) {
+//   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
+//   // 拡張子以降のパスセグメントは除外する
+//   size_t pos_period = request_file_path.find('.', 1);
+//   size_t pos_separator = request_file_path.substr(pos_period).find('/');
+//   // '/'が見つからない場合には拡張子以降のパスセグメントがないのでそのまま返す
+//   if (pos_separator == std::string::npos) {
+//     return request_file_path;
+//   }
+//   return request_file_path.substr(0, pos_period + pos_separator);
+// }
 
 // 存在しない場合は空文字を返す
-std::string RequestHandler::GetPathInfoPath(const IConfig &config,
-                                            RequestContext req_ctx) {
-  std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
+// std::string RequestHandler::GetPathInfoPath(const IConfig &config,
+//                                             RequestContext req_ctx) {
+//   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
 
-  // CGIスクリプトの絶対パス以降がパスセグメントになる
-  std::string path_segment =
-      request_file_path.substr(GetCGIScriptPath(config, req_ctx).size());
-  if (path_segment.empty()) {
-    return "";
-  }
-  return ResolveRootPath(config, req_ctx) + path_segment;
-}
+//   // CGIスクリプトの絶対パス以降がパスセグメントになる
+//   std::string path_segment =
+//       request_file_path.substr(GetCGIScriptPath(config, req_ctx).size());
+//   if (path_segment.empty()) {
+//     return "";
+//   }
+//   return ResolveRootPath(config, req_ctx) + path_segment;
+// }
 
 HTTPResponse *RequestHandler::GenerateAutoIndexPage(
     const IConfig &config, const HTTPRequest *request,
