@@ -14,13 +14,12 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
   }
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
-  const Result<LocationContext, std::string> location_ctx_result =
+  const LocationContext &location_ctx =
       server_ctx.SearchLocation(request->GetUri());
 
   // リクエストボディのサイズが制限を超えている場合には413を返す
-  if (location_ctx_result.IsOk() &&
-      static_cast<int>(request->GetBody().length()) >
-          location_ctx_result.Unwrap().GetLimitClientBody()) {
+  if (static_cast<int>(request->GetBody().length()) >
+          location_ctx.GetLimitClientBody()) {
     return Some(GenerateErrorResponse(http::kPayloadTooLarge, config));
   }
 
@@ -52,8 +51,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
 
     // CGIスクリプトの拡張子が許可されていない場合にはテキストとして返す
     bool is_valid_cgi_extension =
-        location_ctx_result.IsOk() &&
-        location_ctx_result.Unwrap().IsValidCgiExtension(
+        location_ctx.IsValidCgiExtension(
             cgi_script_path.substr(cgi_script_path.find('.', 1)));
     bool is_method_allowed = IsAllowedMethod(config, req_ctx);
     if (!is_valid_cgi_extension && req_ctx.request->GetMethod() == "GET" &&
@@ -76,7 +74,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   const HTTPRequest *request = req_ctx.request;
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
-  const Result<LocationContext, std::string> location_ctx_result =
+  const LocationContext &location_ctx =
       server_ctx.SearchLocation(request->GetUri());
 
   bool need_autoindex = false;
@@ -91,8 +89,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
                       .Build());
     }
     // AutoIndexが有効な場合にはディレクトリの中身を表示する
-    if (location_ctx_result.IsOk() &&
-        location_ctx_result.Unwrap().GetCanAutoIndex()) {
+    if (location_ctx.GetCanAutoIndex()) {
       // パーミッションを確認してからAutoIndexを表示する
       need_autoindex = true;
     }
@@ -116,9 +113,8 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
 
   // リクエストされたファイルのパスがディレクトリの場合には、indexファイルが存在する場合にはそれを返す
   if (file_utils::IsDirectory(request_file_path)) {
-    if (location_ctx_result.IsOk() &&
-        !location_ctx_result.Unwrap().GetIndex().empty()) {
-      request_file_path += location_ctx_result.Unwrap().GetIndex();
+    if (!location_ctx.GetIndex().empty()) {
+      request_file_path += location_ctx.GetIndex();
     } else if (!server_ctx.GetIndex().empty()) {
       request_file_path += server_ctx.GetIndex();
     }
@@ -145,11 +141,11 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
 Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
                                             RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
-  const IServerContext &server_ctx =
-      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  // const IServerContext &server_ctx =
+  //     config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  const Result<LocationContext, std::string> location_ctx_result =
-      server_ctx.SearchLocation(uri);
+  // const LocationContext &location_ctx =
+  //     server_ctx.SearchLocation(uri);
 
   const std::string request_file_path =
       ResolveRequestTargetPath(config, req_ctx);
@@ -189,11 +185,10 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
 Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
                                               RequestContext req_ctx) {
   const HTTPRequest *request = req_ctx.request;
-  const IServerContext &server_ctx =
-      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  // const IServerContext &server_ctx =
+  //     config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  const Result<LocationContext, std::string> location_ctx_result =
-      server_ctx.SearchLocation(uri);
+  // const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
 
   const std::string request_file_path =
       ResolveRequestTargetPath(config, req_ctx);
@@ -235,13 +230,12 @@ std::string RequestHandler::ResolveRootPath(const IConfig &config,
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  const Result<LocationContext, std::string> location_ctx_result =
+  const LocationContext &location_ctx =
       server_ctx.SearchLocation(uri);
 
   std::string root = server_ctx.GetRoot();
-  if (location_ctx_result.IsOk() &&
-      !location_ctx_result.Unwrap().GetRoot().empty()) {
-    root = location_ctx_result.Unwrap().GetRoot();
+  if (!location_ctx.GetRoot().empty()) {
+    root = location_ctx.GetRoot();
   }
 
   return root;
@@ -479,12 +473,10 @@ bool RequestHandler::IsCGIRequest(const IConfig &config,
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  const Result<LocationContext, std::string> location_ctx_result =
-      server_ctx.SearchLocation(uri);
+  const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
 
   // cgi extensionが0より大きければCGIリクエストである
-  return location_ctx_result.IsOk() &&
-         location_ctx_result.Unwrap().GetCgiExtension().size() > 0;
+  return (location_ctx.GetCgiExtension().size() > 0);
 }
 
 bool RequestHandler::IsAllowedMethod(const IConfig &config,
@@ -493,10 +485,8 @@ bool RequestHandler::IsAllowedMethod(const IConfig &config,
   const IServerContext &server_ctx =
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const std::string &uri = request->GetUri();
-  const Result<LocationContext, std::string> location_ctx_result =
-      server_ctx.SearchLocation(uri);
-  return location_ctx_result.IsOk() &&
-         location_ctx_result.Unwrap().IsAllowedMethod(request->GetMethod());
+  const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
+  return location_ctx.IsAllowedMethod(request->GetMethod());
 }
 
 RequestHandler::RequestHandler() {}

@@ -100,22 +100,21 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetPath(), "= /red");
   ++it2;
   ASSERT_EQ(it2, config.GetServer()[0].GetLocation().end());
-  ASSERT_EQ("/", config.GetServer()[0].SearchLocation("/").Unwrap().GetPath());
+  ASSERT_EQ("/", config.GetServer()[0].SearchLocation("/").GetPath());
   ASSERT_EQ(
       "/",
-      config.GetServer()[0].SearchLocation("/index.html").Unwrap().GetPath());
+      config.GetServer()[0].SearchLocation("/index.html").GetPath());
   ASSERT_EQ("= /red",
-            config.GetServer()[0].SearchLocation("/red").Unwrap().GetPath());
+            config.GetServer()[0].SearchLocation("/red").GetPath());
   ASSERT_EQ("/red",
-            config.GetServer()[0].SearchLocation("/red/").Unwrap().GetPath());
+            config.GetServer()[0].SearchLocation("/red/").GetPath());
   ASSERT_EQ("/tours", config.GetServer()[0]
                           .SearchLocation("/tours/index.html")
-                          .Unwrap()
                           .GetPath());
   ASSERT_EQ("/tours",
-            config.GetServer()[0].SearchLocation("/tours/").Unwrap().GetPath());
+            config.GetServer()[0].SearchLocation("/tours/").GetPath());
   ASSERT_EQ("/tours",
-            config.GetServer()[0].SearchLocation("/tours").Unwrap().GetPath());
+            config.GetServer()[0].SearchLocation("/tours").GetPath());
 }
 
 TEST(ConfigTest, NoRootTest) {
@@ -304,12 +303,12 @@ TEST(SerchLocation, DefaultTest) {
   Config config = ConfigParser::Parse("test/conf_test/search_location.conf");
   const IServerContext &tmp =
       config.SearchServer("8002", "127.0.0.1", "localhost");
-  ASSERT_EQ("/", tmp.SearchLocation("/").Unwrap().GetPath());
-  ASSERT_EQ("/red", tmp.SearchLocation("/red/bin").Unwrap().GetPath());
-  ASSERT_EQ("= /red", tmp.SearchLocation("/red").Unwrap().GetPath());
-  ASSERT_EQ("/tours", tmp.SearchLocation("/tours/usrs").Unwrap().GetPath());
+  ASSERT_EQ("/", tmp.SearchLocation("/").GetPath());
+  ASSERT_EQ("/red", tmp.SearchLocation("/red/bin").GetPath());
+  ASSERT_EQ("= /red", tmp.SearchLocation("/red").GetPath());
+  ASSERT_EQ("/tours", tmp.SearchLocation("/tours/usrs").GetPath());
   ASSERT_EQ("/tours/usr",
-            tmp.SearchLocation("/tours/usr/sina").Unwrap().GetPath());
+            tmp.SearchLocation("/tours/usr/sina").GetPath());
   ASSERT_EQ("",
-            tmp.SearchLocation("").Unwrap().GetPath());
+            tmp.SearchLocation("").GetPath());
 }

@@ -34,7 +34,7 @@ TEST_F(RequestHandlerTest, GetMethodNormal) {
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+      .AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -64,7 +64,7 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
   ctx.AddAllowMethod("POST");
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+      .AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -99,7 +99,7 @@ TEST_F(RequestHandlerTest, PostMethodDirectoryRequest) {
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+      .AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -131,7 +131,7 @@ TEST_F(RequestHandlerTest, DeleteMethodNormalTest) {
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+      .AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -165,7 +165,7 @@ TEST_F(RequestHandlerTest, DeleteMethodDirectoryTarget) {
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+      .AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -194,7 +194,7 @@ TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithMultiplePathSegments) {
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+      .AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -218,7 +218,7 @@ TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithoutPathSegment) {
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+      .AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -242,7 +242,7 @@ TEST_F(RequestHandlerTest, GetPathInfoPath) {
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+      .AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -266,7 +266,7 @@ TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegmentWithoutPathSegment) {
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+      .AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
