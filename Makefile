@@ -66,21 +66,26 @@ format:
 	clang-format --style=Google -i test/*.cpp
 
 # Test ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
-.PHONY: test
+.PHONY: test/unit test/e2e
 
 BASE_DIR      = $(CURDIR)
 BUILD_DIR     = build
 BUILD_PATH    = $(BASE_DIR)/$(BUILD_DIR)
 TEST_EXE_PATH = $(BUILD_PATH)/webserv_test
 
+test: test/unit test/e2e
+
 # Run all tests
-test:
+test/unit:
 	@# Ensure cmake runs to generate the test executable
 	cmake -S $(BASE_DIR) -B $(BUILD_PATH)
 	@# Build the project
 	@cmake --build $(BUILD_PATH) || exit 1
 	@# Execute the test
 	@$(TEST_EXE_PATH) || exit 1
+
+test/e2e:
+	python3 ./test/e2e/main.py
 
 # CI -+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: build
