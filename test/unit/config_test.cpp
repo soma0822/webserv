@@ -119,7 +119,7 @@ TEST(ConfigTest, DefaultPath) {
 
 TEST(ConfigTest, NoRootTest) {
   const Config config = ConfigParser::Parse("test/conf_test/no_root.conf");
-  ASSERT_EQ(config.GetServer().at(0).GetRoot(), "./html");
+  ASSERT_EQ(config.GetServer().at(0).GetRoot(), "./www/html");
 }
 
 TEST(ConfigTest, TooLargePortTest) {

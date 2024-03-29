@@ -1,6 +1,6 @@
 #include "server_context.hpp"
 
-const std::string ServerContext::kDefaultRoot = "./html";
+const std::string ServerContext::kDefaultRoot = "./www/html";
 
 ServerContext::ServerContext() : root_(kDefaultRoot) {}
 
