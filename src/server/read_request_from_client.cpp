@@ -4,7 +4,7 @@ ReadRequestFromClient::ReadRequestFromClient(int fd, const std::string &port,
                                              const std::string &ip,
                                              struct sockaddr_in client_addr,
                                              const IConfig &config)
-    : AIOTask(fd, POLLIN),
+    : AIOTask(fd, POLLIN, kClientSocket),
       port_(port),
       ip_(ip),
       client_addr_(client_addr),
@@ -15,7 +15,8 @@ ReadRequestFromClient::~ReadRequestFromClient() {
   Logger::Info() << ip_ << ":" << port_ << " : 接続を切りました" << std::endl;
 }
 
-Result<int, std::string> ReadRequestFromClient::Execute() {
+Result<int, std::string> ReadRequestFromClient::Execute(int revent) {
+  if (!(event_ & revent)) return Ok(kNotReady);
   char buf[buf_size_ + 1];
   int len = read(fd_, buf, buf_size_);
   if (len == -1) {

@@ -80,6 +80,7 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
     // CGIスクリプトの拡張子が許可されていない場合にはテキストとして返す
     bool is_valid_cgi_extension =
         location_ctx_result.IsOk() &&
+        cgi_script_path.find('.') != std::string::npos &&
         location_ctx_result.Unwrap().IsValidCgiExtension(
             cgi_script_path.substr(cgi_script_path.find('.', 1)));
     bool is_method_allowed = IsAllowedMethod(config, req_ctx);
@@ -128,8 +129,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   if (need_autoindex) {
     // ファイルが存在しない場合には404を返す
     if (!file_utils::DoesFileExist(request_file_path)) {
-      return Some(
-          HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+      return Some(GenerateErrorResponse(http::kNotFound, config));
     }
     // 許可されていないメソッドの場合には405を返す
     if (!IsAllowedMethod(config, req_ctx)) {
@@ -137,8 +137,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
     }
     // パーミッションがない場合には403を返す
     if (!file_utils::IsReadable(request_file_path)) {
-      return Some(
-          HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
+      return Some(GenerateErrorResponse(http::kForbidden, config));
     }
     return Some(GenerateAutoIndexPage(config, request, request_file_path));
   }
@@ -154,7 +153,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   }
   // ファイルが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(request_file_path)) {
-    return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+    return Some(GenerateErrorResponse(http::kNotFound, config));
   }
   // 許可されていないメソッドの場合には405を返す
   if (!IsAllowedMethod(config, req_ctx)) {
@@ -162,8 +161,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   }
   // パーミッションがない場合には403を返す
   if (!file_utils::IsReadable(request_file_path)) {
-    return Some(
-        HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
+    return Some(GenerateErrorResponse(http::kForbidden, config));
   }
 
   return Some(HTTPResponse::Builder()
@@ -185,15 +183,14 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
       ResolveRequestTargetPath(config, req_ctx);
   // リクエストターゲットがディレクトリの場合には400を返す
   if (request_file_path.at(request_file_path.size() - 1) == '/') {
-    return Some(
-        HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build());
+    return Some(GenerateErrorResponse(http::kBadRequest, config));
   }
 
   const std::string parent_dir =
       request_file_path.substr(0, request_file_path.find_last_of('/'));
   // 親ディレクトリが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(parent_dir)) {
-    return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+    return Some(GenerateErrorResponse(http::kNotFound, config));
   }
   // 許可されていないメソッドの場合には405を返す
   if (!IsAllowedMethod(config, req_ctx)) {
@@ -201,15 +198,12 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   }
   // 親ディレクトリに書き込み権限がない場合には403を返す
   if (!file_utils::IsWritable(parent_dir)) {
-    return Some(
-        HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
+    return Some(GenerateErrorResponse(http::kForbidden, config));
   }
 
   std::ofstream ofs(request_file_path.c_str());
   if (!ofs) {
-    return Some(HTTPResponse::Builder()
-                    .SetStatusCode(http::kInternalServerError)
-                    .Build());
+    return Some(GenerateErrorResponse(http::kInternalServerError, config));
   }
   ofs << request->GetBody();
   ofs.close();
@@ -235,13 +229,12 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
   // リクエストターゲットがディレクトリの場合には400を返す
   if (uri.at(uri.size() - 1) == '/' ||
       file_utils::IsDirectory(request_file_path)) {
-    return Some(
-        HTTPResponse::Builder().SetStatusCode(http::kBadRequest).Build());
+    return Some(GenerateErrorResponse(http::kBadRequest, config));
   }
 
   // ファイルが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(request_file_path)) {
-    return Some(HTTPResponse::Builder().SetStatusCode(http::kNotFound).Build());
+    return Some(GenerateErrorResponse(http::kNotFound, config));
   }
 
   // 許可されていないメソッドの場合には405を返す
@@ -253,18 +246,15 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
       request_file_path.substr(0, request_file_path.find_last_of('/'));
   // 親ディレクトリに書き込み権限がない場合には403を返す
   if (!file_utils::IsWritable(parent_dir)) {
-    return Some(
-        HTTPResponse::Builder().SetStatusCode(http::kForbidden).Build());
+    return Some(GenerateErrorResponse(http::kForbidden, config));
   }
 
   // ファイルを削除する
   if (unlink(request_file_path.c_str()) == -1) {
-    return Some(HTTPResponse::Builder()
-                    .SetStatusCode(http::kInternalServerError)
-                    .Build());
+    return Some(GenerateErrorResponse(http::kInternalServerError, config));
   }
 
-  return Some(HTTPResponse::Builder().SetStatusCode(http::kOk).Build());
+  return Some(GenerateErrorResponse(http::kOk, config));
 }
 
 std::string RequestHandler::ResolveRootPath(const IConfig &config,
@@ -304,6 +294,9 @@ std::string RequestHandler::GetCGIScriptPath(const IConfig &config,
   std::string request_file_path = ResolveRequestTargetPath(config, req_ctx);
   // 拡張子以降のパスセグメントは除外する
   size_t pos_period = request_file_path.find('.', 1);
+  if (pos_period == std::string::npos) {
+    return request_file_path;
+  }
   size_t pos_separator = request_file_path.substr(pos_period).find('/');
   // '/'が見つからない場合には拡張子以降のパスセグメントがないのでそのまま返す
   if (pos_separator == std::string::npos) {
@@ -428,12 +421,14 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
     const char *argv[] = {script_name.c_str(), NULL};
     Logger::Info() << "CGI実行: " << argv[0] << std::endl;
     execve(argv[0], const_cast<char *const *>(argv), env);
+    perror("execve");
     Logger::Error() << "execve エラー" << std::endl;
     std::exit(1);
   }
   close(cgi_fd[1]);
   if (req_ctx.request->GetMethod() == "POST") close(redirect_fd[0]);
-  IOTaskManager::AddTask(new ReadFromCGI(pid, cgi_fd[0], req_ctx, config));
+  IOTaskManager::AddTask(new ReadFromCGI(pid, cgi_fd[0], req_ctx, config,
+                                         time_utils::GetCurrentTime()));
   return http::kOk;
 }
 
