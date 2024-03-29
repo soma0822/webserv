@@ -27,7 +27,7 @@ Result<int, std::string> ReadRequestFromClient::Execute() {
                    << std::endl;
     return Ok(kFdDelete);
   }
-  if (len == 1 && buf[0] == static_cast<char>(kEOF)) {
+  if (len == 1 && buf[0] == static_cast<char>(kEOT)) {
     Logger::Info() << ip_ << ":" << port_ << " : 接続が切られました"
                    << std::endl;
     IOTaskManager::AddTask(new WriteResponseToClient(
