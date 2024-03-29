@@ -28,6 +28,14 @@ Result<int, std::string> ReadRequestFromClient::Execute(int revent) {
                    << std::endl;
     return Ok(kFdDelete);
   }
+  if (len == 1 && buf[0] == static_cast<char>(kEOT)) {
+    Logger::Info() << ip_ << ":" << port_ << " : 接続が切られました"
+                   << std::endl;
+    IOTaskManager::AddTask(new WriteResponseToClient(
+        fd_, GenerateErrorResponse(http::kBadRequest, config_),
+        new HTTPRequest()));
+    return Ok(kOk);
+  }
   buf[len] = '\0';
   Result<HTTPRequest *, int> result = parser_.Parser(buf);
   if (result.IsErr() && result.UnwrapErr() == HTTPRequestParser::kNotEnough) {
