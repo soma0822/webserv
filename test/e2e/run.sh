@@ -36,7 +36,7 @@ function test() {
     response=$(request "$host_addr" "$test_file")
 
     status=$(echo "$response" | head -n 1 | awk '{print $2}')
-    if [ "$status" -ne "$expected_status" ]; then
+    if [ "$status" != "$expected_status" ]; then
       echo -e "${RED}failed: $test_file${NC}" >&2
       echo -e "${RED}Expected: $expected_status${NC}" >&2
       echo -e "${RED}Actual: $status${NC}" >&2
@@ -64,7 +64,7 @@ function request() {
 function main() {
 
   # テストの実行
-  test localhost:8002 test/e2e/request/bad_request 400
+  test localhost:8002 test/e2e/request/bad_request "400"
 
   # テスト結果の出力
   echo -e "${GREEN}Success: $success${NC}"
