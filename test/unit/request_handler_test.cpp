@@ -33,8 +33,7 @@ TEST_F(RequestHandlerTest, GetMethodNormal) {
   ctx.AddAllowMethod("GET");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
-  When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -57,16 +56,16 @@ TEST_F(RequestHandlerTest, GetMethodNormal) {
 TEST_F(RequestHandlerTest, PostMethodNormal) {
   const std::string root = "/tmp";
   const std::string uri = "/index.html";
+  const std::string index = "index.html";
   const std::string body = "Hello, world!\n";
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
   ctx.AddAllowMethod("POST");
   Mock<IServerContext> server_ctx_mock;
-  When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
-  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(index);
 
   // config mock
   Mock<IConfig> config_mock;
@@ -93,15 +92,15 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
 TEST_F(RequestHandlerTest, PostMethodDirectoryRequest) {
   const std::string root = "/tmp";
   const std::string uri = "/";
+  const std::string index = "";
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
   // server context mock
   Mock<IServerContext> server_ctx_mock;
-  When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
-  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(index);
 
   // config mock
   Mock<IConfig> config_mock;
@@ -130,8 +129,7 @@ TEST_F(RequestHandlerTest, DeleteMethodNormalTest) {
   ctx.AddAllowMethod("DELETE");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
-  When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -164,8 +162,7 @@ TEST_F(RequestHandlerTest, DeleteMethodDirectoryTarget) {
   ctx.SetCanAutoIndex(true);
   // server context mock
   Mock<IServerContext> server_ctx_mock;
-  When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -185,16 +182,18 @@ TEST_F(RequestHandlerTest, DeleteMethodDirectoryTarget) {
   ASSERT_TRUE(std::filesystem::exists(path));
 }
 
-TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithMultiplePathSegments) {
-  const std::string root = "/var/www/html";
-  const std::string uri = "/cgi-bin/cgi.py/foo/bar";
+// 存在するファイルが来たら、切るようにしてあるのでテストでも実際に存在するファイルにする必要があった。
+TEST_F(RequestHandlerTest, ResolveRequestTargetPath) {
+  const std::string root = "./www/html/root/cgi-bin";
+  const std::string uri = "/cgi-bin/cgi_test.py/foo/bar";
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.SetPath("/cgi-bin");
+  ctx.AddCgiExtension(".py");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
-  When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -205,20 +204,23 @@ TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithMultiplePathSegments) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(RequestHandler::GetCGIScriptPath(config_mock.get(), req_ctx),
-            "/var/www/html/cgi-bin/cgi.py");
+  std::pair<std::string, std::string> path_pair =
+      RequestHandler::ResolveRequestTargetPath(config_mock.get(), req_ctx);
+  ASSERT_EQ(path_pair.first, "./www/html/root/cgi-bin/cgi_test.py");
+  ASSERT_EQ(path_pair.second, "./www/html/root/cgi-bin/foo/bar");
 }
 
-TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithoutPathSegment) {
-  const std::string root = "/var/www/html";
-  const std::string uri = "/cgi-bin/cgi.py";
+TEST_F(RequestHandlerTest, ResolveRequestTargetPathSegmentWithoutPathSegment) {
+  const std::string root = "./www/html/root/cgi-bin";
+  const std::string uri = "/cgi-bin/cgi_test.py";
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.SetPath("/cgi-bin");
+  ctx.AddCgiExtension(".py");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
-  When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -229,20 +231,22 @@ TEST_F(RequestHandlerTest, GetAbsoluteCGIScriptWithoutPathSegment) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(RequestHandler::GetCGIScriptPath(config_mock.get(), req_ctx),
-            "/var/www/html/cgi-bin/cgi.py");
+  std::pair<std::string, std::string> path_pair =
+      RequestHandler::ResolveRequestTargetPath(config_mock.get(), req_ctx);
+  ASSERT_EQ(path_pair.first, "./www/html/root/cgi-bin/cgi_test.py");
+  ASSERT_EQ(path_pair.second, "");
 }
 
-TEST_F(RequestHandlerTest, GetPathInfoPath) {
-  const std::string root = "/var/www/html";
-  const std::string uri = "/cgi-bin/cgi.py/foo/bar";
+TEST_F(RequestHandlerTest, ResolveRequestTargetPathNotSetCGIExtension) {
+  const std::string root = "./www/html/root/cgi-bin";
+  const std::string uri = "/cgi-bin/cgi_test.py/foo/bar";
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.SetPath("/cgi-bin");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
-  When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -253,20 +257,23 @@ TEST_F(RequestHandlerTest, GetPathInfoPath) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(RequestHandler::GetPathInfoPath(config_mock.get(), req_ctx),
-            "/var/www/html/foo/bar");
+  std::pair<std::string, std::string> path_pair =
+      RequestHandler::ResolveRequestTargetPath(config_mock.get(), req_ctx);
+  ASSERT_EQ(path_pair.first, "./www/html/root/cgi-bin/cgi_test.py/foo/bar");
+  ASSERT_EQ(path_pair.second, "");
 }
 
-TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegmentWithoutPathSegment) {
-  const std::string root = "/var/www/html";
-  const std::string uri = "/cgi-bin/cgi.py";
+TEST_F(RequestHandlerTest, ResolveRequestTargetPathNotValidFile) {
+  const std::string root = "/";
+  const std::string uri = "/cgi-bin/cgi_test.py/foo/bar";
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
+  ctx.SetPath("/cgi-bin");
+  ctx.AddCgiExtension(".py");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
-  When(Method(server_ctx_mock, SearchLocation))
-      .AlwaysReturn(Result<LocationContext, std::string>(Ok(ctx)));
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
   When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
 
@@ -277,5 +284,8 @@ TEST_F(RequestHandlerTest, GetAbsolutePathForPathSegmentWithoutPathSegment) {
   HTTPRequest request;
   request.SetUri(uri);
   RequestContext req_ctx = {&request, "80", "", 0, 0};
-  ASSERT_EQ(RequestHandler::GetPathInfoPath(config_mock.get(), req_ctx), "");
+  std::pair<std::string, std::string> path_pair =
+      RequestHandler::ResolveRequestTargetPath(config_mock.get(), req_ctx);
+  ASSERT_EQ(path_pair.first, "/cgi_test.py/foo/bar");
+  ASSERT_EQ(path_pair.second, "");
 }

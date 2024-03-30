@@ -14,3 +14,4 @@ for key in form:
     print('<p>%s: %s</p>' % (key, value))
 
 print("</body></html>")
+

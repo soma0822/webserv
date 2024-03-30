@@ -6,12 +6,12 @@
 #include "server_context.hpp"
 
 TEST(ConfigTest, EmptyConfig) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/empty.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/empty.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, DefaultPath) {
-  Config config = ConfigParser::Parse("test/conf_test/default.conf");
+  Config config = ConfigParser::Parse("test/unit/conf_test/default.conf");
   std::map<std::string, std::string>::const_iterator it =
       config.GetErrorPage().begin();
   ASSERT_EQ(it->first, "404");
@@ -25,9 +25,10 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(config.GetServer()[0].GetIndex(), "index.html");
   ASSERT_EQ(config.GetServer()[0].GetPort(), "8002");
   ASSERT_EQ(config.GetServer()[0].GetServerName(), "localhost");
-  ASSERT_EQ(config.GetServer()[0].GetLocation().size(), 5);
+  ASSERT_EQ(config.GetServer()[0].GetLocation().size(), 6);
   std::map<std::string, LocationContext>::const_iterator it2 =
       config.GetServer()[0].GetLocation().begin();
+  it2++;
   ASSERT_EQ(it2->first, "/");
   ASSERT_EQ(it2->second.GetCanAutoIndex(), false);
   ASSERT_EQ(it2->second.GetLimitClientBody(), 1000);
@@ -99,193 +100,200 @@ TEST(ConfigTest, DefaultPath) {
   ASSERT_EQ(it2->second.GetPath(), "= /red");
   ++it2;
   ASSERT_EQ(it2, config.GetServer()[0].GetLocation().end());
-  ASSERT_EQ("/", config.GetServer()[0].SearchLocation("/").Unwrap().GetPath());
+  ASSERT_EQ("/", config.GetServer()[0].SearchLocation("/").GetPath());
+  ASSERT_EQ("/", config.GetServer()[0].SearchLocation("/index.html").GetPath());
+  ASSERT_EQ("= /red", config.GetServer()[0].SearchLocation("/red").GetPath());
+  ASSERT_EQ("/red", config.GetServer()[0].SearchLocation("/red/").GetPath());
   ASSERT_EQ(
-      "/",
-      config.GetServer()[0].SearchLocation("/index.html").Unwrap().GetPath());
-  ASSERT_EQ("= /red",
-            config.GetServer()[0].SearchLocation("/red").Unwrap().GetPath());
-  ASSERT_EQ("/red",
-            config.GetServer()[0].SearchLocation("/red/").Unwrap().GetPath());
-  ASSERT_EQ("/tours", config.GetServer()[0]
-                          .SearchLocation("/tours/index.html")
-                          .Unwrap()
-                          .GetPath());
+      "/tours",
+      config.GetServer()[0].SearchLocation("/tours/index.html").GetPath());
   ASSERT_EQ("/tours",
-            config.GetServer()[0].SearchLocation("/tours/").Unwrap().GetPath());
-  ASSERT_EQ("/tours",
-            config.GetServer()[0].SearchLocation("/tours").Unwrap().GetPath());
+            config.GetServer()[0].SearchLocation("/tours/").GetPath());
+  ASSERT_EQ("/tours", config.GetServer()[0].SearchLocation("/tours").GetPath());
 }
 
 TEST(ConfigTest, NoRootTest) {
-  const Config config = ConfigParser::Parse("test/conf_test/no_root.conf");
-  ASSERT_EQ(config.GetServer().at(0).GetRoot(), "./www/html");
+  const Config config = ConfigParser::Parse("test/unit/conf_test/no_root.conf");
+  ASSERT_EQ(config.GetServer().at(0).GetRoot(), "");
 }
 
 TEST(ConfigTest, TooLargePortTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/too_large_port.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/too_large_port.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, NotNumberPortTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/not_num_port.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/not_num_port.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidServerTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_server.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/invalid_server.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, NoFileTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/no_file.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/no_file.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidLocationKeyTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_location_key.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/invalid_location_key.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidLocationValueTest) {
   ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/invalid_location_value.conf"),
+      ConfigParser::Parse("test/unit/conf_test/invalid_location_value.conf"),
       std::invalid_argument);
 }
 
 TEST(ConfigTest, LocationSyntaxErrorTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/location_syntax_error.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/location_syntax_error.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, ServerSyntaxErrorTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/server_syntax_error.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/server_syntax_error.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidServerKeyTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_server_key.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/invalid_server_key.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, InvalidServerValueTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/invalid_server_value.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/invalid_server_value.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, NoPortTest) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/no_port.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/no_port.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleIp) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_ip.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/double_ip.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleRoot) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_root.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/double_root.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleIndex) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_index.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/double_index.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, DoublePort) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_port.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/double_port.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleServerName) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_server_name.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/double_server_name.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, DoublePair) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_server_pair.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/double_server_pair.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleErrorPage) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_error_page.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/double_error_page.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleLocation) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/double_location.conf"),
                std::invalid_argument);
 }
 // location double
 TEST(ConfigTest, DoubleLocationCanAutoIndex) {
-  ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/double_location_can_auto_index.conf"),
-      std::invalid_argument);
+  ASSERT_THROW(ConfigParser::Parse(
+                   "test/unit/conf_test/double_location_can_auto_index.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleLocationLimitClientBody) {
-  ASSERT_THROW(ConfigParser::Parse(
-                   "test/conf_test/double_location_limit_client_body.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse(
+          "test/unit/conf_test/double_location_limit_client_body.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleLocationReturn) {
   ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/double_location_return.conf"),
+      ConfigParser::Parse("test/unit/conf_test/double_location_return.conf"),
       std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleLocationalias) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_alias.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/double_location_alias.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleLocationRoot) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_root.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/double_location_root.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleLocationIndex) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/double_location_index.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/double_location_index.conf"),
+      std::invalid_argument);
 }
 TEST(ConfigTest, DoubleLocationCgiExtension) {
-  ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/double_location_Cgi_Extension.conf"),
-      std::invalid_argument);
+  ASSERT_THROW(ConfigParser::Parse(
+                   "test/unit/conf_test/double_location_Cgi_Extension.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, DoubleLocationAllowMethod) {
-  ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/double_location_allow_method.conf"),
-      std::invalid_argument);
+  ASSERT_THROW(ConfigParser::Parse(
+                   "test/unit/conf_test/double_location_allow_method.conf"),
+               std::invalid_argument);
 }
 
 TEST(ConfigTest, PortIp) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/port_ip.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/port_ip.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, PortIpServerName) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/port_ip_server_name.conf"),
-               std::invalid_argument);
+  ASSERT_THROW(
+      ConfigParser::Parse("test/unit/conf_test/port_ip_server_name.conf"),
+      std::invalid_argument);
 }
 
 TEST(ConfigTest, HostListen) {
-  ASSERT_THROW(ConfigParser::Parse("test/conf_test/host_listen.conf"),
+  ASSERT_THROW(ConfigParser::Parse("test/unit/conf_test/host_listen.conf"),
                std::invalid_argument);
 }
 
 TEST(ConfigTest, HostListenServername) {
   ASSERT_THROW(
-      ConfigParser::Parse("test/conf_test/host_listen_server_name.conf"),
+      ConfigParser::Parse("test/unit/conf_test/host_listen_server_name.conf"),
       std::invalid_argument);
 }
 
 // SerchServer
 TEST(SerchServer, DefaultTest) {
-  Config config = ConfigParser::Parse("test/conf_test/search_server.conf");
+  Config config = ConfigParser::Parse("test/unit/conf_test/search_server.conf");
   const IServerContext &tmp = config.SearchServer("8002", "127.0.0.1", "");
   ASSERT_EQ(&config.GetServer().at(0), &tmp);
   const IServerContext &tmp1 = config.SearchServer("8000", "127.0.0.1", "");
@@ -300,13 +308,14 @@ TEST(SerchServer, DefaultTest) {
 
 // SerchLocation
 TEST(SerchLocation, DefaultTest) {
-  Config config = ConfigParser::Parse("test/conf_test/search_location.conf");
+  Config config =
+      ConfigParser::Parse("test/unit/conf_test/search_location.conf");
   const IServerContext &tmp =
       config.SearchServer("8002", "127.0.0.1", "localhost");
-  ASSERT_EQ("/", tmp.SearchLocation("/").Unwrap().GetPath());
-  ASSERT_EQ("/red", tmp.SearchLocation("/red/bin").Unwrap().GetPath());
-  ASSERT_EQ("= /red", tmp.SearchLocation("/red").Unwrap().GetPath());
-  ASSERT_EQ("/tours", tmp.SearchLocation("/tours/usrs").Unwrap().GetPath());
-  ASSERT_EQ("/tours/usr",
-            tmp.SearchLocation("/tours/usr/sina").Unwrap().GetPath());
+  ASSERT_EQ("/", tmp.SearchLocation("/").GetPath());
+  ASSERT_EQ("/red", tmp.SearchLocation("/red/bin").GetPath());
+  ASSERT_EQ("= /red", tmp.SearchLocation("/red").GetPath());
+  ASSERT_EQ("/tours", tmp.SearchLocation("/tours/usrs").GetPath());
+  ASSERT_EQ("/tours/usr", tmp.SearchLocation("/tours/usr/sina").GetPath());
+  ASSERT_EQ("", tmp.SearchLocation("").GetPath());
 }

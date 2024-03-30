@@ -16,7 +16,7 @@ class IServerContext {
   virtual bool HavePort(const std::string &port) const = 0;
   virtual bool HaveServerName(const std::string &server_name) const = 0;
   virtual bool IsValidContext() const = 0;
-  virtual Result<LocationContext, std::string> SearchLocation(
+  virtual const LocationContext &SearchLocation(
       const std::string &path) const = 0;
   // ゲッター
   virtual const std::string &GetIp() const = 0;
@@ -44,8 +44,7 @@ class ServerContext : public IServerContext {
   bool HavePort(const std::string &port) const;
   bool HaveServerName(const std::string &server_name) const;
   bool IsValidContext() const;
-  Result<LocationContext, std::string> SearchLocation(
-      const std::string &path) const;
+  const LocationContext &SearchLocation(const std::string &path) const;
   // ゲッター
   const std::string &GetIp() const;
   const std::string &GetRoot() const;

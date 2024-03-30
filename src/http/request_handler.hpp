@@ -2,6 +2,7 @@
 #define WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_
 
 #include "config.hpp"
+#include "file_utils.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 #include "io_task_manager.hpp"
@@ -23,12 +24,8 @@ class RequestHandler {
   static http::StatusCode CGIExe(const IConfig &config, RequestContext req_ctx,
                                  const std::string &script_name,
                                  const std::string &path_translated);
-  static std::string GetCGIScriptPath(const IConfig &config,
-                                      RequestContext req_ctx);
-  static std::string GetPathInfoPath(const IConfig &config,
-                                     RequestContext req_ctx);
-  static char const **MakeArgv(const std::string &script_name,
-                               std::string &first_line);
+  static std::pair<std::string, std::string> ResolveRequestTargetPath(
+      const IConfig &config, const RequestContext req_ctx);
 
  private:
   RequestHandler();
@@ -46,12 +43,15 @@ class RequestHandler {
       const std::string &script_name, const std::string &path_translated);
   static char **DupEnv(const std::map<std::string, std::string> &env_map);
   static void DeleteEnv(char **env);
-  static std::string ResolveRequestTargetPath(const IConfig &config,
-                                              const RequestContext req_ctx);
   static std::string ResolveRootPath(const IConfig &config,
                                      const RequestContext req_ctx);
+  static std::string ResolveScriptPart(const LocationContext &loc_ctx,
+                                       const std::string &target);
+  static std::string RemoveLocPath(const IConfig &config,
+                                   const RequestContext req_ctx);
   static bool IsCGIRequest(const IConfig &config, RequestContext req_ctx);
   static bool IsAllowedMethod(const IConfig &config, RequestContext req_ctx);
+  static const std::string server_dir;
 };
 
 #endif  // WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_

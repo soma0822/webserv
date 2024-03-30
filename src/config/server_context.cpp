@@ -1,8 +1,6 @@
 #include "server_context.hpp"
 
-const std::string ServerContext::kDefaultRoot = "./www/html";
-
-ServerContext::ServerContext() : root_(kDefaultRoot) {}
+ServerContext::ServerContext() {}
 
 ServerContext::ServerContext(const ServerContext &other) { *this = other; }
 
@@ -35,17 +33,15 @@ bool ServerContext::IsValidContext() const {
     return true;
 }
 
-Result<LocationContext, std::string> ServerContext::SearchLocation(
+const LocationContext &ServerContext::SearchLocation(
     const std::string &path) const {
-  if (location_.empty()) {
-    return Err("locationが設定されていません");
-  }
   std::map<std::string, LocationContext>::const_iterator it = location_.begin();
-  std::map<std::string, LocationContext>::const_iterator ret = location_.end();
+  std::map<std::string, LocationContext>::const_iterator ret =
+      location_.begin();
   long unsigned int ret_len = 0;
   for (; it != location_.end(); ++it) {
     if (it->first[0] == '=' && it->first.substr(2) == path) {
-      return Ok(it->second);
+      return it->second;
     } else {
       if (path.find(it->first) == 0 && ret_len < it->first.length() &&
           (path.length() == it->first.length() ||
@@ -56,10 +52,7 @@ Result<LocationContext, std::string> ServerContext::SearchLocation(
       }
     }
   }
-  if (ret == location_.end()) {
-    return Err("locationが見つかりません");
-  }
-  return Ok(ret->second);
+  return ret->second;
 }
 
 // ゲッター
