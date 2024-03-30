@@ -93,9 +93,9 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
       request_file_path += server_ctx.GetIndex();
     }
   }
-  bool is_cgi = (request_file_path.find('.', 1) != std::string::npos &&
+  bool is_cgi = (request_file_path.rfind('.') != std::string::npos &&
                  location_ctx.IsValidCgiExtension(
-                     request_file_path.substr(request_file_path.find('.', 1))));
+                     request_file_path.substr(request_file_path.rfind('.'))));
   // パーミッションがない場合には403を返す
   if ((!file_utils::IsReadable(request_file_path) && !is_cgi) ||
       (!file_utils::IsExecutable(request_file_path) && is_cgi)) {
@@ -150,9 +150,9 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   } else {
     cgi_script = request_file_path;
   }
-  bool is_cgi = (cgi_script.find('.', 1) != std::string::npos &&
+  bool is_cgi = (cgi_script.rfind('.', 1) != std::string::npos &&
                  location_ctx.IsValidCgiExtension(
-                     cgi_script.substr(cgi_script.find('.', 1))));
+                     cgi_script.substr(cgi_script.find('.'))));
   // リクエストターゲットがディレクトリの場合には400を返す
   if (!is_cgi && request_file_path.at(request_file_path.size() - 1) == '/') {
     return Some(GenerateErrorResponse(http::kBadRequest, config));
@@ -261,7 +261,10 @@ std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
   if (!root_empty && root.at(root.size() - 1) == '/') {
     root.erase(root.size() - 1, 1);
   }
-
+  const HTTPRequest *request = req_ctx.request;
+  const IServerContext &server_ctx =
+      config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
+  const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
   // RFC9112によれば、OPTIONSとCONNECT以外のリクエストはパスが以下の形式になる
   // origin-form = absolute-path [ "?" query ]
   // rootが/で終わっている場合には/が重複してしまうので削除する
@@ -272,7 +275,7 @@ std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
     target_path = root + uri;
   }
   Logger::Debug() << root << " : uri : " << uri << std::endl;
-  std::string script_path = ResolveScriptPart(target_path);
+  std::string script_path = ResolveScriptPart(location_ctx, target_path);
   std::string path_translated = target_path.substr(script_path.length());
   if (!path_translated.empty()) {
     if (root_empty) {
@@ -284,11 +287,16 @@ std::pair<std::string, std::string> RequestHandler::ResolveRequestTargetPath(
   return std::make_pair(script_path, path_translated);
 }
 
-// 途中でファイルがあればそこまでを返す。なければそのまま返す。
-std::string RequestHandler::ResolveScriptPart(const std::string &target) {
+// 途中でファイルがあり、その拡張子がcgiのものであればそれを返す。なければそのまま返す
+std::string RequestHandler::ResolveScriptPart(const LocationContext &loc_ctx,
+                                              const std::string &target) {
   unsigned long pos = 0;
   while ((pos = target.find("/", pos + 1)) != std::string::npos) {
-    if (file_utils::IsFile(target.substr(0, pos))) return target.substr(0, pos);
+    std::string tmp = target.substr(0, pos);
+    if (file_utils::IsFile(tmp) &&
+        loc_ctx.IsValidCgiExtension(tmp.substr(tmp.rfind(".")))) {
+      return tmp;
+    }
   }
   return target;
 }

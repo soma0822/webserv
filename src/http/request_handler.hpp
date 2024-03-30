@@ -45,7 +45,8 @@ class RequestHandler {
   static void DeleteEnv(char **env);
   static std::string ResolveRootPath(const IConfig &config,
                                      const RequestContext req_ctx);
-  static std::string ResolveScriptPart(const std::string &target);
+  static std::string ResolveScriptPart(const LocationContext &loc_ctx,
+                                       const std::string &target);
   static std::string RemoveLocPath(const IConfig &config,
                                    const RequestContext req_ctx);
   static bool IsCGIRequest(const IConfig &config, RequestContext req_ctx);
