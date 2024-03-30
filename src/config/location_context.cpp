@@ -46,7 +46,7 @@ const std::map<std::string, bool> &LocationContext::GetAllowMethod() const {
 }
 bool LocationContext::IsAllowedMethod(const std::string &key) const {
   std::map<std::string, bool>::const_iterator it = allow_method_.find(key);
-  return it->second == true;
+  return (it != allow_method_.end() && it->second == true);
 }
 // セッター
 void LocationContext::SetCanAutoIndex(bool can_auto_index) {
