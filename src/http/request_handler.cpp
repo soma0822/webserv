@@ -450,7 +450,7 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   env_map["REMOTE_ADDR"] = inet_ntoa(req_ctx.client_addr.sin_addr);
   env_map["SCRIPT_NAME"] = script_name;
   std::string host = req_ctx.request->GetHostHeader();
-  if (host.find(":") != std::string::npos){
+  if (host.find(":") != std::string::npos) {
     env_map["SERVER_NAME"] = host.substr(0, host.find(":"));
   } else {
     env_map["SERVER_NAME"] = host;
