@@ -163,8 +163,14 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   if (!file_utils::DoesFileExist(parent_dir)) {
     return Some(GenerateErrorResponse(http::kNotFound, config));
   }
+  bool parent_unwritable = !is_cgi &&
+                           !file_utils::DoesFileExist(request_file_path) &&
+                           (!file_utils::IsWritable(parent_dir));
+  bool request_file_unwritable = !is_cgi &&
+                                 file_utils::IsFile(request_file_path) &&
+                                 (!file_utils::IsWritable(request_file_path));
   // 親ディレクトリに書き込み権限がない場合には403を返す cgiの場合は実行権限
-  if ((!is_cgi && !file_utils::IsWritable(parent_dir)) ||
+  if (parent_unwritable || request_file_unwritable ||
       (is_cgi && !file_utils::IsExecutable(cgi_script))) {
     return Some(GenerateErrorResponse(http::kForbidden, config));
   }
@@ -213,16 +219,16 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
     return Some(GenerateErrorResponse(http::kNotFound, config));
   }
 
-  // 許可されていないメソッドの場合には405を返す
-  if (!IsAllowedMethod(config, req_ctx)) {
-    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
-  }
-
   const std::string parent_dir =
       request_file_path.substr(0, request_file_path.find_last_of('/'));
   // 親ディレクトリに書き込み権限がない場合には403を返す
   if (!file_utils::IsWritable(parent_dir)) {
     return Some(GenerateErrorResponse(http::kForbidden, config));
+  }
+
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
 
   // ファイルを削除する
