@@ -236,3 +236,56 @@ TEST_F(RequestHandlerTest, ResolveRequestTargetPathSegmentWithoutPathSegment) {
   ASSERT_EQ(path_pair.first, "./www/html/root/cgi-bin/cgi_test.py");
   ASSERT_EQ(path_pair.second, "");
 }
+
+TEST_F(RequestHandlerTest, ResolveRequestTargetPathNotSetCGIExtension) {
+  const std::string root = "./www/html/root/cgi-bin";
+  const std::string uri = "/cgi-bin/cgi_test.py/foo/bar";
+
+  LocationContext ctx;
+  ctx.SetCanAutoIndex(true);
+  ctx.SetPath("/cgi-bin");
+  // server context mock
+  Mock<IServerContext> server_ctx_mock;
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
+  When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+
+  // config mock
+  Mock<IConfig> config_mock;
+  When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+
+  HTTPRequest request;
+  request.SetUri(uri);
+  RequestContext req_ctx = {&request, "80", "", 0, 0};
+  std::pair<std::string, std::string> path_pair =
+      RequestHandler::ResolveRequestTargetPath(config_mock.get(), req_ctx);
+  ASSERT_EQ(path_pair.first, "./www/html/root/cgi-bin/cgi_test.py/foo/bar");
+  ASSERT_EQ(path_pair.second, "");
+}
+
+TEST_F(RequestHandlerTest, ResolveRequestTargetPathNotValidFile) {
+  const std::string root = "/";
+  const std::string uri = "/cgi-bin/cgi_test.py/foo/bar";
+
+  LocationContext ctx;
+  ctx.SetCanAutoIndex(true);
+  ctx.SetPath("/cgi-bin");
+  ctx.AddCgiExtension(".py");
+  // server context mock
+  Mock<IServerContext> server_ctx_mock;
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
+  When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+
+  // config mock
+  Mock<IConfig> config_mock;
+  When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+
+  HTTPRequest request;
+  request.SetUri(uri);
+  RequestContext req_ctx = {&request, "80", "", 0, 0};
+  std::pair<std::string, std::string> path_pair =
+      RequestHandler::ResolveRequestTargetPath(config_mock.get(), req_ctx);
+  ASSERT_EQ(path_pair.first, "/cgi_test.py/foo/bar");
+  ASSERT_EQ(path_pair.second, "");
+}
