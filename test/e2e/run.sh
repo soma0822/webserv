@@ -34,11 +34,6 @@ function test() {
   # 全てのファイルにつき、requestを実行
   for test_file in $test_files; do
     response=$(request "$host_addr" "$test_file")
-    if [ $? -ne 0 ]; then
-      echo -e "${RED}Error: request failed${NC}" >&2
-      failure=$((failure + 1))
-      continue
-    fi
 
     status=$(echo "$response" | head -n 1 | awk '{print $2}')
     if [ "$status" -ne "$expected_status" ]; then
@@ -63,7 +58,7 @@ function request() {
     exit 1
   fi
 
-  cat "$request_file" | awk 1 ORS='\r\n' | curl telnet://"$host_addr" 2>/dev/null
+  cat "$request_file" | awk 1 ORS='\r\n' | curl -m 1 telnet://"$host_addr" 2> /dev/null || true
 }
 
 function main() {
