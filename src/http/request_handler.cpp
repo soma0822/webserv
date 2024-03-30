@@ -217,7 +217,7 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
 
   // ファイルが存在しない場合には404を返す
   if (!file_utils::DoesFileExist(request_file_path) ||
-      path_translated.empty()) {
+      !path_translated.empty()) {
     return Some(GenerateErrorResponse(http::kNotFound, config));
   }
 
