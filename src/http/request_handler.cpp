@@ -18,6 +18,12 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const LocationContext &location_ctx =
       server_ctx.SearchLocation(request->GetUri());
+  if (!location_ctx.GetReturn().empty()) {
+    return Some(HTTPResponse::Builder()
+                    .SetStatusCode(http::kMovedPermanently)
+                    .AddHeader("Location", location_ctx.GetReturn())
+                    .Build());
+  }
 
   // リクエストボディのサイズが制限を超えている場合には413を返す
   if (static_cast<int>(request->GetBody().length()) >
