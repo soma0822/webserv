@@ -353,21 +353,6 @@ http::StatusCode RequestHandler::CGIExe(const IConfig &config,
                                         RequestContext req_ctx,
                                         const std::string &script_name,
                                         const std::string &path_translated) {
-  // スクリプトが存在しない場合には404を返す
-  if (!file_utils::DoesFileExist(script_name)) {
-    return http::kNotFound;
-  }
-
-  // 許可されていないメソッドの場合には405を返す
-  if (!IsAllowedMethod(config, req_ctx)) {
-    return http::kMethodNotAllowed;
-  }
-
-  // スクリプトが実行可能でない場合には403を返す
-  if (!file_utils::IsExecutable(script_name)) {
-    return http::kForbidden;
-  }
-
   int redirect_fd[2], cgi_fd[2];
   pid_t pid;
   if (pipe(cgi_fd) == -1) {
