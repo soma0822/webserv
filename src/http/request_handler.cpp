@@ -109,9 +109,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   if (!IsAllowedMethod(config, req_ctx)) {
     return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
-  if (request_file_path.rfind('.') != std::string::npos &&
-      location_ctx.IsValidCgiExtension(
-          request_file_path.substr(request_file_path.rfind('.')))) {
+  if (is_cgi) {
     http::StatusCode status =
         CGIExe(config, req_ctx, request_file_path, path_translated);
     if (status == http::kOk)
@@ -205,8 +203,11 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
   const HTTPRequest *request = req_ctx.request;
   const std::string &uri = request->GetUri();
 
-  const std::string request_file_path =
-      ResolveRequestTargetPath(config, req_ctx).first;
+  std::pair<std::string, std::string> resolve_pair =
+      ResolveRequestTargetPath(config, req_ctx);
+
+  std::string request_file_path = resolve_pair.first;
+  std::string path_translated = resolve_pair.second;
 
   // リクエストターゲットがディレクトリの場合には400を返す
   if (uri.at(uri.size() - 1) == '/' ||
@@ -215,7 +216,8 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
   }
 
   // ファイルが存在しない場合には404を返す
-  if (!file_utils::DoesFileExist(request_file_path)) {
+  if (!file_utils::DoesFileExist(request_file_path) ||
+      path_translated.empty()) {
     return Some(GenerateErrorResponse(http::kNotFound, config));
   }
 
