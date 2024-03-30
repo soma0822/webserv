@@ -25,6 +25,7 @@ class Server {
   Server &operator=(const Server &other);
   static Result<int, int> Listen(const std::string &port,
                                  const std::string &ip);
+  static uint32_t InetAddr(const std::string& ip_str);
 
   // TODO : errornoによって定義していく
   enum Error {
@@ -32,7 +33,8 @@ class Server {
     kSetSockOptError,
     kListenError,
     kBindError,
-    kFcntlError
+    kFcntlError,
+    kBadIP
   };
 };
 
