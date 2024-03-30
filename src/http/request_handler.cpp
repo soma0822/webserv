@@ -109,9 +109,9 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   if (!IsAllowedMethod(config, req_ctx)) {
     return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
-  if (request_file_path.find('.', 1) != std::string::npos &&
+  if (request_file_path.rfind('.') != std::string::npos &&
       location_ctx.IsValidCgiExtension(
-          request_file_path.substr(request_file_path.find('.', 1)))) {
+          request_file_path.substr(request_file_path.rfind('.')))) {
     http::StatusCode status =
         CGIExe(config, req_ctx, request_file_path, path_translated);
     if (status == http::kOk)
@@ -150,9 +150,9 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   } else {
     cgi_script = request_file_path;
   }
-  bool is_cgi = (cgi_script.rfind('.', 1) != std::string::npos &&
+  bool is_cgi = (cgi_script.rfind('.') != std::string::npos &&
                  location_ctx.IsValidCgiExtension(
-                     cgi_script.substr(cgi_script.find('.'))));
+                     cgi_script.substr(cgi_script.rfind('.'))));
   // リクエストターゲットがディレクトリの場合には400を返す
   if (!is_cgi && request_file_path.at(request_file_path.size() - 1) == '/') {
     return Some(GenerateErrorResponse(http::kBadRequest, config));
