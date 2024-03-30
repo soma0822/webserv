@@ -71,6 +71,7 @@ int HTTPRequestParser::SetHeader() {
       return kBadRequest;  // Hostが複数ある時
     request_->AddHeader(string_utils::StrToUpper(key),
                         string_utils::SkipSpace(value));
+    if (value == "") return kBadRequest;  // 右辺が空
   }
   return kOk;
 }
