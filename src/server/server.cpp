@@ -45,8 +45,7 @@ Result<int, int> Server::Listen(const std::string &port,
   addr.sin_family = AF_INET;
   addr.sin_port = htons(result.Unwrap());
   uint32_t s_addr = addr_utils::InetAddr(ip.c_str());
-  if (s_addr == 0)
-    return Err(kBadIP);
+  if (s_addr == 0) return Err(kBadIP);
   addr.sin_addr.s_addr = s_addr;
   if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1)
     return Err(kBindError);
@@ -56,4 +55,3 @@ Result<int, int> Server::Listen(const std::string &port,
   Logger::Info() << ip << ":" << port << " : リッスン開始" << std::endl;
   return Ok(sock);
 }
-
