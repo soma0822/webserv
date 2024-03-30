@@ -44,8 +44,6 @@ Result<int, int> Server::Listen(const std::string &port,
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
   addr.sin_port = htons(result.Unwrap());
-  // TODO:
-  // inet_addrは使用可能ではないため、自作の必要あり　空文字列の場合INADDR_ANYを返してくる
   uint32_t s_addr = InetAddr(ip.c_str());
   if (s_addr == 0)
     return Err(kBadIP);
