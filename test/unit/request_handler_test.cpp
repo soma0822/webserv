@@ -56,6 +56,7 @@ TEST_F(RequestHandlerTest, GetMethodNormal) {
 TEST_F(RequestHandlerTest, PostMethodNormal) {
   const std::string root = "/tmp";
   const std::string uri = "/index.html";
+  const std::string index = "index.html";
   const std::string body = "Hello, world!\n";
 
   LocationContext ctx;
@@ -64,7 +65,7 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
-  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(index);
 
   // config mock
   Mock<IConfig> config_mock;
@@ -91,6 +92,7 @@ TEST_F(RequestHandlerTest, PostMethodNormal) {
 TEST_F(RequestHandlerTest, PostMethodDirectoryRequest) {
   const std::string root = "/tmp";
   const std::string uri = "/";
+  const std::string index = "";
 
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
@@ -98,7 +100,7 @@ TEST_F(RequestHandlerTest, PostMethodDirectoryRequest) {
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
   When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
-  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(index);
 
   // config mock
   Mock<IConfig> config_mock;
@@ -188,6 +190,7 @@ TEST_F(RequestHandlerTest, ResolveRequestTargetPath) {
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
   ctx.SetPath("/cgi-bin");
+  ctx.AddCgiExtension(".py");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
@@ -214,6 +217,7 @@ TEST_F(RequestHandlerTest, ResolveRequestTargetPathSegmentWithoutPathSegment) {
   LocationContext ctx;
   ctx.SetCanAutoIndex(true);
   ctx.SetPath("/cgi-bin");
+  ctx.AddCgiExtension(".py");
   // server context mock
   Mock<IServerContext> server_ctx_mock;
   When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);

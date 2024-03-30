@@ -75,13 +75,13 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
     if (!file_utils::DoesFileExist(request_file_path)) {
       return Some(GenerateErrorResponse(http::kNotFound, config));
     }
-    // 許可されていないメソッドの場合には405を返す
-    if (!IsAllowedMethod(config, req_ctx)) {
-      return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
-    }
     // パーミッションがない場合には403を返す
     if (!file_utils::IsReadable(request_file_path)) {
       return Some(GenerateErrorResponse(http::kForbidden, config));
+    }
+    // 許可されていないメソッドの場合には405を返す
+    if (!IsAllowedMethod(config, req_ctx)) {
+      return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
     }
     return Some(GenerateAutoIndexPage(config, request, request_file_path));
   }
@@ -96,14 +96,14 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   bool is_cgi = (request_file_path.rfind('.') != std::string::npos &&
                  location_ctx.IsValidCgiExtension(
                      request_file_path.substr(request_file_path.rfind('.'))));
+  // ファイルが存在しない場合には404を返す
+  if (!file_utils::DoesFileExist(request_file_path)) {
+    return Some(GenerateErrorResponse(http::kNotFound, config));
+  }
   // パーミッションがない場合には403を返す
   if ((!file_utils::IsReadable(request_file_path) && !is_cgi) ||
       (!file_utils::IsExecutable(request_file_path) && is_cgi)) {
     return Some(GenerateErrorResponse(http::kForbidden, config));
-  }
-  // ファイルが存在しない場合には404を返す
-  if (!file_utils::DoesFileExist(request_file_path)) {
-    return Some(GenerateErrorResponse(http::kNotFound, config));
   }
   // 許可されていないメソッドの場合には405を返す
   if (!IsAllowedMethod(config, req_ctx)) {
@@ -163,14 +163,14 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   if (!file_utils::DoesFileExist(parent_dir)) {
     return Some(GenerateErrorResponse(http::kNotFound, config));
   }
-  // 許可されていないメソッドの場合には405を返す
-  if (!IsAllowedMethod(config, req_ctx)) {
-    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
-  }
   // 親ディレクトリに書き込み権限がない場合には403を返す cgiの場合は実行権限
   if ((!is_cgi && !file_utils::IsWritable(parent_dir)) ||
       (is_cgi && !file_utils::IsExecutable(cgi_script))) {
     return Some(GenerateErrorResponse(http::kForbidden, config));
+  }
+  // 許可されていないメソッドの場合には405を返す
+  if (!IsAllowedMethod(config, req_ctx)) {
+    return Some(GenerateErrorResponse(http::kMethodNotAllowed, config));
   }
   if (is_cgi) {
     http::StatusCode status =
@@ -310,10 +310,9 @@ std::string RequestHandler::RemoveLocPath(const IConfig &config,
   const std::string &uri = request->GetUri();
   const LocationContext &location_ctx = server_ctx.SearchLocation(uri);
   std::string loc_path = location_ctx.GetPath();
-  if (loc_path.at(loc_path.size() - 1) == '/') {
+  if (loc_path.length() != 0 && loc_path.at(loc_path.size() - 1) == '/') {
     loc_path.erase(loc_path.size() - 1, 1);
   }
-
   return uri.substr(loc_path.length());
 }
 
