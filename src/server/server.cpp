@@ -44,7 +44,7 @@ Result<int, int> Server::Listen(const std::string &port,
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
   addr.sin_port = htons(result.Unwrap());
-  uint32_t s_addr = InetAddr(ip.c_str());
+  uint32_t s_addr = addr_utils::InetAddr(ip.c_str());
   if (s_addr == 0)
     return Err(kBadIP);
   addr.sin_addr.s_addr = s_addr;
@@ -57,23 +57,3 @@ Result<int, int> Server::Listen(const std::string &port,
   return Ok(sock);
 }
 
-uint32_t Server::InetAddr(const std::string& ip_str){
-    std::vector<uint8_t> ip_bytes;
-    std::stringstream ss(ip_str);
-    std::string token;
-    while (std::getline(ss, token, '.')) {
-      Result<int, std::string> result = string_utils::StrToI(token);
-      if (result.IsErr())
-        return 0;
-      ip_bytes.push_back(result.Unwrap());
-    }
-    if (ip_bytes.size() != 4) {
-        return 0;
-    }
-
-    uint32_t ip_addr = 0;
-    for (int i = 0; i < 4; ++i) {
-        ip_addr += ip_bytes[3 - i] << (8 * (3 - i));
-    }
-    return ip_addr;
-}
