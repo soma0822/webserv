@@ -449,7 +449,12 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   // TODO: inet_ntoa使用禁止なので自作
   env_map["REMOTE_ADDR"] = inet_ntoa(req_ctx.client_addr.sin_addr);
   env_map["SCRIPT_NAME"] = script_name;
-  env_map["SERVER_NAME"] = req_ctx.request->GetHostHeader();
+  std::string host = req_ctx.request->GetHostHeader();
+  if (host.find(":") != std::string::npos){
+    env_map["SERVER_NAME"] = host.substr(0, host.find(":"));
+  } else {
+    env_map["SERVER_NAME"] = host;
+  }
   env_map["SERVER_PORT"] = req_ctx.port;
   env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
   env_map["SERVER_SOFTWARE"] = "webserv";
