@@ -1,7 +1,9 @@
 #ifndef WEBSERV_SRC_UTILS_ADDR_UTILS_HPP
 #define WEBSERV_SRC_UTILS_ADDR_UTILS_HPP
 
+#include <arpa/inet.h>
 #include <sstream>
+#include <vector>
 
 #include "result.hpp"
 #include "string_utils.hpp"
