@@ -28,9 +28,9 @@ const std::map<std::string, std::string> &Config::GetErrorPage() const {
   return error_page_;
 }
 
-const IServerContext &Config::SearchServer(
-    const std::string &port, const std::string &ip,
-    const std::string &host) const {
+const IServerContext &Config::SearchServer(const std::string &port,
+                                           const std::string &ip,
+                                           const std::string &host) const {
   std::stringstream ss(host);
   std::string server_name;
   getline(ss, server_name, ':');
