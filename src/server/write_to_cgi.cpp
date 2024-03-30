@@ -8,8 +8,7 @@ WriteToCGI::~WriteToCGI() {}
 Result<int, std::string> WriteToCGI::Execute(int revent) {
   if (!(event_ & revent)) return Ok(kNotReady);
   int ret = write(fd_, body_.c_str() + wrote_size_, body_.size() - wrote_size_);
-  if (ret == 0 || ret == -1)
-    return Ok(kFdDelete);
+  if (ret == 0 || ret == -1) return Ok(kFdDelete);
   wrote_size_ += ret;
   if (wrote_size_ == body_.size()) {
     return Ok(kTaskDelete);
