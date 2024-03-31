@@ -20,6 +20,38 @@ class RequestHandlerTest : public testing::Test {
   }
 };
 
+TEST_F(RequestHandlerTest, Return) {
+  const std::string root = "/tmp";
+  const std::string uri = "/index.html";
+  const std::string test_file_path = root + uri;
+  std::ofstream ofs(test_file_path.c_str());
+  ofs << "Hello, world!" << std::endl;
+  ofs.close();
+
+  LocationContext ctx;
+  ctx.SetCanAutoIndex(true);
+  ctx.AddAllowMethod("GET");
+  ctx.SetReturn("/foo/bar");
+  // server context mock
+  Mock<IServerContext> server_ctx_mock;
+  When(Method(server_ctx_mock, SearchLocation)).AlwaysReturn(ctx);
+  When(Method(server_ctx_mock, GetRoot)).AlwaysReturn(root);
+  When(Method(server_ctx_mock, GetIndex)).AlwaysReturn(uri.substr(1));
+
+  // config mock
+  Mock<IConfig> config_mock;
+  When(Method(config_mock, SearchServer)).AlwaysReturn(server_ctx_mock.get());
+  HTTPRequest request;
+  request.SetUri(uri);
+  request.SetMethod("GET");
+  RequestContext req_ctx = {&request, "80", "", 0, 0};
+  response = RequestHandler::Handle(config_mock.get(), req_ctx).Unwrap();
+  ASSERT_EQ(response->GetStatusCode(), http::kMovedPermanently);
+  ASSERT_EQ(response->GetHeaders().at("LOCATION"), "/foo/bar");
+
+  unlink(test_file_path.c_str());
+}
+
 TEST_F(RequestHandlerTest, GetMethodNormal) {
   const std::string root = "/tmp";
   const std::string uri = "/index.html";
