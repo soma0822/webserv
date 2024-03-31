@@ -44,7 +44,7 @@ Result<int, int> Server::Listen(const std::string &port,
   memset(&addr, 0, sizeof(addr));
   addr.sin_family = AF_INET;
   addr.sin_port = htons(result.Unwrap());
-  uint32_t s_addr = addr_utils::InetAddr(ip.c_str());
+  uint32_t s_addr = addr_utils::InetAddr(ip);
   if (s_addr == 0) return Err(kBadIP);
   addr.sin_addr.s_addr = s_addr;
   if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) == -1)
