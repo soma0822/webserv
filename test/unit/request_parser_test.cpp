@@ -121,6 +121,12 @@ TEST(HTTPRequestParser, ParseRequestGET_Requestline_BadRequest) {
       "10000000000000000000000000000000000000\r\n\r\n";
   Result<HTTPRequest *, int> req11 = parser.Parser(request);
   EXPECT_EQ(req11.UnwrapErr(), HTTPRequestParser::kPayloadTooLarge);
+  // Uriがスラッシュ始まりじゃない
+  request =
+      "GET a HTTP/1.1\r\nHost: localhost:8080\r\nContent-Length: "
+      "1000\r\n\r\n";
+  Result<HTTPRequest *, int> req12 = parser.Parser(request);
+  EXPECT_EQ(req12.UnwrapErr(), HTTPRequestParser::kBadRequest);
 }
 
 // headerエラーケース
