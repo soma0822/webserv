@@ -36,6 +36,8 @@ function test_requests() {
     exit 1
   fi
 
+  printf "\n#### $expected_status test\n"
+
   # テストディレクトリ内のファイルを取得
   test_files=$(find "$test_dir" -type f)
 
@@ -45,9 +47,9 @@ function test_requests() {
 
     status=$(echo "$response" | head -n 1 | awk '{print $2}')
     if [ "$status" != "$expected_status" ]; then
-      echo -e "${RED}failed: $test_file${NC}" >&2
-      echo -e "${RED}Expected: $expected_status${NC}" >&2
-      echo -e "${RED}Actual: $status${NC}" >&2
+      echo -e "${RED}failed: $test_file${NC}"
+      echo -e "${RED}Expected: $expected_status${NC}"
+      echo -e "${RED}Actual: $status${NC}"
       failure=$((failure + 1))
     else
       echo -e "${GREEN}passed: $test_file${NC}"
@@ -106,7 +108,6 @@ function main() {
   launch_test_server "$config_file"
 
   # テストの実行
-  echo "Testing..." 1>&2
   test "$host_addr"
 
   # テスト結果の出力
