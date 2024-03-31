@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "accept.hpp"
+#include "addr_utils.hpp"
 #include "config.hpp"
 #include "io_task_manager.hpp"
 #include "logger.hpp"
@@ -32,7 +33,8 @@ class Server {
     kSetSockOptError,
     kListenError,
     kBindError,
-    kFcntlError
+    kFcntlError,
+    kBadIP
   };
 };
 
