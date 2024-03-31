@@ -15,7 +15,6 @@ test_server_pid=0
 function test() {
   host_addr=$1 # host:port
 
-  # テストの実行
   test_requests "$host_addr" test/e2e/request/bad_request "400"
   test_requests "$host_addr" test/e2e/request/http_version_not_supported "505"
 }
@@ -81,17 +80,14 @@ function launch_test_server() {
   fi
 
   # ビルド
+  echo "Building..." 1>&2
   make debug 1>&2
 
   # サーバーの起動
   ./webserv_debug "$config_file" &
-  status=$?
-  test_server_pid=$!
 
   # サーバーの起動待ち
-  sleep 1
-
-  echo $status
+  sleep 2
 }
 
 function cleanup() {
@@ -111,13 +107,10 @@ function main() {
   fi
 
   # テストサーバーの起動
-  status=$(launch_test_server "$config_file")
-  if [ "$status" != 0 ]; then
-    echo -e "${RED}Failed to launch test server${NC}" >&2
-    exit 1
-  fi
+  launch_test_server "$config_file"
 
   # テストの実行
+  echo "Testing..." 1>&2
   test "$host_addr"
 
   # テスト結果の出力
@@ -131,4 +124,4 @@ function main() {
   cleanup
 }
 
-main conf/default.conf "localhost:8002"
+main conf/defaul.conf "localhost:8002"
