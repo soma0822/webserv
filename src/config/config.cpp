@@ -28,9 +28,12 @@ const std::map<std::string, std::string> &Config::GetErrorPage() const {
   return error_page_;
 }
 
-const IServerContext &Config::SearchServer(
-    const std::string &port, const std::string &ip,
-    const std::string &server_name) const {
+const IServerContext &Config::SearchServer(const std::string &port,
+                                           const std::string &ip,
+                                           const std::string &host) const {
+  std::stringstream ss(host);
+  std::string server_name;
+  getline(ss, server_name, ':');
   std::vector<ServerContext>::const_iterator ans = server_.end();
   std::vector<ServerContext>::const_iterator it = server_.begin();
   for (; it != server_.end(); ++it) {
