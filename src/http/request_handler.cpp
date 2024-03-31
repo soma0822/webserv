@@ -18,6 +18,12 @@ Option<HTTPResponse *> RequestHandler::Handle(const IConfig &config,
       config.SearchServer(req_ctx.port, req_ctx.ip, request->GetHostHeader());
   const LocationContext &location_ctx =
       server_ctx.SearchLocation(request->GetUri());
+  if (!location_ctx.GetReturn().empty()) {
+    return Some(HTTPResponse::Builder()
+                    .SetStatusCode(http::kMovedPermanently)
+                    .AddHeader("Location", location_ctx.GetReturn())
+                    .Build());
+  }
 
   // リクエストボディのサイズが制限を超えている場合には413を返す
   if (static_cast<int>(request->GetBody().length()) >
@@ -432,8 +438,6 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   env_map["REQUEST_METHOD"] = req->GetMethod();
   if (headers.find("Authorization") != headers.end())
     env_map["AUTH_TYPE"] = headers.find("Authorization")->second;
-  else
-    env_map["AUTH_TYPE"] = "";
   if (env_map["REQUEST_METHOD"] == "POST") {
     unsigned int size = req->GetBody().size();
     std::stringstream ss;
@@ -450,16 +454,13 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   env_map["QUERY_STRING"] = req->GetQuery();
   // TODO: inet_ntoa使用禁止なので自作
   env_map["REMOTE_ADDR"] = inet_ntoa(req_ctx.client_addr.sin_addr);
-  // REMOTE_HOSTは使用可能関数ではわからない
-  env_map["REMOTE_HOST"] = "";
-  // TODO: userの取得
-  if (env_map["AUTH_TYPE"] == "")
-    env_map["REMOTE_USER"] = "";
-  else
-    env_map["REMOTE_USER"] = "user";
   env_map["SCRIPT_NAME"] = script_name;
-  // TODO: URIからサーバ名の取得
-  env_map["SERVER_NAME"] = "localhost";
+  std::string host = req_ctx.request->GetHostHeader();
+  if (host.find(":") != std::string::npos) {
+    env_map["SERVER_NAME"] = host.substr(0, host.find(":"));
+  } else {
+    env_map["SERVER_NAME"] = host;
+  }
   env_map["SERVER_PORT"] = req_ctx.port;
   env_map["SERVER_PROTOCOL"] = "HTTP/1.1";
   env_map["SERVER_SOFTWARE"] = "webserv";

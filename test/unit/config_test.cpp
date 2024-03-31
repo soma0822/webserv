@@ -291,23 +291,23 @@ TEST(ConfigTest, HostListenServername) {
       std::invalid_argument);
 }
 
-// SerchServer
-TEST(SerchServer, DefaultTest) {
+// SearchServer
+TEST(SearchServer, DefaultTest) {
   Config config = ConfigParser::Parse("test/unit/conf_test/search_server.conf");
   const IServerContext &tmp = config.SearchServer("8002", "127.0.0.1", "");
   ASSERT_EQ(&config.GetServer().at(0), &tmp);
   const IServerContext &tmp1 = config.SearchServer("8000", "127.0.0.1", "");
   ASSERT_EQ(&config.GetServer().at(1), &tmp1);
   const IServerContext &tmp2 =
-      config.SearchServer("8000", "127.0.0.1", "tokazaki");
+      config.SearchServer("8000", "127.0.0.1", "tokazaki:8000");
   ASSERT_EQ(&config.GetServer().at(1), &tmp2);
   const IServerContext &tmp3 =
-      config.SearchServer("8002", "127.0.0.1", "tkuramot");
+      config.SearchServer("8002", "127.0.0.1", "tkuramot:8002");
   ASSERT_EQ(&config.GetServer().at(2), &tmp3);
 }
 
-// SerchLocation
-TEST(SerchLocation, DefaultTest) {
+// SearchLocation
+TEST(SearchLocation, DefaultTest) {
   Config config =
       ConfigParser::Parse("test/unit/conf_test/search_location.conf");
   const IServerContext &tmp =
