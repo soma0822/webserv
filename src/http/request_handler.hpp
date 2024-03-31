@@ -1,6 +1,7 @@
 #ifndef WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_
 #define WEBSERV_SRC_HTTP_REQUEST_HANDLER_HPP_
 
+#include "addr_utils.hpp"
 #include "config.hpp"
 #include "file_utils.hpp"
 #include "http_request.hpp"
