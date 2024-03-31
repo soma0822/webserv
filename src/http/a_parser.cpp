@@ -26,8 +26,7 @@ int AParser::SetRequestLine() {
   // method
   result = ParsePart(request_line, " ", kBadRequest);
   if (result.second != kOk) return result.second;
-  if (result.first != string_utils::StrToUpper(result.first))
-    return kBadRequest;
+  if (string_utils::IsStrUpper(result.first) == false) return kBadRequest;
   request_->SetMethod(result.first);
 
   // uri
