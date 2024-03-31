@@ -25,13 +25,13 @@ function test_requests() {
 
   # 引数のチェック
   if [ -z "$host_addr" ] || [ -z "$test_dir" ] || [ -z "$expected_status" ]; then
-    echo -e "${RED}Error: host_addr, test_dir and expected_status are required${NC}" >&2
+    echo -e "${RED}エラー: host_addr, test_dir, expected_statusは必須です${NC}" >&2
     exit 1
   fi
 
   # テストディレクトリの存在チェック
   if [ ! -d "$test_dir" ]; then
-    echo -e "${RED}Error: test_dir does not exist${NC}" >&2
+    echo -e "${RED}エラー: test_dirは必須です${NC}" >&2
     exit 1
   fi
 
@@ -61,7 +61,7 @@ function request() {
 
   # 引数のチェック
   if [ -z "$host_addr" ] || [ -z "$request_file" ]; then
-    echo -e "${RED}Error: host, port and request_file are required${NC}" >&2
+    echo -e "${RED}エラー: host, port and request_fileは必須です${NC}" >&2
     exit 1
   fi
 
@@ -74,7 +74,7 @@ function launch_test_server() {
 
   # 引数のチェック
   if [ -z "$config_file" ]; then
-    echo -e "${RED}Error: host_addr and config_file are required${NC}" >&2
+    echo -e "${RED}エラー: host_addr and config_fileは必須です${NC}" >&2
     exit 1
   fi
 
@@ -97,7 +97,7 @@ function main() {
 
   # 引数のチェック
   if [ -z "$config_file" ] || [ -z "$host_addr" ]; then
-    echo -e "${RED}Error: config_file and host_addr are required${NC}" >&2
+    echo -e "${RED}エラー: config_file and host_addrは必須です${NC}" >&2
     exit 1
   fi
 
