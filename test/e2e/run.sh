@@ -80,7 +80,7 @@ function launch_test_server() {
   fi
 
   # ビルド
-  make debug > /dev/null
+  make debug 1>&2
 
   # サーバーの起動
   ./webserv_debug "$config_file" &
@@ -109,8 +109,8 @@ function main() {
     exit 1
   fi
 
+  # テストサーバーの起動
   status=$(launch_test_server "$config_file")
-  echo "status: $status"
   if [ "$status" != 0 ]; then
     echo -e "${RED}Failed to launch test server${NC}" >&2
     exit 1
