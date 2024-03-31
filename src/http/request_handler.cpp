@@ -452,8 +452,8 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   env_map["PATH_INFO"] = req->GetUri();
   env_map["PATH_TRANSLATED"] = path_translated;
   env_map["QUERY_STRING"] = req->GetQuery();
-  // TODO: inet_ntoa使用禁止なので自作
-  env_map["REMOTE_ADDR"] = inet_ntoa(req_ctx.client_addr.sin_addr);
+  env_map["REMOTE_ADDR"] =
+      addr_utils::InetNtoa(req_ctx.client_addr.sin_addr.s_addr);
   env_map["SCRIPT_NAME"] = script_name;
   std::string host = req_ctx.request->GetHostHeader();
   if (host.find(":") != std::string::npos) {

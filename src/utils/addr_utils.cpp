@@ -19,3 +19,17 @@ uint32_t addr_utils::InetAddr(const std::string& ip_str) {
   }
   return ip_addr;
 }
+
+// 32ビット整数のIPv4アドレスをドット区切りの10進数表現に変換する関数
+std::string addr_utils::InetNtoa(uint32_t ip) {
+  std::string ret;
+  for (unsigned int i = 0; i < 4; i++) {
+    std::stringstream ss;
+    ss << (ip >> (i * 8) & 255);
+    std::string tmp;
+    ss >> tmp;
+    ret += tmp;
+    if (i != 3) ret += ".";
+  }
+  return ret;
+}
