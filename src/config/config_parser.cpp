@@ -12,6 +12,9 @@ Config ConfigParser::Parse(const std::string &file) {
     throw std::invalid_argument("ファイルが開けませんでした: " + file);
   }
   while (std::getline(inf, line)) {
+    if (line.find("#") != std::string::npos){
+      line = line.substr(0, line.find("#"));
+    }
     std::stringstream ss(line);
     std::string key;
     std::string value;
