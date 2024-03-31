@@ -84,7 +84,7 @@ test/unit:
 	@# Execute the test
 	@$(TEST_EXE_PATH) || exit 1
 
-test/e2e:
+test/e2e: debug
 	python3 test/e2e/main.py
 	bash test/e2e/run.sh
 

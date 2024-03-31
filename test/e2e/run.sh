@@ -78,10 +78,6 @@ function launch_test_server() {
     exit 1
   fi
 
-  # ビルド
-  echo "Building..." 1>&2
-  make debug 1>&2
-
   # サーバーの起動
   ./webserv_debug "$config_file" &
 
