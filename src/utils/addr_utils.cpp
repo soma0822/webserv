@@ -24,7 +24,11 @@ uint32_t addr_utils::InetAddr(const std::string& ip_str) {
 std::string addr_utils::InetNtoa(uint32_t ip) {
   std::string ret;
   for (unsigned int i = 0; i < 4; i++) {
-    ret += std::to_string(ip >> (i * 8) & 255);
+    std::stringstream ss;
+    ss << (ip >> (i * 8) & 255);
+    std::string tmp;
+    ss >> tmp;
+    ret += tmp;
     if (i != 3) ret += ".";
   }
   return ret;
