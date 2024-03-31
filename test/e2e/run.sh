@@ -10,8 +10,16 @@ NC='\033[0m'
 
 success=0
 failure=0
+test_server_pid=0
 
 function test() {
+  host_addr=$1 # host:port
+
+  # テストの実行
+  test_requests "$host_addr" test/e2e/request/bad_request "400"
+}
+
+function test_requests() {
   host_addr=$1 # host:port
   test_dir=$2
   expected_status=$3
@@ -61,10 +69,55 @@ function request() {
   cat "$request_file" | awk 1 ORS='\r\n' | curl -m 1 telnet://"$host_addr" 2> /dev/null || true
 }
 
+function launch_test_server() {
+  # テスト用のサーバーを起動
+  config_file=$1
+
+  # 引数のチェック
+  if [ -z "$config_file" ]; then
+    echo -e "${RED}Error: host_addr and config_file are required${NC}" >&2
+    exit 1
+  fi
+
+  # ビルド
+  make debug > /dev/null
+
+  # サーバーの起動
+  ./webserv_debug "$config_file" &
+  status=$?
+  test_server_pid=$!
+
+  # サーバーの起動待ち
+  sleep 1
+
+  echo $status
+}
+
+function cleanup() {
+  if [ "$test_server_pid" -ne 0 ]; then
+    kill -9 "$test_server_pid"
+  fi
+}
+
 function main() {
+  config_file=$1
+  host_addr=$2
+
+  # 引数のチェック
+  if [ -z "$config_file" ] || [ -z "$host_addr" ]; then
+    echo -e "${RED}Error: config_file and host_addr are required${NC}" >&2
+    exit 1
+  fi
+
+  status=$(launch_test_server "$config_file")
+  echo "status: $status"
+  if [ "$status" != 0 ]; then
+    echo -e "${RED}Failed to launch test server${NC}" >&2
+    exit 1
+  fi
 
   # テストの実行
-  test localhost:8002 test/e2e/request/bad_request "400"
+  test "$host_addr"
 
   # テスト結果の出力
   echo -e "${GREEN}Success: $success${NC}"
@@ -73,6 +126,8 @@ function main() {
   if [ "$failure" -ne 0 ]; then
     exit 1
   fi
+
+  cleanup
 }
 
-main "$@"
+main conf/default.conf "localhost:8002"
