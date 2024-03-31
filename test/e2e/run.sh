@@ -16,6 +16,7 @@ function test() {
   host_addr=$1 # host:port
 
   test_requests "$host_addr" test/e2e/request/bad_request_400
+  test_requests "$host_addr" test/e2e/request/ok_200
 }
 
 function test_requests() {
