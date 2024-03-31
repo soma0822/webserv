@@ -124,4 +124,4 @@ function main() {
   cleanup
 }
 
-main conf/defaul.conf "localhost:8002"
+main conf/default.conf "localhost:8002"
