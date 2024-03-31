@@ -15,23 +15,23 @@ test_server_pid=0
 function test() {
   host_addr=$1 # host:port
 
-  test_requests "$host_addr" test/e2e/request/bad_request "400"
+  test_requests "$host_addr" test/e2e/request/bad_request_400
 }
 
 function test_requests() {
   host_addr=$1 # host:port
   test_dir=$2
-  expected_status=$3
+  expected_status=$(echo "$test_dir" | awk -F'_' '{print $NF}')
 
   # 引数のチェック
-  if [ -z "$host_addr" ] || [ -z "$test_dir" ] || [ -z "$expected_status" ]; then
+  if [ -z "$host_addr" ] || [ -z "$test_dir" ] ; then
     echo -e "${RED}エラー: host_addr, test_dir, expected_statusは必須です${NC}" >&2
     exit 1
   fi
 
   # テストディレクトリの存在チェック
   if [ ! -d "$test_dir" ]; then
-    echo -e "${RED}エラー: test_dirは必須です${NC}" >&2
+    echo -e "${RED}エラー: test_dirが存在しません${NC}" >&2
     exit 1
   fi
 
