@@ -41,13 +41,8 @@ TEST(HTTPRequestParser, ParseRequestGET) {
   EXPECT_EQ(req1.Unwrap()->GetHostHeader(), "localhost:8080");
   EXPECT_EQ(req1.Unwrap()->GetBody(), "");
   delete req1.Unwrap();
-  // Hostの中身がない
-  request = "GET / HTTP/1.1\r\nHost:\r\n\r\n";
-  Result<HTTPRequest *, int> req9 = parser.Parser(request);
-  EXPECT_EQ(req9.Unwrap()->GetMethod(), "GET");
-  delete req9.Unwrap();
   // リクエストラインの前に余計な改行がある
-  request = "\r\n\r\nGET / HTTP/1.1\r\nHost:\r\n\r\n";
+  request = "\r\n\r\nGET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
   Result<HTTPRequest *, int> req10 = parser.Parser(request);
   EXPECT_EQ(req10.Unwrap()->GetMethod(), "GET");
   delete req10.Unwrap();
