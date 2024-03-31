@@ -17,6 +17,7 @@ function test() {
 
   # テストの実行
   test_requests "$host_addr" test/e2e/request/bad_request "400"
+  test_requests "$host_addr" test/e2e/request/http_version_not_supported "505"
 }
 
 function test_requests() {
