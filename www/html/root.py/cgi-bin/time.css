@@ -1,0 +1,83 @@
+header {
+    background-color: #b7c2ca; /* ヘッダーの背景色 */
+    color: #fff; /* ヘッダーテキストの色 */
+    padding: 10px 20px;
+    text-align: left;
+  }
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    margin: 20px auto;
+    border: 2px solid #333;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #fff;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 24px;
+    color: #333;
+}
+
+.sidebar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+a, button {
+    color: #808080;
+    text-decoration: none;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+a:hover, button:hover {
+    background-color: #f7e78e;
+    padding: 10px 20px; /* ボタンの余白を元に戻す */
+}
+
+.sidebar h2 {
+    text-align: left;
+    margin: 0;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0; /* マージンをリセット */
+}
+
+.sidebar li {
+    text-align: left;
+    font-size: 16px;
+    padding: 5px 0; /* リストアイテムの上下の余白を追加 */
+    margin: 0; /* マージンをリセット */
+}
+
+section {
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+}
