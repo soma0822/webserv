@@ -15,6 +15,9 @@ ServerContext ServerParser::ParseServer(std::ifstream &inf) {
 
   ParseFuncInit(func);
   while (std::getline(inf, line)) {
+    if (line.find("#") != std::string::npos) {
+      line = line.substr(0, line.find("#"));
+    }
     if (line.empty()) continue;
     RemoveSemicolon(line);
     std::stringstream ss(line);
