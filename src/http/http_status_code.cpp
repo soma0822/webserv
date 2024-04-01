@@ -108,6 +108,7 @@ std::string GetErrorPage(StatusCode status_code) {
      << "</h1></center>\r\n";
   ss << "<hr><center>webserver</center>\r\n";
   ss << "</body>\r\n";
+  ss << "</html>\r\n";
   return ss.str();
 }
 
