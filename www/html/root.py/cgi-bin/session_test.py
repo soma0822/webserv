@@ -14,12 +14,20 @@ import hashlib
 import time
 import urllib.parse
 
+<<<<<<< HEAD
 def write_string_by_id(file_path, id_, name, value):
+=======
+def write_string_by_id(file_path, id_, string):
+>>>>>>> a9bc9ef (feat: session一旦できた。)
     try:
         with open(file_path, 'a') as file:
             fd = file.fileno()
             fcntl.flock(fd, fcntl.LOCK_EX)  # 排他ロック
+<<<<<<< HEAD
             file.write(f"{id_},{name},{value}\n")
+=======
+            file.write(f"{id_},{string},\n")
+>>>>>>> a9bc9ef (feat: session一旦できた。)
             fcntl.flock(fd, fcntl.LOCK_UN)  # ロック解除
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}")
@@ -36,10 +44,27 @@ def get_data(file_path, target_id):
         print("File not found.")
         return None
 
+<<<<<<< HEAD
 def get_data_from_name(file_path, name):
     if not name:
         return "KO", ""
     name = urllib.parse.unquote(name)
+=======
+#def get_data_from_name(file_path, name):
+#    try:
+#        with open(file_path, 'r') as file:
+#            for line in file:
+#                parts = line.strip().split(',',1)
+#                if name == parts[1]:
+#                    return "OK",parts
+#            return "KO", ""
+#    except FileNotFoundError:
+#        print("File not found.")
+#        return None
+#
+
+def get_data_from_name(file_path, name):
+>>>>>>> a9bc9ef (feat: session一旦できた。)
     try:
         with open(file_path, 'r') as file:
             for line in file:
@@ -119,6 +144,7 @@ def set_html():
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+<<<<<<< HEAD
     <title>Cookie情報登録</title>
     <link rel=\"stylesheet\" href=\"/root.py/cgi-bin/time.css\">
 </head>
@@ -181,6 +207,47 @@ def set_html():
     <section>
         <p> <font color="red">{{ none_data }}</font></p>
     </section>
+=======
+    <title>My Cute Webpage</title>
+</head>
+<body>
+    <h3>session_id = {{ session_id }}</h3>
+    <h2>My Cute Webpage</h2>
+
+    <!-- 名前を入力するフォーム -->
+    <h3>名前からデータベースから確認</h3>
+    <form action="/cgi-bin/session_test.py" method="GET">
+        <label for="name">名前からキーワードを確認する:</label>
+        <input type="text" id="confname" name="confname">
+        <input type="submit" value="確認">
+    </form>
+
+    <!-- 名前とキーワードを入力するフォーム -->
+    <h3>名前とキーワードをcokkieに紐付けて、データベースに記録する</h3>
+    <form action="/cgi-bin/session_test.py" method="GET">
+        <label for="name"名前を入力してね:</label>
+        <input type="text" id="name" name="name">
+        <label for="value">キーワードを入力してね:</label>
+        <input type="text" id="value" name="value">
+        <input type="submit" value="登録する">
+    </form>
+
+    <!-- フォーム -->
+    <h3>cokkieから確認する</h3>
+    <form id="myForm" action="/cgi-bin/session_test.py" method="GET">
+        <!-- ボタンをフォームの内部に配置 -->
+        <button>再確認</button>
+    </form>
+
+    <!-- 入力された名前を表示する欄 -->
+    {% if submitted_name %}
+    <p>名前: {{ submitted_name }}</p>
+    <p>キーワード: {{ submitted_value }}</p>
+    {% endif %}
+    {% if conf_name %}
+    <p>名前: {{ conf_name }}</p>
+    <p>キーワード: {{ conf_value }}</p>
+>>>>>>> a9bc9ef (feat: session一旦できた。)
     {% endif %}
 </body>
 </html>
@@ -191,9 +258,16 @@ def set_html():
 
 def check_query(db_path, session_id):
     query_string = os.environ.get('QUERY_STRING')
+<<<<<<< HEAD
     if not query_string:
         return get_data(db_path, session_id)
     if query_string == 'reset=reset':
+=======
+    sys.stderr.write(query_string)
+    if not query_string:
+        return get_data(db_path, session_id)
+    if query_string == 'reset':
+>>>>>>> a9bc9ef (feat: session一旦できた。)
         delete_cookie(db_path, session_id)
         return "KO", ""
     
@@ -202,6 +276,7 @@ def check_query(db_path, session_id):
 
     if 'name' in param_dict and 'value' in param_dict:
         if param_dict['name'] == '' or param_dict['value'] == '':
+<<<<<<< HEAD
             return "Err", ""
         name = urllib.parse.unquote(param_dict['name'])
         value = urllib.parse.unquote(param_dict['value'])
@@ -214,6 +289,42 @@ def check_query(db_path, session_id):
 
     data = get_data(db_path, session_id)
     return data
+=======
+            return "KO", ""
+        name = urllib.parse.unquote(param_dict['name'])
+        value = urllib.parse.unquote(param_dict['value'])
+        insert_data(db_path, session_id, name, value)
+        return "OK", f"{name}, {value}"
+    else:
+        return "KO", ""
+#def check_query(db_path, session_id):
+#    query_string = os.environ.get('QUERY_STRING')
+#    sys.stderr.write(query_string)
+#    if not query_string:
+#        sys.stderr.write("2")
+#        return "KO", ""
+#    if query_string == 'reset':
+#        delete_cookie(db_path, session_id)
+#        sys.stderr.write("3")
+#        return "KO", ""
+#    if query_string.find('confname') == 1:
+#        sys.stderr.write(query_string.split('=')[1])
+#        data = get_data_from_name(db_path, query_string.split('=')[1])
+#        sys.stderr.write("4")
+#        return data
+#    if query_string.find('name') == 1 and query_string.find('value') == 1:
+#        name = query_string.split('=')[1]
+#        value = query_string.split('=')[2]
+#        insert_data(db_path, session_id, name, value)
+#        sys.stderr.write("5")
+#        return "OK", "{name}, {value}"
+#    else:
+#        sys.stderr.write("6")
+#        return "KO", ""
+            
+    
+
+>>>>>>> a9bc9ef (feat: session一旦できた。)
 
 # メイン処理
 def main():
@@ -224,16 +335,29 @@ def main():
     # データの取得
     db_path = '/Users/kaaaaakun_/Desktop/42tokyo/webserv/www/html/root.py/cgi-bin/session_dir/session.db'
 
+<<<<<<< HEAD
     if not session_id:
         session_id = hashlib.sha256(str(time.time()).encode()).hexdigest()
 
     data = check_query(db_path, session_id)#クエリがあった時
+=======
+    if session_id:
+        data = get_data(db_path, session_id)
+        if data[0] == "KO":
+            write_string_by_id(db_path, session_id, '')
+    else:
+        session_id = hashlib.sha256(str(time.time()).encode()).hexdigest()
+        write_string_by_id(db_path, session_id, '')
+
+    data = check_query(db_path, session_id)
+>>>>>>> a9bc9ef (feat: session一旦できた。)
     if data[0] == "OK":
         submitted_name = data[1].split(',')[0]
         submitted_value = data[1].split(',')[1]
     else:
         submitted_name = None
         submitted_value = None
+<<<<<<< HEAD
     
     if data[0] == "Err":
         is_error = '値は両方入力してください'
@@ -242,6 +366,10 @@ def main():
         
 
     query_string = os.environ.get('QUERY_STRING')#confnameのクエリがあった時
+=======
+
+    query_string = os.environ.get('QUERY_STRING')
+>>>>>>> a9bc9ef (feat: session一旦できた。)
     query_params = query_string.split('&')
     param_dict = {param.split('=')[0]: param.split('=')[1] for param in query_params if '=' in param}
     data = get_data_from_name(db_path, param_dict.get('confname'))
@@ -252,6 +380,7 @@ def main():
         conf_name = None
         conf_value = None
 
+<<<<<<< HEAD
     if submitted_name is None and conf_name is None:
         none_data = "データがありません"
         sys.stderr.write(none_data)
@@ -259,6 +388,8 @@ def main():
         none_data = None
         sys.stderr.write("データがあります")
 
+=======
+>>>>>>> a9bc9ef (feat: session一旦できた。)
     # HTMLの設定
     set_header(visit_count, session_id)
     template = set_html()
@@ -268,8 +399,11 @@ def main():
             'submitted_value' : submitted_value,
             'conf_name' : conf_name,
             'conf_value' : conf_value,
+<<<<<<< HEAD
             'none_data' : none_data,
             'error_str' : is_error,
+=======
+>>>>>>> a9bc9ef (feat: session一旦できた。)
             }
     return (template.render(data))
 
