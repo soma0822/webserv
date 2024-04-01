@@ -1,0 +1,4 @@
+GET /permission/read_only.cgi HTTP/1.1
+Host: localhost
+
+
