@@ -471,9 +471,19 @@ std::map<std::string, std::string> RequestHandler::GetEnv(
   return env_map;
 }
 
+size_t RequestHandler::CountEnv(char **env) {
+  size_t count = 0;
+  while (env[count] != NULL) {
+    ++count;
+  }
+  return count;
+}
+
 char **RequestHandler::DupEnv(
     const std::map<std::string, std::string> &env_map) {
-  char **env = new char *[env_map.size() + 1];
+  extern char **environ;
+  char **env = new char *[env_map.size() + CountEnv(environ) + 1];
+
   Logger::Debug() << "-------env_map--------" << std::endl;
   std::map<std::string, std::string>::const_iterator it = env_map.begin();
   for (unsigned int i = 0; it != env_map.end(); ++it, ++i) {
@@ -481,6 +491,11 @@ char **RequestHandler::DupEnv(
     env[i] = new char[tmp.size() + 1];
     std::strcpy(env[i], tmp.c_str());
     Logger::Debug() << env[i] << std::endl;
+  }
+  for (unsigned int i = 0; environ[i] != NULL; ++i) {
+    env[env_map.size() + i] = new char[std::strlen(environ[i]) + 1];
+    std::strcpy(env[env_map.size() + i], environ[i]);
+    Logger::Debug() << env[env_map.size() + i] << std::endl;
   }
   Logger::Debug() << "----------------------" << std::endl;
   env[env_map.size()] = NULL;
