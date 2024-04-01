@@ -14,7 +14,8 @@ import hashlib
 import time
 import urllib.parse
 
-def write_string_by_id(file_path, id_, name, value):
+# 関数定義：ファイルに情報を書き込む
+def set_data(file_path, id_, name, value):
     try:
         with open(file_path, 'a') as file:
             fd = file.fileno()
@@ -24,7 +25,8 @@ def write_string_by_id(file_path, id_, name, value):
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}")
 
-def get_data(file_path, target_id):
+# 関数定義：idをもとにファイルからのデータ取得
+def get_data_from_id(file_path, target_id):
     try:
         with open(file_path, 'r') as file:
             for line in file:
@@ -36,6 +38,7 @@ def get_data(file_path, target_id):
         print("File not found.")
         return None
 
+# 関数定義：名前をもとにファイルからのデータ取得
 def get_data_from_name(file_path, name):
     if not name:
         return "KO", ""
@@ -46,40 +49,33 @@ def get_data_from_name(file_path, name):
                 parts = line.strip().split(',', 1)
                 if len(parts) >= 2 and name == parts[1].split(',')[0]:
                     return "OK", parts
-            return "KO", ""
+            return "Err", ""
     except FileNotFoundError:
         print("File not found.")
         return None
 
-def delete_cookie(file_path, session_id):
+# 関数定義：ファイルからデータ削除
+def delete_data(file_path, session_id):
     try:
-        with open(file_path, 'r') as file:
-            lines = file.readlines()
-        with open(file_path, 'w') as file:
+        with open(file_path, 'r+') as file:
             fd = file.fileno()
+            fcntl.flock(fd, fcntl.LOCK_EX)  # 排他ロック
+            lines = file.readlines()
+            file.seek(0)  # ファイルの先頭に移動
+            file.truncate(0)  # ファイルの中身を空にする
             for line in lines:
                 if session_id not in line:
-                    fcntl.flock(fd, fcntl.LOCK_EX)  # 排他ロック
-                    file.write(line)
-                    fcntl.flock(fd, fcntl.LOCK_UN)  # ロック解除
+                    original_file.write(line)
+            fcntl.flock(fd, fcntl.LOCK_UN)  # ロック解除
     except FileNotFoundError:
         print("File not found.")
         return None
 
-def insert_data(file_path, session_id, name, value):
+# 関数定義：データの変更
+def change_data(file_path, session_id, name, value):
     try:
-        with open(file_path, 'r') as file:
-            lines = file.readlines()
-        with open(file_path, 'w') as file:
-            fd = file.fileno()
-            for line in lines:
-                if session_id == line.split(',')[0]:
-                    fcntl.flock(fd, fcntl.LOCK_EX)  # 排他ロック
-                    file.write(f"{session_id},{name},{value}\n")
-                    fcntl.flock(fd, fcntl.LOCK_UN)  # ロック解除
-                    return
-                else:
-                    file.write(line)
+        delete_data(file_path, session_id)
+        set_data(file_path, session_id, name, value)
         return
     except FileNotFoundError:
         print("File not found.")
@@ -97,6 +93,7 @@ def visit_count_cookie():
     else:
         return 0
 
+# 関数定義：セッションIDの取得
 def session_id_cookie():
     cookie = cookies.SimpleCookie(os.environ.get('COOKIE'))
     cookie = cookie.get('session_id')
@@ -105,6 +102,7 @@ def session_id_cookie():
     else:
         return None
 
+# 関数定義：ヘッダの設定
 def set_header(n, session_id):
     print("Content-Type: text/html; charset=utf-8")
     print("Content-Language: ja")
@@ -115,7 +113,7 @@ def set_header(n, session_id):
     cookie['session_id']['expires'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%a, %d-%b-%Y %H:%M:%S GMT")
     print(str(cookie.output()) + "\r\n\r\n")
 
-
+# 関数定義：HTMLの設定
 def set_html():
     html = '''
 <!DOCTYPE html>
@@ -175,6 +173,9 @@ def set_html():
         <p>名前: {{ conf_name }}</p>
         <p>キーワード: {{ conf_value }}</p>
     {% endif %}
+    {% if confname_error %}
+        <p> <font color="red">{{ confname_error }}</font></p>
+    {% endif %}
     </section>
 
     {% if none_data %}
@@ -189,12 +190,13 @@ def set_html():
     template = Template(html)
     return template
 
+# 関数定義：クエリの確認
 def check_query(db_path, session_id):
     query_string = os.environ.get('QUERY_STRING')
     if not query_string:
-        return get_data(db_path, session_id)
+        return get_data_from_id(db_path, session_id)
     if query_string == 'reset=reset':
-        delete_cookie(db_path, session_id)
+        delete_data(db_path, session_id)
         return "KO", ""
     
     query_params = query_string.split('&')
@@ -205,14 +207,14 @@ def check_query(db_path, session_id):
             return "Err", ""
         name = urllib.parse.unquote(param_dict['name'])
         value = urllib.parse.unquote(param_dict['value'])
-        data = get_data(db_path, session_id)
+        data = get_data_from_id(db_path, session_id)
         if data[0] == "KO":
-            write_string_by_id(db_path, session_id, name, value)
+            set_data(db_path, session_id, name, value)
         else:
-            insert_data(db_path, session_id, name, value)
+            change_data(db_path, session_id, name, value)
         return "OK", f"{name}, {value}"
 
-    data = get_data(db_path, session_id)
+    data = get_data_from_id(db_path, session_id)
     return data
 
 # メイン処理
@@ -221,9 +223,10 @@ def main():
     session_id = session_id_cookie()
     visit_count = int(visit_count_cookie()) + 1
 
-    # データの取得
-    db_path = '/Users/kaaaaakun_/Desktop/42tokyo/webserv/www/html/root.py/cgi-bin/session_dir/session.db'
+    # データベースのパス
+    db_path = './www/html/root.py/cgi-bin/session_dir/session.db'
 
+    # クエリの確認
     if not session_id:
         session_id = hashlib.sha256(str(time.time()).encode()).hexdigest()
 
@@ -236,10 +239,9 @@ def main():
         submitted_value = None
     
     if data[0] == "Err":
-        is_error = '値は両方入力してください'
+        is_error = '名前とキーワードの両方を入力してくれると嬉しいな'
     else:
         is_error = None
-        
 
     query_string = os.environ.get('QUERY_STRING')#confnameのクエリがあった時
     query_params = query_string.split('&')
@@ -248,9 +250,14 @@ def main():
     if data[0] == "OK":
         conf_name = data[1][1].split(',')[0]
         conf_value = data[1][1].split(',')[1]
+        confname_error = None
     else:   
         conf_name = None
         conf_value = None
+        if data[0] == "Err":
+            confname_error = 'その名前に心当たりはないかも'
+        else:
+            confname_error = None
 
     if submitted_name is None and conf_name is None:
         none_data = "データがありません"
@@ -266,15 +273,14 @@ def main():
             'submitted_value' : submitted_value,
             'conf_name' : conf_name,
             'conf_value' : conf_value,
+            'confname_error' : confname_error,
             'none_data' : none_data,
             'error_str' : is_error,
             }
     return (template.render(data))
 
 
-# insert_data('4','Alice', 'Pizza', 'Summer')
 #sys.stderr.write(str(os.environ)) #環境変数の表示
 string = main()
-#データを挿入し、割り当てられたIDを取得
 #sys.stderr.write(string) #HTMLの表示
 print(string)
