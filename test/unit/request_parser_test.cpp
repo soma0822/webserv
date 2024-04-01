@@ -121,8 +121,6 @@ TEST(HTTPRequestParser, ParseRequestGET_Requestline_BadRequest) {
       "10000000000000000000000000000000000000\r\n\r\n";
   Result<HTTPRequest *, int> req11 = parser.Parser(request);
   EXPECT_EQ(req11.UnwrapErr(), HTTPRequestParser::kPayloadTooLarge);
-<<<<<<< Updated upstream
-=======
   // methodに小文字が含まれてる
   request = "1 / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
   Result<HTTPRequest *, int> req14 = parser.Parser(request);
@@ -137,7 +135,6 @@ TEST(HTTPRequestParser, ParseRequestGET_Requestline_BadRequest) {
       "1000\r\n\r\n";
   Result<HTTPRequest *, int> req12 = parser.Parser(request);
   EXPECT_EQ(req12.UnwrapErr(), HTTPRequestParser::kBadRequest);
->>>>>>> Stashed changes
 }
 
 // headerエラーケース
