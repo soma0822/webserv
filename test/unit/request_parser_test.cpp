@@ -116,6 +116,10 @@ TEST(HTTPRequestParser, ParseRequestGET_Requestline_BadRequest) {
       "10000000000000000000000000000000000000\r\n\r\n";
   Result<HTTPRequest *, int> req11 = parser.Parser(request);
   EXPECT_EQ(req11.UnwrapErr(), HTTPRequestParser::kPayloadTooLarge);
+  // methodに小文字が含まれてる
+  request = "Get / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n";
+  Result<HTTPRequest *, int> req14 = parser.Parser(request);
+  EXPECT_EQ(req14.UnwrapErr(), HTTPRequestParser::kBadRequest);
   // Hostの中身がない
   request = "GET / HTTP/1.1\r\nHost:\r\n\r\n";
   Result<HTTPRequest *, int> req13 = parser.Parser(request);
