@@ -498,7 +498,6 @@ char **RequestHandler::DupEnv(
     Logger::Debug() << env[env_map.size() + i] << std::endl;
   }
   Logger::Debug() << "----------------------" << std::endl;
-  std::cerr << env_map.size() + CountEnv(environ) << std::endl;
   env[env_map.size() + CountEnv(environ)] = NULL;
   return env;
 }
