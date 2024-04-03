@@ -27,12 +27,14 @@ int AParser::SetRequestLine() {
   // method
   result = ParsePart(request_line, " ", kBadRequest);
   if (result.second != kOk) return result.second;
-  request_->SetMethod(string_utils::StrToUpper(result.first));
+  if (string_utils::IsStrUpper(result.first) == false) return kBadRequest;
+  request_->SetMethod(result.first);
 
   // uri
   request_line = string_utils::SkipSpace(request_line);
   result = ParsePart(request_line, " ", kBadRequest);
   if (result.second != kOk) return result.second;
+  if (result.first[0] != '/') return kBadRequest;
   pos = result.first.find("?");
   if (pos != std::string::npos) {
     request_->SetUri(result.first.substr(0, pos));
