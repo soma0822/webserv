@@ -10,6 +10,7 @@ body {
   font-family: Arial, sans-serif;
   background-color: #f0f0f0;
   text-align: center;
+  margin: 0;
 }
 
 h1 {
@@ -36,5 +37,6 @@ h1 {
 
 li {
   padding-top: 5%;
+  text-align: left;
 }
 

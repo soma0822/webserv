@@ -15,9 +15,7 @@ def get_cookie():
 
 # メイン処理
 def main():
-    string = "status: 200 ok\r\n"
-    # HTMLヘッダーの出力
-    string += "Content-Type: text/html; charset=utf-8\r\n"
+    print("Content-Type: text/html; charset=utf-8")
 
     # クッキーの取得
     visit_cookie = get_cookie()
@@ -36,11 +34,10 @@ def main():
     cookie = cookies.SimpleCookie()
     cookie['visit_count'] = str(n)
     cookie['visit_count']['expires'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-    string += cookie.output()
-    string += "\r\n"
+    print(cookie.output() + "\r\n\r\n")
 
     # HTMLの出力
-    string += """
+    string = """
 <!DOCTYPE html>
 <html>
 <head>
