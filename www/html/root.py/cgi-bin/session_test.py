@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.9
+#!/usr/bin/env python3
 
 # -*- coding: utf-8 -*-
 
@@ -65,7 +65,7 @@ def delete_data(file_path, session_id):
             file.truncate(0)  # ファイルの中身を空にする
             for line in lines:
                 if session_id not in line:
-                    original_file.write(line)
+                    file.write(line)
             fcntl.flock(fd, fcntl.LOCK_UN)  # ロック解除
     except FileNotFoundError:
         print("File not found.")
