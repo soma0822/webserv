@@ -1,6 +1,5 @@
 #include "a_parser.hpp"
 
-#include "logger.hpp"
 #include <cstddef>
 
 // canonical
@@ -140,8 +139,7 @@ int AParser::SetRequestBody() {
   }
   // trasfer-encoding
   else {
-    int ret = SetChunkedBody();
-    Logger::Info() << "ret: " << ret << std::endl;
+    return SetChunkedBody();
   }
   return kOk;
 }
@@ -149,7 +147,7 @@ int AParser::SetRequestBody() {
 int AParser::SetChunkedBody() {
   static ChunkedState status = {kNeedChunkedSize, 0, 0};
   size_t pos = 0;
-  Logger::Info() << "row_line_: " << row_line_ << std::endl;
+
   while (1) {
     // sizeが書かれているか確認
     if (status.chunked_state == kNeedChunkedSize) {
