@@ -1,0 +1,7 @@
+POST /max-body-1000/too-large.html HTTP/1.1
+Host: localhost
+Transfer-Encoding: chunked
+
+10
+0123456789
+0
