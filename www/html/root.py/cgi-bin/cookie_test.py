@@ -36,11 +36,10 @@ def main():
     cookie = cookies.SimpleCookie()
     cookie['visit_count'] = str(n)
     cookie['visit_count']['expires'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-    string += cookie.output()
-    string += "\r\n"
+    print(cookie.output() + "\r\n\r\n")
 
     # HTMLの出力
-    string += """
+    string = """
 <!DOCTYPE html>
 <html>
 <head>

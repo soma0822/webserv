@@ -43,6 +43,7 @@ class RequestHandler {
       const IConfig &config, const RequestContext &req_ctx,
       const std::string &script_name, const std::string &path_translated);
   static char **DupEnv(const std::map<std::string, std::string> &env_map);
+  static size_t CountEnv(char **env);
   static void DeleteEnv(char **env);
   static std::string ResolveRootPath(const IConfig &config,
                                      const RequestContext req_ctx);
