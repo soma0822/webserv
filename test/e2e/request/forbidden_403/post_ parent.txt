@@ -1,4 +1,4 @@
-POST /forbodden-write/index.html HTTP/1.1
+POST /read_only/index.html HTTP/1.1
 Host: localhost:8080
 Content-length 10
 
