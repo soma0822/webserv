@@ -1,0 +1,5 @@
+POST /read_only/index.html HTTP/1.1
+Host: localhost:8080
+Content-length 10
+
+0123456789
