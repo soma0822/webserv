@@ -104,4 +104,18 @@ logclean:
 	$(RM) $(LOGDIR)/*.log
 
 -include $(DEPENDS)
+# Permission change -++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+.PHONY: permission
+
+PERMISSION_DIR = ./www/test/
+READ_ONLY = $(shell find $(PERMISSION_DIR) -type f -o -type d -name 'read_only')
+WRITE_ONLY = $(shell find $(PERMISSION_DIR) -type f -o -type d -name 'write_only')
+EXECUTE_ONLY = $(shell find $(PERMISSION_DIR) -type f -o -type d -name 'execute_only')
+
+permission:
+	chmod 444 $(READ_ONLY)
+	chmod 222 $(WRITE_ONLY)
+	chmod 111 $(EXECUTE_ONLY)
+
+-include $(DEPENDS)
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
