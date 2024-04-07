@@ -90,6 +90,7 @@ function launch_test_server() {
 }
 
 function cleanup() {
+  make permission-clean
   kill $(ps -ax | awk '$4 == "./webserv_debug" {print $1}')
 }
 
@@ -120,4 +121,5 @@ function main() {
   fi
 }
 
+make permission
 main conf/test.conf "localhost:8002"
