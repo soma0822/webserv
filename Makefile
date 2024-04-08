@@ -102,8 +102,6 @@ LOGDIR = log
 
 logclean:
 	$(RM) $(LOGDIR)/*.log
-
--include $(DEPENDS)
 # Permission change -++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: permission
 
@@ -119,6 +117,5 @@ permission:
 
 permission-clean:
 	chmod 755 $(READ_ONLY) $(WRITE_ONLY) $(EXECUTE_ONLY)
-
--include $(DEPENDS)
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+-include $(DEPENDS)
