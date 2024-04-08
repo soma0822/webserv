@@ -86,7 +86,7 @@ def visit_count_cookie():
     cookie = cookies.SimpleCookie(os.environ.get('COOKIE'))
     visit_count = cookie.get('visit_count')
     # resetのクエリがある場合、訪問回数を更新
-    if os.environ.get('QUERY_STRING') == 'wreset':
+    if os.environ.get('QUERY_STRING') == 'reset':
         visit_count = 0
     if visit_count:
         return visit_count.value
@@ -146,10 +146,10 @@ def set_html():
     <section>
         <h3>Cookieから情報を確認する</h3>
         <div style="display: flex;">
-            <form id="myForm" action="/cgi-bin/session_test.py" method="GET">
+            <form action="./session_test.py" method="POST">
                 <button>sessionの確認</button>
             </form>
-            <form action="/cgi-bin/session_test.py" method="GET">
+            <form action="./session_test.py" method="GET">
                 <input type="hidden" id="reset" name="reset" value="reset">
                 <button>sessionの削除</button>
             </form>
