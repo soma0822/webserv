@@ -81,18 +81,6 @@ def change_data(file_path, session_id, name, value):
         print("File not found.")
         return None
 
-# 関数定義：クッキーの取得
-def visit_count_cookie():
-    cookie = cookies.SimpleCookie(os.environ.get('COOKIE'))
-    visit_count = cookie.get('visit_count')
-    # resetのクエリがある場合、訪問回数を更新
-    if os.environ.get('QUERY_STRING') == 'reset':
-        visit_count = 0
-    if visit_count:
-        return visit_count.value
-    else:
-        return 0
-
 # 関数定義：セッションIDの取得
 def session_id_cookie():
     cookie = cookies.SimpleCookie(os.environ.get('COOKIE'))
@@ -103,12 +91,11 @@ def session_id_cookie():
         return None
 
 # 関数定義：ヘッダの設定
-def set_header(n, session_id):
+def set_header(session_id):
     print("Content-Type: text/html; charset=utf-8")
     print("Content-Language: ja")
     # クッキーの設定
     cookie = cookies.SimpleCookie()
-    cookie['visit_count'] = str(n)
     cookie['session_id'] = session_id  # session_id をクッキーに追加
     cookie['session_id']['expires'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%a, %d-%b-%Y %H:%M:%S GMT")
     print(str(cookie.output()) + "\r\n\r\n")
@@ -221,7 +208,6 @@ def check_query(db_path, session_id):
 def main():
     # クッキーの取得
     session_id = session_id_cookie()
-    visit_count = int(visit_count_cookie()) + 1
 
     # データベースのパス
     db_path = './www/html/root.py/cgi-bin/session_dir/session.db'
@@ -265,7 +251,7 @@ def main():
         none_data = None
 
     # HTMLの設定
-    set_header(visit_count, session_id)
+    set_header(session_id)
     template = set_html()
     data = {
             'session_id' : session_id,
