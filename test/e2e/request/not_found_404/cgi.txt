@@ -1,0 +1,4 @@
+GET /cgi-bin/not_found.cgi HTTP/1.1
+Host: localhost
+
+

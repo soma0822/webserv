@@ -1,0 +1,5 @@
+POST /permission/read_only.html HTTP/1.1
+Host: localhost
+Content-length: 10
+
+0123456789

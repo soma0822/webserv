@@ -1,0 +1,3 @@
+DELETE /read_only/tmp.html HTTP/1.1
+Host: localhost
+

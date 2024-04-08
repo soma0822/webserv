@@ -14,9 +14,10 @@ test_server_pid=0
 
 function test() {
   host_addr=$1 # host:port
-
-  test_requests "$host_addr" test/e2e/request/bad_request_400
-  test_requests "$host_addr" test/e2e/request/ok_200
+  test_dirs=$(find test/e2e/request/ -mindepth 1 -maxdepth 1 -type d)
+  for test_dir in $test_dirs; do
+    test_requests "$host_addr" "$test_dir"
+  done
 }
 
 function test_requests() {
@@ -89,9 +90,8 @@ function launch_test_server() {
 }
 
 function cleanup() {
-  if [ "$test_server_pid" -ne 0 ]; then
-    kill -9 "$test_server_pid"
-  fi
+  make permission-clean
+  kill $(ps -ax | awk '$4 == "./webserv_debug" {print $1}')
 }
 
 function main() {
@@ -114,11 +114,12 @@ function main() {
   echo -e "${GREEN}Success: $success${NC}"
   echo -e "${RED}Failure: $failure${NC}"
 
+  cleanup
+
   if [ "$failure" -ne 0 ]; then
     exit 1
   fi
-
-  cleanup
 }
 
-main conf/default.conf "localhost:8002"
+make permission
+main conf/test.conf "localhost:8002"
