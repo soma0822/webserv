@@ -1,5 +1,6 @@
 #include "file_utils.hpp"
 
+#include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -30,8 +31,28 @@ bool file_utils::IsFile(const std::string &path) {
   return S_ISREG(st.st_mode);
 }
 
-bool file_utils::DoesFileExist(const std::string &path) {
+// ディレクトリに対する実行権限を必要とする
+bool file_utils::DoesFileOrDirectoryExist(const std::string &path) {
   return access(path.c_str(), F_OK) == 0;
+}
+
+// 実行権限を必要としないでファイルが存在するかどうかを確認する。読み取り権限は必要
+// 絶対パスで渡す必要がある
+bool file_utils::CheckIfFileExistsWithoutExecPermission(
+    const std::string &path) {
+  const std::string parent_dir = path.substr(0, path.find_last_of('/'));
+
+  DIR *dir = opendir(parent_dir.c_str());
+  if (!dir) {
+    closedir(dir);
+    return false;
+  }
+  for (dirent *dp = readdir(dir); dp != NULL; dp = readdir(dir)) {
+    if (parent_dir + "/" + dp->d_name == path) {
+      return true;
+    }
+  }
+  return false;
 }
 
 bool file_utils::IsReadable(const std::string &path) {
