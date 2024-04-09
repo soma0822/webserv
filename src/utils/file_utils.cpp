@@ -49,9 +49,11 @@ bool file_utils::CheckIfFileExistsWithoutExecPermission(
   }
   for (dirent *dp = readdir(dir); dp != NULL; dp = readdir(dir)) {
     if (parent_dir + "/" + dp->d_name == path) {
+      closedir(dir);
       return true;
     }
   }
+  closedir(dir);
   return false;
 }
 
