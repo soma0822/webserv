@@ -77,8 +77,9 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   }
 
   if (need_autoindex) {
-    // ファイルが存在しない場合には404を返す
-    if (!file_utils::CheckIfFileExistsWithoutExecPermission(
+    // ディレクトリが存在しない場合には404を返す
+    Logger::Debug() << "===============" << request_file_path << std::endl;
+    if (!file_utils::DoesFileOrDirectoryExist(
             request_file_path)) {
       return Some(GenerateErrorResponse(http::kNotFound, config));
     }
