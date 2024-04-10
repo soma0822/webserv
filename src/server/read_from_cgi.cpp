@@ -23,9 +23,17 @@ Result<int, std::string> ReadFromCGI::Execute(int revent) {
   } else if (result != 0 && (WIFEXITED(status) == 0 ||
                              WEXITSTATUS(status) != 0)) {  // 異常終了の判定
     Logger::Error() << "cgi エラー" << std::endl;
-    IOTaskManager::AddTask(new WriteResponseToClient(
-        req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
-        req_ctx_.request));
+    if (SIGKILL == WTERMSIG(status)) {
+      IOTaskManager::AddTask(new WriteResponseToClient(
+          req_ctx_.fd, GenerateErrorResponse(http::kGatewayTimeout, config_),
+          req_ctx_.request));
+      return Ok(kFdDelete);
+    } else {
+      IOTaskManager::AddTask(new WriteResponseToClient(
+          req_ctx_.fd,
+          GenerateErrorResponse(http::kInternalServerError, config_),
+          req_ctx_.request));
+    }
     return Ok(kFdDelete);
   }
   if (!sended_signal_ && result == 0 &&
