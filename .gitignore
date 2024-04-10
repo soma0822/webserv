@@ -9,7 +9,6 @@ a.out
 *.un~
 *.json
 *.swp
-*.db
 .DS*
 log.txt
 obj/
