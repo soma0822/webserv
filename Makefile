@@ -45,16 +45,17 @@ re: fclean all
 # Debug +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: debug
 
-NAME_DEBUG  = $(NAME)_debug
-DEBUG_FLAGS = -fsanitize=address -fsanitize=bounds
-OBJS_DEBUG  = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o.debug,$(SRCS))
+NAME_DEBUG    = $(NAME)_debug
+DEBUG_FLAGS   = -fsanitize=address -fsanitize=bounds
+OBJS_DEBUG    = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.debug.o,$(SRCS))
+DEPENDS_DEBUG = $(OBJS_DEBUG:.o=.d)
 
 debug: $(NAME_DEBUG)
 
 $(NAME_DEBUG): $(OBJS_DEBUG)
 	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) $(INCLUDE) -o $@ $(OBJS_DEBUG)
 
-$(OBJDIR)/%.o.debug: $(SRCDIR)/%.cpp
+$(OBJDIR)/%.debug.o: $(SRCDIR)/%.cpp
 	mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) $(INCLUDE) -o $@ -c $<
 
@@ -118,4 +119,5 @@ permission:
 permission-clean:
 	chmod 755 $(READ_ONLY) $(WRITE_ONLY) $(EXECUTE_ONLY)
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
--include $(DEPENDS)
+
+-include $(DEPENDS) $(DEPENDS_DEBUG)

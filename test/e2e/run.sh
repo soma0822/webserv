@@ -16,13 +16,19 @@ function test() {
   host_addr=$1 # host:port
   test_dirs=$(find test/e2e/request/ -mindepth 1 -maxdepth 1 -type d)
   for test_dir in $test_dirs; do
-    test_requests "$host_addr" "$test_dir"
+    if [[ "$test_dir" == *"504"* ]]; then
+      test_requests "$host_addr" "$test_dir" 3
+    else
+      test_requests "$host_addr" "$test_dir"
+    fi
   done
 }
 
 function test_requests() {
   host_addr=$1 # host:port
   test_dir=$2
+  # タイムアウトが定義されていなければ、デフォルトで1sec
+  timeout=${3:-1}
   expected_status=$(echo "$test_dir" | awk -F'_' '{print $NF}')
 
   # 引数のチェック
@@ -44,7 +50,7 @@ function test_requests() {
 
   # 全てのファイルにつき、requestを実行
   for test_file in $test_files; do
-    response=$(request "$host_addr" "$test_file")
+    response=$(request "$host_addr" "$test_file" "$timeout")
 
     status=$(echo "$response" | head -n 1 | awk '{print $2}')
     if [ "$status" != "$expected_status" ]; then
@@ -62,14 +68,15 @@ function test_requests() {
 function request() {
   host_addr=$1
   request_file=$2
+  timeout=$3
 
   # 引数のチェック
-  if [ -z "$host_addr" ] || [ -z "$request_file" ]; then
-    echo -e "${RED}エラー: host, port and request_fileは必須です${NC}" >&2
+  if [ -z "$host_addr" ] || [ -z "$request_file" ] || [ -z "$timeout" ]; then
+    echo -e "${RED}エラー: host_addr, request_file, timeoutは必須です${NC}" >&2
     exit 1
   fi
 
-  cat "$request_file" | awk 1 ORS='\r\n' | curl -m 1 telnet://"$host_addr" 2> /dev/null || true
+  cat "$request_file" | awk 1 ORS='\r\n' | curl -m "$timeout" telnet://"$host_addr" 2> /dev/null || true
 }
 
 function launch_test_server() {
