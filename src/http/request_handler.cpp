@@ -79,8 +79,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
   if (need_autoindex) {
     // ディレクトリが存在しない場合には404を返す
     Logger::Debug() << "===============" << request_file_path << std::endl;
-    if (!file_utils::DoesFileOrDirectoryExist(
-            request_file_path)) {
+    if (!file_utils::DoesFileOrDirectoryExist(request_file_path)) {
       return Some(GenerateErrorResponse(http::kNotFound, config));
     }
     // パーミッションがない場合には403を返す
