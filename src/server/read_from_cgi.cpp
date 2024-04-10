@@ -23,7 +23,8 @@ Result<int, std::string> ReadFromCGI::Execute(int revent) {
   } else if (result != 0 && (WIFEXITED(status) == 0 ||
                              WEXITSTATUS(status) != 0)) {  // 異常終了の判定
     Logger::Error() << "cgi エラー" << std::endl;
-    if (SIGKILL == WTERMSIG(status)) {
+    // SIGKILLで終了した場合はタイムアウトとして扱う
+    if (WIFSIGNALED(status) && SIGKILL == WTERMSIG(status)) {
       IOTaskManager::AddTask(new WriteResponseToClient(
           req_ctx_.fd, GenerateErrorResponse(http::kGatewayTimeout, config_),
           req_ctx_.request));
