@@ -42,8 +42,12 @@ bool file_utils::CheckIfFileExistsWithoutExecPermission(
     const std::string &path) {
   const std::string parent_dir = path.substr(0, path.find_last_of('/'));
 
+  errno = 0;
   DIR *dir = opendir(parent_dir.c_str());
   if (!dir) {
+    if (errno == ENOMEM) {
+      throw std::bad_alloc();
+    }
     return false;
   }
   for (dirent *dp = readdir(dir); dp != NULL; dp = readdir(dir)) {
