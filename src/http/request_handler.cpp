@@ -78,7 +78,8 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
 
   if (need_autoindex) {
     // ファイルが存在しない場合には404を返す
-    if (!file_utils::DoesFileExist(request_file_path)) {
+    if (!file_utils::CheckIfFileExistsWithoutExecPermission(
+            request_file_path)) {
       return Some(GenerateErrorResponse(http::kNotFound, config));
     }
     // パーミッションがない場合には403を返す
@@ -103,7 +104,7 @@ Option<HTTPResponse *> RequestHandler::Get(const IConfig &config,
                  location_ctx.IsValidCgiExtension(
                      request_file_path.substr(request_file_path.rfind('.'))));
   // ファイルが存在しない場合には404を返す
-  if (!file_utils::DoesFileExist(request_file_path)) {
+  if (!file_utils::CheckIfFileExistsWithoutExecPermission(request_file_path)) {
     return Some(GenerateErrorResponse(http::kNotFound, config));
   }
   // パーミッションがない場合には403を返す
@@ -164,12 +165,12 @@ Option<HTTPResponse *> RequestHandler::Post(const IConfig &config,
   const std::string parent_dir =
       request_file_path.substr(0, request_file_path.find_last_of('/'));
   // 親ディレクトリが存在しない場合には404を返す
-  if (!file_utils::DoesFileExist(parent_dir)) {
+  if (!file_utils::DoesFileOrDirectoryExist(parent_dir)) {
     return Some(GenerateErrorResponse(http::kNotFound, config));
   }
-  bool parent_unwritable = !is_cgi &&
-                           !file_utils::DoesFileExist(request_file_path) &&
-                           (!file_utils::IsWritable(parent_dir));
+  bool parent_unwritable =
+      !is_cgi && !file_utils::DoesFileOrDirectoryExist(request_file_path) &&
+      (!file_utils::IsWritable(parent_dir));
   bool request_file_unwritable = !is_cgi &&
                                  file_utils::IsFile(request_file_path) &&
                                  (!file_utils::IsWritable(request_file_path));
@@ -222,8 +223,7 @@ Option<HTTPResponse *> RequestHandler::Delete(const IConfig &config,
   }
 
   // ファイルが存在しない場合には404を返す
-  if (!file_utils::DoesFileExist(request_file_path) ||
-      !path_translated.empty()) {
+  if (!file_utils::CheckIfFileExistsWithoutExecPermission(request_file_path)) {
     return Some(GenerateErrorResponse(http::kNotFound, config));
   }
 
