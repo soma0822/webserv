@@ -13,4 +13,5 @@ a.out
 .DS*
 log.txt
 obj/
+__pycache__/
 webserv_debug
