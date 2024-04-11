@@ -15,7 +15,7 @@ int main(int ac, char **av) {
     config_file = av[1];
   else {
     Logger::Error() << "Invalid argument." << std::endl;
-    return 0;
+    return 1;
   }
   Logger::Info() << "Reading " << config_file << std::endl;
   try {
@@ -30,7 +30,10 @@ int main(int ac, char **av) {
          it != m.end(); ++it) {
       Logger::Info() << *it << std::endl;
     }
-    Server::Run(config);
+    if (!Server::Run(config)) {
+      Logger::Error() << "Server::Run() failed." << std::endl;
+      return 1;
+    }
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     std::exit(1);
