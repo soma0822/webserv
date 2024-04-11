@@ -46,7 +46,7 @@ int AParser::SetRequestLine() {
   request_line = string_utils::SkipSpace(request_line);
   result = ParsePart(request_line, "/", kBadRequest);
   if (result.second != kOk) return result.second;
-  request_->SetProtocol(string_utils::StrToUpper(result.first));
+  request_->SetProtocol(result.first);
 
   // version
   if (request_line == "") return kBadRequest;

@@ -6,37 +6,42 @@ from http import cookies
 import os
 import sys
 import datetime
-import subprocess
 from jinja2 import Template
-import sqlite3
 import fcntl
 import hashlib
 import time
 import urllib.parse
 
+
 # 関数定義：ファイルに情報を書き込む
 def set_data(file_path, id_, name, value):
     try:
-        with open(file_path, 'a') as file:
+        with open(file_path, 'a+') as file:
             fd = file.fileno()
             fcntl.flock(fd, fcntl.LOCK_EX)  # 排他ロック
             file.write(f"{id_},{name},{value}\n")
             fcntl.flock(fd, fcntl.LOCK_UN)  # ロック解除
+    except FileNotFoundError:
+        with open(file_path, 'w'):
+            pass
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}")
+
 
 # 関数定義：idをもとにファイルからのデータ取得
 def get_data_from_id(file_path, target_id):
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r+') as file:
             for line in file:
-                parts = line.strip().split(',',1)
+                parts = line.strip().split(',', 1)
                 if target_id == parts[0]:
-                    return "OK",parts[1]
+                    return "OK", parts[1]
             return "KO", ""
     except FileNotFoundError:
-        print("File not found.")
-        return None
+        with open(file_path, 'w'):
+            pass
+        return "KO", ""
+
 
 # 関数定義：名前をもとにファイルからのデータ取得
 def get_data_from_name(file_path, name):
@@ -44,15 +49,17 @@ def get_data_from_name(file_path, name):
         return "KO", ""
     name = urllib.parse.unquote(name)
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r+') as file:
             for line in file:
                 parts = line.strip().split(',', 1)
                 if len(parts) >= 2 and name == parts[1].split(',')[0]:
                     return "OK", parts
             return "Err", ""
     except FileNotFoundError:
-        print("File not found.")
-        return None
+        with open(file_path, 'w'):
+            pass
+        return "KO", ""
+
 
 # 関数定義：ファイルからデータ削除
 def delete_data(file_path, session_id):
@@ -68,8 +75,10 @@ def delete_data(file_path, session_id):
                     file.write(line)
             fcntl.flock(fd, fcntl.LOCK_UN)  # ロック解除
     except FileNotFoundError:
-        print("File not found.")
-        return None
+        with open(file_path, 'w'):
+            pass
+        return "KO", ""
+
 
 # 関数定義：データの変更
 def change_data(file_path, session_id, name, value):
@@ -78,8 +87,10 @@ def change_data(file_path, session_id, name, value):
         set_data(file_path, session_id, name, value)
         return
     except FileNotFoundError:
-        print("File not found.")
-        return None
+        with open(file_path, 'w'):
+            pass
+        return "KO", ""
+
 
 # 関数定義：セッションIDの取得
 def session_id_cookie():
@@ -90,6 +101,7 @@ def session_id_cookie():
     else:
         return None
 
+
 # 関数定義：ヘッダの設定
 def set_header(session_id):
     print("Content-Type: text/html; charset=utf-8")
@@ -97,8 +109,10 @@ def set_header(session_id):
     # クッキーの設定
     cookie = cookies.SimpleCookie()
     cookie['session_id'] = session_id  # session_id をクッキーに追加
-    cookie['session_id']['expires'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%a, %d-%b-%Y %H:%M:%S GMT")
+    cookie['session_id']['expires'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime(
+        "%a, %d-%b-%Y %H:%M:%S GMT")
     print(str(cookie.output()) + "\r\n\r\n")
+
 
 # 関数定義：HTMLの設定
 def set_html():
@@ -177,6 +191,7 @@ def set_html():
     template = Template(html)
     return template
 
+
 # 関数定義：クエリの確認
 def check_query(db_path, session_id):
     query_string = os.environ.get('QUERY_STRING')
@@ -185,7 +200,7 @@ def check_query(db_path, session_id):
     if query_string == 'reset=reset':
         delete_data(db_path, session_id)
         return "KO", ""
-    
+
     query_params = query_string.split('&')
     param_dict = {param.split('=')[0]: param.split('=')[1] for param in query_params if '=' in param}
 
@@ -204,32 +219,33 @@ def check_query(db_path, session_id):
     data = get_data_from_id(db_path, session_id)
     return data
 
+
 # メイン処理
 def main():
     # クッキーの取得
     session_id = session_id_cookie()
 
     # データベースのパス
-    db_path = './www/html/root.py/cgi-bin/session_dir/session.db'
+    db_path = './www/test/cgi-bin/session.db'
 
     # クエリの確認
     if not session_id:
         session_id = hashlib.sha256(str(time.time()).encode()).hexdigest()
 
-    data = check_query(db_path, session_id)#クエリがあった時
+    data = check_query(db_path, session_id)  # クエリがあった時
     if data[0] == "OK":
         submitted_name = data[1].split(',')[0]
         submitted_value = data[1].split(',')[1]
     else:
         submitted_name = None
         submitted_value = None
-    
+
     if data[0] == "Err":
         is_error = '名前とキーワードの両方を入力してくれると嬉しいな'
     else:
         is_error = None
 
-    query_string = os.environ.get('QUERY_STRING')#confnameのクエリがあった時
+    query_string = os.environ.get('QUERY_STRING')
     query_params = query_string.split('&')
     param_dict = {param.split('=')[0]: param.split('=')[1] for param in query_params if '=' in param}
     data = get_data_from_name(db_path, param_dict.get('confname'))
@@ -237,7 +253,7 @@ def main():
         conf_name = data[1][1].split(',')[0]
         conf_value = data[1][1].split(',')[1]
         confname_error = None
-    else:   
+    else:
         conf_name = None
         conf_value = None
         if data[0] == "Err":
@@ -254,19 +270,17 @@ def main():
     set_header(session_id)
     template = set_html()
     data = {
-            'session_id' : session_id,
-            'submitted_name' : submitted_name,
-            'submitted_value' : submitted_value,
-            'conf_name' : conf_name,
-            'conf_value' : conf_value,
-            'confname_error' : confname_error,
-            'none_data' : none_data,
-            'error_str' : is_error,
-            }
-    return (template.render(data))
+        'session_id': session_id,
+        'submitted_name': submitted_name,
+        'submitted_value': submitted_value,
+        'conf_name': conf_name,
+        'conf_value': conf_value,
+        'confname_error': confname_error,
+        'none_data': none_data,
+        'error_str': is_error,
+    }
+    return template.render(data)
 
 
-#sys.stderr.write(str(os.environ)) #環境変数の表示
 string = main()
-#sys.stderr.write(string) #HTMLの表示
 print(string)
