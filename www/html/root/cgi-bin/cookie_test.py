@@ -15,6 +15,10 @@ def get_cookie():
 
 # メイン処理
 def main():
+<<<<<<< HEAD
+=======
+    string = "status: 200 ok_200\r\n"
+>>>>>>> main
     # HTMLヘッダーの出力
     print("Content-Type: text/html; charset=utf-8\r\n")
 
