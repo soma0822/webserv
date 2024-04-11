@@ -24,10 +24,8 @@ def set_data(file_path, id_, name, value):
     except FileNotFoundError:
         with open(file_path, 'w'):
             pass
-        return "KO", ""
     except Exception as e:
         sys.stderr.write(f"An error occurred: {e}")
-        return "KO", ""
 
 
 # 関数定義：idをもとにファイルからのデータ取得
