@@ -10,7 +10,6 @@ NC='\033[0m'
 
 success=0
 failure=0
-test_server_pid=0
 
 function test() {
   host_addr=$1 # host:port
