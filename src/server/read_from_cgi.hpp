@@ -33,7 +33,7 @@ class ReadFromCGI : public AIOTask {
   int pid_;
   timespec ts_;
   bool sended_signal_;
-  const static int child_process_timeout_ = 3;
+  const static int child_process_timeout_ = 2;
 };
 
 #endif
