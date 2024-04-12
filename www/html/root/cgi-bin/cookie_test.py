@@ -15,10 +15,6 @@ def get_cookie():
 
 # メイン処理
 def main():
-<<<<<<< HEAD
-=======
-    string = "status: 200 ok_200\r\n"
->>>>>>> main
     # HTMLヘッダーの出力
     print("Content-Type: text/html; charset=utf-8\r\n")
 
@@ -32,18 +28,17 @@ def main():
         n = 1
 
     # resetのクエリがある場合、訪問回数を更新
-    if os.environ.get('QUERY_STRING') == 'reset': 
+    if os.environ.get('QUERY_STRING') == 'reset':
         n = 1
 
     # クッキーの設定
     cookie = cookies.SimpleCookie()
     cookie['visit_count'] = str(n)
     cookie['visit_count']['expires'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-    string += cookie.output()
-    string += "\r\n"
+    print(cookie.output() + "\r\n\r\n")
 
     # HTMLの出力
-    string += """
+    string = """
 <!DOCTYPE html>
 <html>
 <head>
