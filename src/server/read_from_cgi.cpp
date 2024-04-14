@@ -16,7 +16,6 @@ Result<int, std::string> ReadFromCGI::Execute(int revent) {
   errno = 0;
   int result = waitpid(pid_, &status, WNOHANG);
   if (result == -1 && errno != ECHILD) {
-    Logger::Debug() << "buf_: " << buf_ << std::endl;
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
     IOTaskManager::AddTask(new WriteResponseToClient(
         req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
