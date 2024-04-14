@@ -13,15 +13,17 @@ ReadFromCGI::~ReadFromCGI() {}
 
 Result<int, std::string> ReadFromCGI::Execute(int revent) {
   int status;
+  errno = 0;
   int result = waitpid(pid_, &status, WNOHANG);
-  if (result == -1) {
+  if (result == -1 && errno != ECHILD) {
+    Logger::Debug() << "buf_: " << buf_ << std::endl;
     Logger::Error() << "waitpid エラー: " << pid_ << std::endl;
     IOTaskManager::AddTask(new WriteResponseToClient(
         req_ctx_.fd, GenerateErrorResponse(http::kInternalServerError, config_),
         req_ctx_.request));
     return Ok(kFdDelete);
   } else if (result != 0 && (WIFEXITED(status) == 0 ||
-                             WEXITSTATUS(status) != 0)) {  // 異常終了の判定
+                             WEXITSTATUS(status) != 0) && errno != ECHILD) {  // 異常終了の判定
     Logger::Error() << "cgi エラー" << std::endl;
     // SIGKILLで終了した場合はタイムアウトとして扱う
     if (WIFSIGNALED(status) && SIGKILL == WTERMSIG(status)) {
@@ -29,7 +31,8 @@ Result<int, std::string> ReadFromCGI::Execute(int revent) {
           req_ctx_.fd, GenerateErrorResponse(http::kGatewayTimeout, config_),
           req_ctx_.request));
       return Ok(kFdDelete);
-    } else {
+    } else{
+      Logger::Debug() << "buf_: " << buf_ << std::endl;
       IOTaskManager::AddTask(new WriteResponseToClient(
           req_ctx_.fd,
           GenerateErrorResponse(http::kInternalServerError, config_),
