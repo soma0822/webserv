@@ -67,7 +67,7 @@ format:
 	clang-format --style=Google -i test/unit/*.cpp
 
 # Test ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
-.PHONY: test/unit test/e2e
+.PHONY: test/unit test/e2e test/e2e/prepare test/e2e/clean
 
 BASE_DIR      = $(CURDIR)
 BUILD_DIR     = build
@@ -85,9 +85,17 @@ test/unit:
 	@# Execute the test
 	@$(TEST_EXE_PATH) || exit 1
 
-test/e2e: debug
+test/e2e: test/e2e/prepare permission
 	pytest ./test/e2e/pytest
 	bash test/e2e/run.sh
+
+test/e2e/prepare:
+	-kill $(shell ps -ax | awk -v target=./$(NAME_DEBUG) '$$4 == target {print $$1}') 2> /dev/null
+	touch ./www/test/allow_method/index.html
+	touch ./www/test/read_only/tmp.html
+
+test/e2e/clean: permission-clean
+	$(RM) ./www/test/allow_method/bye.html
 
 # CI -+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: build

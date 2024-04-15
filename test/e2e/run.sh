@@ -7,6 +7,7 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
+TEST_BINARY=webserv_debug
 
 success=0
 failure=0
@@ -89,15 +90,19 @@ function launch_test_server() {
   fi
 
   # サーバーの起動
-  ./webserv_debug "$config_file" &
+  ./$TEST_BINARY "$config_file" &
 
   # サーバーの起動待ち
   sleep 2
 }
 
+function prepare() {
+  make test/e2e/prepare
+}
+
 function cleanup() {
-  make permission-clean
-  kill $(ps -ax | awk '$4 == "./webserv_debug" {print $1}')
+  make test/e2e/clean
+  kill $(ps -ax | awk -v target=./${TEST_BINARY} '$4 == target {print $1}')
 }
 
 function main() {
@@ -109,6 +114,9 @@ function main() {
     echo -e "${RED}エラー: config_file and host_addrは必須です${NC}" >&2
     exit 1
   fi
+
+  # テストの準備
+  prepare
 
   # テストサーバーの起動
   launch_test_server "$config_file"
@@ -127,5 +135,4 @@ function main() {
   fi
 }
 
-make permission
 main conf/test.conf "localhost:8002"
