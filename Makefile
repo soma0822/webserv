@@ -85,7 +85,7 @@ test/unit:
 	@# Execute the test
 	@$(TEST_EXE_PATH) || exit 1
 
-test/e2e: test/e2e/prepare permission
+test/e2e: debug test/e2e/prepare permission
 	pytest ./test/e2e/pytest
 	bash test/e2e/run.sh
 
