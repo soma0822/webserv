@@ -1,7 +1,7 @@
 import requests
 import concurrent.futures
 
-url = 'http://localhost:8002/cgi-bin/session_test.py'  # 送信先のURLを指定してください
+url = 'http://localhost:8002/cgi-bin/cookie_test.py'  # 送信先のURLを指定してください
 num_requests = 100  # 送信するリクエストの回数
 
 def send_request(url):
