@@ -45,16 +45,17 @@ re: fclean all
 # Debug +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: debug
 
-NAME_DEBUG  = $(NAME)_debug
-DEBUG_FLAGS = -fsanitize=address -fsanitize=bounds
-OBJS_DEBUG  = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o.debug,$(SRCS))
+NAME_DEBUG    = $(NAME)_debug
+DEBUG_FLAGS   = -fsanitize=address -fsanitize=bounds
+OBJS_DEBUG    = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.debug.o,$(SRCS))
+DEPENDS_DEBUG = $(OBJS_DEBUG:.o=.d)
 
 debug: $(NAME_DEBUG)
 
 $(NAME_DEBUG): $(OBJS_DEBUG)
 	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) $(INCLUDE) -o $@ $(OBJS_DEBUG)
 
-$(OBJDIR)/%.o.debug: $(SRCDIR)/%.cpp
+$(OBJDIR)/%.debug.o: $(SRCDIR)/%.cpp
 	mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(DEBUG_FLAGS) $(INCLUDE) -o $@ -c $<
 
@@ -66,7 +67,7 @@ format:
 	clang-format --style=Google -i test/unit/*.cpp
 
 # Test ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
-.PHONY: test/unit test/e2e
+.PHONY: test/unit test/e2e test/e2e/prepare test/e2e/clean
 
 BASE_DIR      = $(CURDIR)
 BUILD_DIR     = build
@@ -84,9 +85,17 @@ test/unit:
 	@# Execute the test
 	@$(TEST_EXE_PATH) || exit 1
 
-test/e2e: debug
-	python3 test/e2e/main.py
+test/e2e: debug test/e2e/prepare permission
+	pytest ./test/e2e/pytest
 	bash test/e2e/run.sh
+
+test/e2e/prepare:
+	-kill $(shell ps -ax | awk -v target=./$(NAME_DEBUG) '$$4 == target {print $$1}') 2> /dev/null
+	touch ./www/test/allow_method/index.html
+	touch ./www/test/read_only/tmp.html
+
+test/e2e/clean: permission-clean
+	$(RM) ./www/test/allow_method/bye.html
 
 # CI -+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 .PHONY: build
@@ -102,6 +111,21 @@ LOGDIR = log
 
 logclean:
 	$(RM) $(LOGDIR)/*.log
+# Permission change -++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+.PHONY: permission
 
--include $(DEPENDS)
+PERMISSION_DIR = ./www/test
+READ_ONLY = $(shell find $(PERMISSION_DIR) \( -type f -name 'read_only*' \) -o \( -type d -name 'read_only*' \))
+WRITE_ONLY = $(shell find $(PERMISSION_DIR) \( -type f -name 'write_only*' \) -o \( -type d -name 'write_only*' \))
+EXECUTE_ONLY = $(shell find $(PERMISSION_DIR) \( -type f -name 'execute_only*' \) -o \( -type d -name 'execute_only*' \))
+
+permission:
+	chmod 444 $(READ_ONLY)
+	chmod 222 $(WRITE_ONLY)
+	chmod 111 $(EXECUTE_ONLY)
+
+permission-clean:
+	chmod 755 $(READ_ONLY) $(WRITE_ONLY) $(EXECUTE_ONLY)
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+
+-include $(DEPENDS) $(DEPENDS_DEBUG)

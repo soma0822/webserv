@@ -16,7 +16,8 @@ std::string ReadFile(const std::string &file_path);
 bool IsDirectory(const std::string &path);
 bool IsFile(const std::string &path);
 
-bool DoesFileExist(const std::string &path);
+bool DoesFileOrDirectoryExist(const std::string &path);
+bool CheckIfFileExistsWithoutExecPermission(const std::string &path);
 
 bool IsReadable(const std::string &path);
 bool IsWritable(const std::string &path);

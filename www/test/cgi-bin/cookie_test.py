@@ -28,7 +28,7 @@ def main():
         n = 1
 
     # resetのクエリがある場合、訪問回数を更新
-    if os.environ.get('QUERY_STRING') == 'reset':
+    if os.environ.get('QUERY_STRING') == 'reset': 
         n = 1
 
     # クッキーの設定
