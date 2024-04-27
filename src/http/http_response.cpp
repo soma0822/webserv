@@ -151,7 +151,6 @@ HTTPResponse *GenerateErrorResponse(const http::StatusCode status_code,
 
   return HTTPResponse::Builder()
       .SetStatusCode(status_code)
-      .AddHeader("Content-Type", "text/html")
       .SetBody(file_utils::ReadFile(error_page_path))
       .Build();
 }

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic File Upload</title>
+</head>
+<body>
+
+<form id="uploadForm" enctype="multipart/form-data">
+    <label for="file">Select a file:</label><br>
+    <input type="file" id="file" name="file"><br>
+    <button type="button" onclick="uploadFile()">Upload</button>
+</form>
+
+<script>
+    function uploadFile() {
+        var fileInput = document.getElementById('file');
+        var file = fileInput.files[0];
+        var fileName = file.name; // ファイル名を取得
+
+        var formData = new FormData();
+        formData.append('file', file);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/resource/' + fileName, true); // 動的なファイル名を含むPOSTリクエストを送信
+        xhr.setRequestHeader('Content-Type', 'text/html'); // リクエストヘッダに"text/html"を設定
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                console.log('File uploaded successfully');
+            } else {
+                console.error('File upload failed');
+            }
+        };
+        xhr.send(formData);
+    }
+</script>
+
+</body>
+</html>
